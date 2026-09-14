@@ -313,6 +313,16 @@ pub struct RbcVariable {
     pub component: Option<ComponentId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unit: Option<String>,
+    /// The MLS §4.8 `quantity` attribute the declaration carries — `"Mass"`,
+    /// `"Resistance"`, `"ThermodynamicTemperature"`.
+    ///
+    /// This is the *semantic* identity of what the variable measures, which a
+    /// unit alone does not give: `"Ohm"` says nothing about whether a value must
+    /// be positive, while `quantity="Resistance"` on a passive component does.
+    /// An external physical-invariant checker needs this to match rules to
+    /// variables without inferring meaning from their names.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub physical_quantity: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     /// Declaration binding expression, when the source gave one.

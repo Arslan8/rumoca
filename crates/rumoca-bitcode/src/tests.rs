@@ -128,6 +128,7 @@ fn variable(id: u32, name: &str, role: RbcRole) -> RbcVariable {
         declaration: source_provenance(),
         component: None,
         unit: None,
+        physical_quantity: None,
         description: None,
         binding: None,
         start: None,

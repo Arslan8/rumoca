@@ -15,6 +15,7 @@ from .event import EventSan
 from .domain import DomainSan
 from .initialization import InitSan
 from .numeric import NumericSan
+from .physical import PhysicalSan
 from .range import RangeSan
 from .registry import SanitizerRegistry
 from .singularity import SingularitySan
@@ -23,7 +24,8 @@ from .zeno import ZenoSan
 
 #: Everything that needs no capability a current backend lacks.
 DEFAULT = (DomainSan, NumericSan, RangeSan, SolverSan, AssertSan,
-           DiscontinuitySan, SingularitySan, InitSan, EventSan, ZenoSan)
+           DiscontinuitySan, SingularitySan, InitSan, EventSan, ZenoSan,
+           PhysicalSan)
 
 #: Oracles that judge several executions against each other rather than one
 #: execution against a property. The pipeline has to schedule extra runs for
@@ -34,5 +36,6 @@ __all__ = ["AssertSan", "COMPARATIVE", "DEFAULT", "DeterminismSan",
            "DifferentialSan", "DifferentialOracle", "DiscontinuitySan",
            "DomainSan", "EventSan", "FuzzHintProvider", "InitSan",
            "InstrumentationRequester",
-           "NumericSan", "RangeSan", "RuntimeObserver", "SanitizerRegistry",
+           "NumericSan", "PhysicalSan", "RangeSan", "RuntimeObserver",
+           "SanitizerRegistry",
            "SingularitySan", "SolverSan", "StaticAnalyzer", "ZenoSan"]

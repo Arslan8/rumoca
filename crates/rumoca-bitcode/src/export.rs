@@ -322,6 +322,7 @@ fn export_variables(
                 declaration: ctx.provenance(variable.declaration()),
                 component,
                 unit: variable.unit().map(str::to_string),
+                physical_quantity: flat.and_then(|flat| physical_quantity(flat, &name)),
                 description: variable.description().map(str::to_string),
                 binding: variable.binding().map(|e| ExprId(e.index())),
                 start: variable.start().map(|e| ExprId(e.index())),
@@ -339,6 +340,12 @@ fn export_variables(
 }
 
 /// Recover connector semantics for one flattened variable from the Flat model.
+/// The declared `quantity` attribute, which the DAE does not carry but Flat does.
+fn physical_quantity(flat: &flat::Model, name: &str) -> Option<String> {
+    let interned = rumoca_core::VarName::intern(name);
+    flat.variables.get(&interned)?.quantity.clone()
+}
+
 fn connector_member(flat: &flat::Model, name: &str) -> Option<RbcConnectorMember> {
     let interned = rumoca_core::VarName::intern(name);
     let variable = flat.variables.get(&interned)?;

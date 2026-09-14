@@ -353,6 +353,16 @@ class Variable:
         return self._raw.get("connector") is not None
 
     @property
+    def physical_quantity(self) -> str | None:
+        """The declared MLS §4.8 `quantity` — `"Mass"`, `"Resistance"`.
+
+        The semantic identity of what this variable measures. Distinct from
+        `quantity`, which is the *connector* role (potential/flow/stream); the
+        names are unfortunately close because Modelica uses the word for both.
+        """
+        return self._raw.get("physical_quantity")
+
+    @property
     def quantity(self) -> str | None:
         """``"potential"``, ``"flow"`` or ``"stream"`` for a connector member."""
         connector = self._raw.get("connector")
