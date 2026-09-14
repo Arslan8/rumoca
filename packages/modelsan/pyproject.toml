@@ -1,0 +1,17 @@
+[project]
+name = "modelsan"
+version = "0.1.0"
+description = "Find parameter configurations under which a valid Modelica model behaves incorrectly"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = ["rumoca-bitcode"]
+
+[project.scripts]
+modelsan = "modelsan.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["modelsan*"]
