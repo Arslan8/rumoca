@@ -10,6 +10,8 @@ from typing import Iterator
 
 from rumoca_bitcode import BinaryOp, Expression, Model
 
+from . import ops
+
 
 def walk_expressions(model: Model) -> Iterator[tuple[object, Expression]]:
     """Every expression the model evaluates, with the owner it belongs to.
@@ -53,7 +55,7 @@ def denominators(model: Model) -> Iterator[tuple[object, Expression]]:
     the divisor specifically, not both operands.
     """
     for owner, node in walk_expressions(model):
-        if isinstance(node, BinaryOp) and node.op in ("Div", "div", "/"):
+        if isinstance(node, BinaryOp) and node.op == ops.DIVIDE:
             yield owner, node.rhs
 
 

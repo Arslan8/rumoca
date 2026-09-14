@@ -245,12 +245,35 @@ def test_backend_error_is_not_a_model_bug():
           "the outcome records that the tool, not the model, failed")
 
 
+# ── 6. Operator vocabulary matches the schema ────────────────────────────────
+
+
+def test_operator_vocabulary():
+    """The op names sanitizers match against must be the ones the DAE emits.
+
+    This exists because getting it wrong is silent. Matching `"Mul"` against
+    `"multiply"` makes a sanitizer find nothing and look like a clean result —
+    the same false-coverage failure the capability planner prevents elsewhere,
+    arriving through a different door.
+    """
+    print("\n== operator vocabulary ==")
+    from modelsan.dae import ops
+    schema = {"add", "subtract", "multiply", "divide", "power", "equal",
+              "not_equal", "less", "less_equal", "greater", "greater_equal",
+              "and", "or"}
+    check(ops.ALL == schema, "ops.ALL matches RbcBinaryOp serialized names")
+    check(ops.MULTIPLY == "multiply" and ops.DIVIDE == "divide",
+          "arithmetic names are the serialized spellings, not Rust variants")
+    check(ops.RELATIONS <= schema, "relations are a subset of the schema")
+
+
 def main() -> int:
     test_failure_without_trajectory()
     test_unsupported_instrumentation()
     test_backend_only_anchor()
     test_canonical_anchor()
     test_backend_error_is_not_a_model_bug()
+    test_operator_vocabulary()
     print(f"\n{'ALL PASS' if not FAILURES else str(len(FAILURES)) + ' FAILED'}")
     for failure in FAILURES:
         print(f"  - {failure}")
@@ -259,3 +282,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+

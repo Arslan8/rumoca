@@ -30,7 +30,9 @@ from ..instrumentation.request import InstrumentationRequest
 from ..runtime.anchors import CanonicalAnchor, EntityKind
 from ..runtime.observations import ExpressionObservation, ObservationStream
 
-DIVISION_OPS = frozenset({"Div", "div", "/"})
+from ..dae import ops
+
+DIVISION_OPS = frozenset({ops.DIVIDE})
 
 # operand must be > 0, >= 0, or within [-1, 1]
 POSITIVE = frozenset({"log", "log10", "log2"})

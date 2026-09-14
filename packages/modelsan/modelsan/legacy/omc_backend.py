@@ -107,7 +107,13 @@ def build(model: str, libraries: list[str], work: Path, t_end: float,
           timeout: float = 600) -> Built:
     """Compile `model` to a standalone executable once."""
     lines = [f'loadFile("{library}"); getErrorString();' for library in libraries]
-    lines.append(f'buildModel({model}, stopTime={t_end}); getErrorString();')
+    # Output density is capped at build time. The default 500 intervals writes
+    # a ~1.2 MB CSV *per trial*, and with one CSV per probe that I/O dominated
+    # the run: a sweep that searched 739 models before the silent-failure oracle
+    # was added searched 202 after it, with 594 harness timeouts. Fifty points
+    # detect a non-finite value or a bound violation just as well.
+    lines.append(f'buildModel({model}, stopTime={t_end}, numberOfIntervals=50);'
+                 ' getErrorString();')
     script = work / "build.mos"
     script.write_text("\n".join(lines) + "\n")
     try:
