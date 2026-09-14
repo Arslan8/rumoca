@@ -9,7 +9,13 @@ from pathlib import Path
 
 from rumoca_bitcode import Model
 
-from .analysis import declared_ranges, find_domain_sites, incomplete, search_knobs
+from .analysis import (
+    declared_ranges,
+    find_domain_sites,
+    find_singular_risks,
+    incomplete,
+    search_knobs,
+)
 from .mutate import candidates, minimize
 from .runner import export, find_rumoca, resolve_span, run
 
@@ -56,11 +62,19 @@ def main(argv: list[str] | None = None) -> int:
         for site in sites:
             print(site)
 
+        risks = find_singular_risks(model)
+        if risks:
+            print(f"\n[+] {len(risks)} parameter(s) whose declared bound admits a fatal value")
+            for risk in risks[:12]:
+                print(risk)
+            if len(risks) > 12:
+                print(f"  ... and {len(risks) - 12} more")
+
         ranges = declared_ranges(model)
         if ranges:
             print(f"[+] {len(ranges)} variable(s) declare a min/max range to respect")
 
-        if args.static_only or (not sites and not ranges):
+        if args.static_only or (not sites and not ranges and not risks):
             return 0
 
         knobs = search_knobs(model, sites)

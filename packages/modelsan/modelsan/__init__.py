@@ -11,13 +11,26 @@ It works on Rumoca's DAE, exported as bitcode, so analyses live outside the
 compiler and can be written in Python.
 """
 
-from .analysis import Site, find_domain_sites, incomplete, search_knobs
+from .analysis import (
+    Site,
+    SingularRisk,
+    declared_ranges,
+    find_domain_sites,
+    find_singular_risks,
+    incomplete,
+    risk_knobs,
+    search_knobs,
+)
 from .domains import Domain
 from .mutate import Candidate, candidates, minimize
 from .runner import Outcome, export, find_rumoca, run
 
 __all__ = [
     "Site",
+    "SingularRisk",
+    "find_singular_risks",
+    "risk_knobs",
+    "declared_ranges",
     "Domain",
     "Candidate",
     "Outcome",

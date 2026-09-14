@@ -39,6 +39,19 @@ pub enum ValidationError {
         "expression {expression} references operand {operand}, which is not strictly earlier; the arena must be topologically ordered"
     )]
     NonTopologicalOperand { expression: u32, operand: u32 },
+    #[error(
+        "discrete-valued variable {id} ({name:?}) has no B.1c definition; a discrete variable that nothing defines cannot be reconstructed"
+    )]
+    UndefinedDiscreteValue { id: u32, name: String },
+    #[error(
+        "discrete definition {definition} branch {branch} gives {values} value(s) for {targets} target(s); each branch must give exactly one value per target"
+    )]
+    DiscreteBranchArity {
+        definition: u32,
+        branch: u32,
+        values: u32,
+        targets: u32,
+    },
     #[error("duplicate variable name {name:?} on ids {first} and {second}")]
     DuplicateVariableName {
         name: String,
@@ -120,6 +133,7 @@ pub fn validate(model: &RbcModel, options: &ValidateOptions) -> Result<(), Vec<V
     check_events(&mut errors, model, &counts);
     check_connections(&mut errors, model, &counts);
     check_trace_points(&mut errors, model, &counts);
+    check_discrete_definitions(&mut errors, model, &counts);
     check_summary(&mut errors, model);
 
     if errors.is_empty() {
@@ -557,6 +571,73 @@ fn check_trace_points(errors: &mut Vec<ValidationError>, model: &RbcModel, count
 
 /// The summary is denormalised, so a truncated or hand-edited artifact whose
 /// counts disagree with its contents is rejected rather than silently trusted.
+/// Every discrete-valued variable must be defined, and every branch must give
+/// one value per target.
+///
+/// The first invariant is what bitcode v1 was missing: an artifact could
+/// declare a `discrete_value` variable, carry no definition for it, and pass
+/// every other check. Reconstruction then failed with "missing B.1c topology
+/// definition", which is the right refusal in the wrong place — the producer
+/// should not have been able to write the artifact.
+fn check_discrete_definitions(
+    errors: &mut Vec<ValidationError>,
+    model: &RbcModel,
+    counts: &Counts,
+) {
+    let mut defined = BTreeSet::new();
+    for (index, definition) in model.discrete_definitions.iter().enumerate() {
+        let index = index as u32;
+        for target in &definition.targets {
+            reference(
+                errors,
+                format!("discrete definition {index} target"),
+                "variable",
+                target.0,
+                counts.variables,
+            );
+            defined.insert(target.0);
+        }
+        for (branch_index, branch) in definition.branches.iter().enumerate() {
+            if branch.values.len() != definition.targets.len() {
+                errors.push(ValidationError::DiscreteBranchArity {
+                    definition: index,
+                    branch: branch_index as u32,
+                    values: branch.values.len() as u32,
+                    targets: definition.targets.len() as u32,
+                });
+            }
+            for value in &branch.values {
+                reference(
+                    errors,
+                    format!("discrete definition {index} branch {branch_index}"),
+                    "expression",
+                    value.0,
+                    counts.expressions,
+                );
+            }
+            if let RbcDiscreteActivation::When { trigger, guard } = branch.activation {
+                for (label, condition) in [("trigger", trigger), ("guard", guard)] {
+                    reference(
+                        errors,
+                        format!("discrete definition {index} branch {branch_index} {label}"),
+                        "condition",
+                        condition.0,
+                        counts.conditions,
+                    );
+                }
+            }
+        }
+    }
+    for variable in &model.variables {
+        if variable.role == RbcRole::DiscreteValue && !defined.contains(&variable.id.0) {
+            errors.push(ValidationError::UndefinedDiscreteValue {
+                id: variable.id.0,
+                name: variable.name.clone(),
+            });
+        }
+    }
+}
+
 fn check_summary(errors: &mut Vec<ValidationError>, model: &RbcModel) {
     let mut check = |field: &'static str, declared: u32, actual: usize| {
         if declared != actual as u32 {
@@ -621,5 +702,6 @@ pub fn recompute_summary(model: &mut RbcModel) {
         connections: model.connections.len() as u32,
         components: model.components.len() as u32,
         trace_points: model.trace_points.len() as u32,
+        discrete_definitions: model.discrete_definitions.len() as u32,
     };
 }

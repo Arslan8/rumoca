@@ -180,6 +180,7 @@ fn build(
     let conditions = export_conditions(view, &mut ctx);
     let roots = export_roots(view, &mut ctx);
     let events = export_events(view, &mut ctx);
+    let discrete_definitions = export_discrete_definitions(view, &mut ctx);
     let time_events = export_time_events(view, &mut ctx)?;
     let connections = export_connections(flat, &variables, &equations, &mut ctx);
 
@@ -207,6 +208,7 @@ fn build(
         &roots,
         &events,
         &time_events,
+        &discrete_definitions,
         &connections,
         &components,
     );
@@ -224,6 +226,7 @@ fn build(
         roots,
         events,
         time_events,
+        discrete_definitions,
         connections,
         components,
         trace_points: Vec::new(),
@@ -501,7 +504,7 @@ fn literal_of(literal: &dae::DaeLiteral) -> RbcLiteral {
         dae::DaeLiteral::String(value) => RbcLiteral::String {
             value: value.to_string(),
         },
-        dae::DaeLiteral::Enumeration(ordinal) => RbcLiteral::Integer { value: *ordinal },
+        dae::DaeLiteral::Enumeration(ordinal) => RbcLiteral::Enumeration { ordinal: *ordinal },
     }
 }
 
@@ -798,6 +801,54 @@ fn export_events(view: dae::DaeView<'_>, ctx: &mut Ctx<'_>) -> Vec<RbcEventActio
         .collect()
 }
 
+/// MLS Appendix B.1c: what each discrete-valued variable equals.
+///
+/// This is a separate arena from the residual equations, and omitting it
+/// produced an artifact that declared `discrete_value` variables and never
+/// defined them — see docs/bugs/BUG-009.
+fn export_discrete_definitions(
+    view: dae::DaeView<'_>,
+    ctx: &mut Ctx<'_>,
+) -> Vec<RbcDiscreteDefinition> {
+    (0..view.discrete_value_owner_count())
+        .filter_map(|index| {
+            let id = view.discrete_value_owner_id(index)?;
+            let owner = view.discrete_value_owner(id)?;
+            let targets = owner
+                .targets()
+                .iter()
+                .map(|target| VariableId(dae::VariableId::from(target).index()))
+                .collect();
+            let branches = owner
+                .branches()
+                .iter()
+                .map(|branch| RbcDiscreteBranch {
+                    activation: match branch.activation() {
+                        dae::DiscreteBranchActivation::Always => RbcDiscreteActivation::Always,
+                        dae::DiscreteBranchActivation::When { trigger, guard } => {
+                            RbcDiscreteActivation::When {
+                                trigger: ConditionId(trigger.index()),
+                                guard: ConditionId(guard.index()),
+                            }
+                        }
+                    },
+                    values: branch
+                        .values()
+                        .iter()
+                        .map(|(value, _)| ExprId(value.index()))
+                        .collect(),
+                    provenance: ctx.provenance(branch.provenance()),
+                })
+                .collect();
+            Some(RbcDiscreteDefinition {
+                targets,
+                branches,
+                provenance: ctx.provenance(owner.provenance()),
+            })
+        })
+        .collect()
+}
+
 fn export_time_events(
     view: dae::DaeView<'_>,
     ctx: &mut Ctx<'_>,
@@ -938,6 +989,7 @@ fn summarize(
     roots: &[RbcRoot],
     events: &[RbcEventAction],
     time_events: &[RbcTimeEvent],
+    discrete_definitions: &[RbcDiscreteDefinition],
     connections: &[RbcConnection],
     components: &[RbcComponent],
 ) -> RbcSummary {
@@ -948,6 +1000,7 @@ fn summarize(
             .count() as u32
     };
     RbcSummary {
+        discrete_definitions: discrete_definitions.len() as u32,
         variables: variables.len() as u32,
         states: count(RbcRole::State),
         parameters: count(RbcRole::Parameter),

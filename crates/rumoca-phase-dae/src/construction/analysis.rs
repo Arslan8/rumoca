@@ -553,7 +553,14 @@ pub(super) fn analyze(flat: &flat::Model) -> Result<Analysis, ToDaeError> {
     let (discrete_connection_ranks, aggregate_discrete_connections, discrete_value_topology) =
         analyze_discrete_connections(flat, &roles)?;
     let (initial_algorithms, initial_discrete_equation_rows) =
-        analyze_initial_owners(flat, &roles, &states, &constants, &mut sample_lattices)?;
+        analyze_initial_owners(
+            flat,
+            &roles,
+            &expression_roles,
+            &states,
+            &constants,
+            &mut sample_lattices,
+        )?;
     let balance = analyze_source_balance(SourceBalanceAnalysisInput {
         flat,
         roles: &roles,
@@ -776,12 +783,19 @@ fn analyze_expression_event_ownership(
 fn analyze_initial_owners(
     flat: &flat::Model,
     roles: &HashMap<VarName, PlannedRole>,
+    expression_roles: &HashMap<VarName, PlannedRole>,
     states: &HashSet<VarName>,
     constants: &EvalContext,
     sample_lattices: &mut Vec<(Span, PeriodicClockSchedule)>,
 ) -> Result<(InitialAlgorithmAnalysis, HashSet<usize>), ToDaeError> {
-    let mut algorithms =
-        analyze_initial_algorithm_owners(flat, roles, states, constants, sample_lattices)?;
+    let mut algorithms = analyze_initial_algorithm_owners(
+        flat,
+        roles,
+        expression_roles,
+        states,
+        constants,
+        sample_lattices,
+    )?;
     let rows = claim_initial_discrete_equations(flat, roles, &mut algorithms.discrete_values)?;
     Ok((algorithms, rows))
 }
@@ -1111,6 +1125,7 @@ fn analyze_source_balance(
 fn analyze_initial_algorithm_owners(
     flat: &flat::Model,
     roles: &HashMap<VarName, PlannedRole>,
+    expression_roles: &HashMap<VarName, PlannedRole>,
     states: &HashSet<VarName>,
     constants: &EvalContext,
     sample_lattices: &mut Vec<(Span, PeriodicClockSchedule)>,
@@ -1122,6 +1137,7 @@ fn analyze_initial_algorithm_owners(
             .chain(&flat.initial_assert_equations)
             .chain(&initial_algorithms.assertions),
         roles,
+        expression_roles,
         states,
         constants,
         sample_lattices,
@@ -1129,9 +1145,21 @@ fn analyze_initial_algorithm_owners(
     Ok(initial_algorithms)
 }
 
+/// `message` and `level` are ordinary value expressions, so they resolve
+/// against `expression_roles` — the plan plus the names that may denote a value
+/// without being a coordinate, which is where MLS §4.9.5 enumeration literals
+/// live. The condition keeps the coordinate plan because it is an event-domain
+/// expression.
+///
+/// Reading `level` against the coordinate plan is what made
+/// `assert(c, "m", AssertionLevel.warning)` fail with `ED008` on a literal the
+/// front end had already resolved and Flat carried in `enum_literal_ordinals` —
+/// the same defect `when` bodies had before they were given the expression
+/// roles.
 fn validate_assertions<'flat>(
     assertions: impl IntoIterator<Item = &'flat flat::AssertEquation>,
     roles: &HashMap<VarName, PlannedRole>,
+    expression_roles: &HashMap<VarName, PlannedRole>,
     states: &HashSet<VarName>,
     constants: &EvalContext,
     sample_lattices: &mut Vec<(Span, PeriodicClockSchedule)>,
@@ -1145,9 +1173,9 @@ fn validate_assertions<'flat>(
             constants,
             sample_lattices,
         )?;
-        validate_expression(&assertion.message, roles, states)?;
+        validate_expression(&assertion.message, expression_roles, states)?;
         if let Some(level) = &assertion.level {
-            validate_expression(level, roles, states)?;
+            validate_expression(level, expression_roles, states)?;
         }
     }
     Ok(())

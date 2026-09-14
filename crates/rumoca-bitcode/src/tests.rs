@@ -110,6 +110,7 @@ fn decay_model() -> RbcModel {
         connections: Vec::new(),
         components: Vec::new(),
         trace_points: Vec::new(),
+        discrete_definitions: Vec::new(),
         summary: RbcSummary::default(),
     };
     recompute_summary(&mut model);
@@ -176,6 +177,199 @@ fn header_rejects_another_version() {
     let mut file = file(decay_model());
     file.bitcode_version = RBC_VERSION + 1;
     assert!(file.check_header().is_err());
+}
+
+// ── Discrete value definitions (MLS Appendix B.1c) ───────────────────────────
+
+/// A `discrete_value` variable must arrive with a definition.
+///
+/// Bitcode v1 originally had no field for B.1c definitions at all, so
+/// `Boolean b; b = x < 0.5;` exported a variable nothing defined and
+/// reconstruction refused it with "missing B.1c topology definition". The
+/// artifact was internally consistent and passed validation, which is what
+/// made it hard to see — so validation now states the invariant too.
+#[test]
+fn a_discrete_value_variable_carries_its_definition() {
+    let mut model = decay_model();
+    model.types.push(RbcType {
+        id: TypeId(1),
+        scalar: RbcScalar::Boolean,
+        dimensions: Vec::new(),
+    });
+    let target = VariableId(model.variables.len() as u32);
+    let mut flag = variable(target.0, "b", RbcRole::DiscreteValue);
+    flag.value_type = TypeId(1);
+    model.variables.push(flag);
+
+    let value = ExprId(model.expressions.len() as u32);
+    model.expressions.push(RbcExpr {
+        id: value,
+        value_type: TypeId(1),
+        node: RbcExprNode::Literal {
+            value: RbcLiteral::Boolean { value: true },
+        },
+        provenance: source_provenance(),
+    });
+    model.discrete_definitions.push(RbcDiscreteDefinition {
+        targets: vec![target],
+        branches: vec![RbcDiscreteBranch {
+            activation: RbcDiscreteActivation::Always,
+            values: vec![value],
+            provenance: source_provenance(),
+        }],
+        provenance: source_provenance(),
+    });
+    recompute_summary(&mut model);
+
+    assert_eq!(model.summary.discrete_definitions, 1);
+    assert!(
+        validate(&model, &ValidateOptions::default()).is_ok(),
+        "a defined discrete variable must validate: {:?}",
+        errors(&model)
+    );
+
+    // And it must survive both encodings with its activation intact.
+    for encoding in [Encoding::Cbor, Encoding::Json] {
+        let bytes = encode(&file(model.clone()), encoding).expect("encode");
+        let (decoded, _) = decode(&bytes).expect("decode");
+        let definition = &decoded.model.discrete_definitions[0];
+        assert_eq!(definition.targets, vec![target]);
+        assert_eq!(definition.branches[0].values, vec![value]);
+        assert!(matches!(
+            definition.branches[0].activation,
+            RbcDiscreteActivation::Always
+        ));
+    }
+}
+
+/// A `when` branch carries its trigger and guard, which is what distinguishes
+/// it from a plain equation on the same target.
+#[test]
+fn a_when_branch_keeps_its_trigger_and_guard() {
+    let branch = RbcDiscreteBranch {
+        activation: RbcDiscreteActivation::When {
+            trigger: ConditionId(2),
+            guard: ConditionId(5),
+        },
+        values: vec![ExprId(7)],
+        provenance: source_provenance(),
+    };
+    let bytes = serde_json::to_vec(&branch).expect("encode");
+    let back: RbcDiscreteBranch = serde_json::from_slice(&bytes).expect("decode");
+    assert_eq!(back, branch);
+}
+
+/// The invariant that would have caught BUG-009 at the producer.
+#[test]
+fn a_discrete_value_variable_with_no_definition_is_rejected() {
+    let mut model = decay_model();
+    model.types.push(RbcType {
+        id: TypeId(1),
+        scalar: RbcScalar::Boolean,
+        dimensions: Vec::new(),
+    });
+    let id = model.variables.len() as u32;
+    let mut flag = variable(id, "b", RbcRole::DiscreteValue);
+    flag.value_type = TypeId(1);
+    model.variables.push(flag);
+    recompute_summary(&mut model);
+
+    assert!(
+        errors(&model).iter().any(|error| matches!(
+            error,
+            ValidationError::UndefinedDiscreteValue { id: reported, .. } if *reported == id
+        )),
+        "an undefined discrete variable must be a validation error, got {:?}",
+        errors(&model)
+    );
+}
+
+/// A branch must give exactly one value per target.
+#[test]
+fn a_discrete_branch_must_match_its_target_count() {
+    let mut model = decay_model();
+    model.types.push(RbcType {
+        id: TypeId(1),
+        scalar: RbcScalar::Boolean,
+        dimensions: Vec::new(),
+    });
+    let target = VariableId(model.variables.len() as u32);
+    let mut flag = variable(target.0, "b", RbcRole::DiscreteValue);
+    flag.value_type = TypeId(1);
+    model.variables.push(flag);
+    model.discrete_definitions.push(RbcDiscreteDefinition {
+        targets: vec![target],
+        branches: vec![RbcDiscreteBranch {
+            activation: RbcDiscreteActivation::Always,
+            values: Vec::new(), // one target, no value
+            provenance: source_provenance(),
+        }],
+        provenance: source_provenance(),
+    });
+    recompute_summary(&mut model);
+
+    assert!(
+        errors(&model)
+            .iter()
+            .any(|error| matches!(error, ValidationError::DiscreteBranchArity { .. })),
+        "arity mismatch must be reported, got {:?}",
+        errors(&model)
+    );
+}
+
+// ── Enumerations ─────────────────────────────────────────────────────────────
+
+/// An enumeration value must not be carried as an `Integer`.
+///
+/// It was, until a real MSL model (`OpAmpCircuits.Der`, whose
+/// `opAmp.homotopyType` is an enumeration parameter) exported cleanly and then
+/// failed to import with `expression type mismatch: expected Enumeration,
+/// found Integer`. Export and import disagreeing is the one thing an
+/// interchange format cannot do, so both directions are pinned here.
+#[test]
+fn enumeration_literal_keeps_its_type_through_the_codec() {
+    let mut model = decay_model();
+    model.types.push(RbcType {
+        id: TypeId(1),
+        scalar: RbcScalar::Enumeration,
+        dimensions: Vec::new(),
+    });
+    let id = ExprId(model.expressions.len() as u32);
+    model.expressions.push(RbcExpr {
+        id,
+        value_type: TypeId(1),
+        node: RbcExprNode::Literal {
+            value: RbcLiteral::Enumeration { ordinal: 3 },
+        },
+        provenance: source_provenance(),
+    });
+    recompute_summary(&mut model);
+
+    for encoding in [Encoding::Cbor, Encoding::Json] {
+        let bytes = encode(&file(model.clone()), encoding).expect("encode");
+        let (decoded, _) = decode(&bytes).expect("decode");
+        let node = &decoded.model.expressions[id.0 as usize].node;
+        assert!(
+            matches!(
+                node,
+                RbcExprNode::Literal {
+                    value: RbcLiteral::Enumeration { ordinal: 3 }
+                }
+            ),
+            "{encoding:?} degraded an enumeration literal to {node:?}",
+        );
+    }
+}
+
+/// MLS §4.9.5 ordinals are one-based, and `enumeration_literal` is the only
+/// DAE constructor that proves it. A zero ordinal must survive the codec so
+/// reconstruction is the thing that rejects it, with a span.
+#[test]
+fn enumeration_ordinal_is_carried_verbatim_for_reconstruction_to_judge() {
+    let value = RbcLiteral::Enumeration { ordinal: 0 };
+    let bytes = serde_json::to_vec(&value).expect("encode");
+    let back: RbcLiteral = serde_json::from_slice(&bytes).expect("decode");
+    assert_eq!(back, value);
 }
 
 // ── Codec ────────────────────────────────────────────────────────────────────

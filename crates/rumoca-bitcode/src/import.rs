@@ -251,7 +251,73 @@ fn rebuild(
     define_variables(construction, &ctx, &expressions, reservations)?;
     let conditions = rebuild_conditions(construction, &ctx, &expressions)?;
     rebuild_equations(construction, &ctx, &expressions)?;
-    rebuild_events(construction, &ctx, &expressions, &variables, &conditions)
+    rebuild_events(construction, &ctx, &expressions, &variables, &conditions)?;
+    rebuild_discrete_definitions(construction, &ctx, &expressions, &variables, &conditions)
+}
+
+/// Replay the MLS Appendix B.1c topology: every discrete-valued variable and
+/// what defines it.
+///
+/// `b1c` takes the complete plan of targets up front, so the whole topology is
+/// one transaction and a missing definition is caught by the DAE rather than
+/// producing a model with an undefined discrete variable.
+fn rebuild_discrete_definitions<'dae>(
+    construction: &mut dae::DaeConstruction<'dae>,
+    ctx: &Rebuild<'_>,
+    expressions: &[dae::ExprId<'dae>],
+    variables: &[VariableSlot<'dae>],
+    conditions: &[dae::ConditionId<'dae>],
+) -> Result<(), dae::DaeConstructionError> {
+    let discrete_value = |id: VariableId| match variables.get(id.0 as usize) {
+        Some(VariableSlot::DiscreteValue(target)) => Ok(*target),
+        _ => Err(ctx.unsupported(format!(
+            "B.1c target {} is not a discrete-valued variable",
+            id.0
+        ))),
+    };
+    let plan = ctx
+        .model
+        .discrete_definitions
+        .iter()
+        .flat_map(|definition| definition.targets.iter().copied())
+        .map(discrete_value)
+        .collect::<Result<Vec<_>, _>>()?;
+
+    construction.b1c(plan, |topology| {
+        for definition in &ctx.model.discrete_definitions {
+            let at = ctx.provenance(definition.provenance)?;
+            let targets = definition
+                .targets
+                .iter()
+                .copied()
+                .map(discrete_value)
+                .collect::<Result<Vec<_>, _>>()?;
+            topology.owner(at, targets, |owner| {
+                for branch in &definition.branches {
+                    let branch_at = ctx.provenance(branch.provenance)?;
+                    let values = branch
+                        .values
+                        .iter()
+                        .map(|value| {
+                            resolve(expressions, value.0, "expression", ctx)
+                                .map(|expression| (expression, branch_at))
+                        })
+                        .collect::<Result<Vec<_>, _>>()?;
+                    match branch.activation {
+                        RbcDiscreteActivation::Always => owner.always(branch_at, values)?,
+                        RbcDiscreteActivation::When { trigger, guard } => owner.when(
+                            resolve(conditions, trigger.0, "condition", ctx)?,
+                            resolve(conditions, guard.0, "condition", ctx)?,
+                            branch_at,
+                            values,
+                        )?,
+                    }
+                }
+                Ok(())
+            })?;
+        }
+        Ok(())
+    })
 }
 
 fn rebuild_types<'dae>(
@@ -370,6 +436,12 @@ fn build_expression<'dae>(
     at: dae::DaeProvenance,
 ) -> Result<dae::ExprId<'dae>, dae::DaeConstructionError> {
     Ok(match &expression.node {
+        // An enumeration value has its own constructor: `literal` rejects
+        // `DaeLiteral::Enumeration` outright, because the ordinal has to be
+        // proved one-based (MLS §4.9.5) before the node is interned.
+        RbcExprNode::Literal {
+            value: RbcLiteral::Enumeration { ordinal },
+        } => owner.at(at).enumeration_literal(*ordinal)?,
         RbcExprNode::Literal { value } => owner.at(at).literal(literal_of(value))?,
         RbcExprNode::Coordinate { coordinate } => {
             let input = coordinate_of(*coordinate, variables)
@@ -689,12 +761,17 @@ fn scalar_of(scalar: RbcScalar) -> dae::ScalarType {
     }
 }
 
+/// Enumerations are routed to `enumeration_literal` before reaching this map,
+/// which is the only constructor that proves the ordinal one-based. The arm
+/// below is kept so a future caller fails closed on a typed
+/// `InvalidEnumerationOrdinal` from `literal` rather than panicking here.
 fn literal_of(literal: &RbcLiteral) -> dae::DaeLiteral {
     match literal {
         RbcLiteral::Real { value } => dae::DaeLiteral::Real(*value),
         RbcLiteral::Integer { value } => dae::DaeLiteral::Integer(*value),
         RbcLiteral::Boolean { value } => dae::DaeLiteral::Boolean(*value),
         RbcLiteral::String { value } => dae::DaeLiteral::String(value.clone()),
+        RbcLiteral::Enumeration { ordinal } => dae::DaeLiteral::Enumeration(*ordinal),
     }
 }
 

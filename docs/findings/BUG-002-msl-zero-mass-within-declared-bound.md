@@ -5,7 +5,7 @@
 | **Severity** | Medium — latent; bites anyone parameterising a model programmatically |
 | **Component** | Modelica Standard Library 4.1.0, not Rumoca |
 | **Affects** | `Modelica.Mechanics.Translational.Components.Mass`, `Modelica.Mechanics.Rotational.Components.Inertia`, and every model built from them |
-| **Found by** | ModelSan parameter sweep over 74 MSL example models, 2026-09-13 |
+| **Found by** | ModelSan parameter sweep over 74 MSL example models, 2026-09-13; extended and cross-confirmed against OpenModelica over the full 847-model corpus the same day |
 | **Status** | Reported, not fixed |
 
 ## Summary
@@ -25,13 +25,22 @@ than a diagnostic about the parameter.
 
 The bound as written is a promise the component cannot keep.
 
-## Confirmed on three models
+## Confirmed on four models, in two independent tools
 
 | Model | Trigger | Failure |
 |---|---|---|
 | `Modelica.Mechanics.Translational.Examples.Damper` | `mass1.m = 0` | `algebraic projection did not converge at event boundary: worst scaled residual row=4 target=mass1.a value=2.5e2 ratio=2.5e12` |
 | `Modelica.Mechanics.Translational.Examples.SignConvention` | `mass1.m = 0` | same class |
 | `Modelica.Mechanics.Rotational.Examples.ElasticBearing` | `shaft.J = 0` | same class, via `Inertia J(min=0)` |
+| `Modelica.Mechanics.Translational.Examples.WhyArrows` | `mass1.m = 0` | same class; found by the full-corpus sweep |
+
+All four were re-run in OpenModelica 1.27.0-dev: each passes at its declared
+values and **fails** at the trigger, so none of them is an artifact of Rumoca.
+
+Two further models — `Rotational.Examples.CompareBrakingTorque` and
+`Translational.Examples.CompareBrakingForce` — fail in Rumoca at `J = 0` and
+`m = 0` but **survive in OpenModelica**, so they are excluded from this report.
+They are recorded as tool-side gaps, not as findings.
 
 All three simulate cleanly with their declared defaults. The failure appears
 only under an override that the declaration permits.

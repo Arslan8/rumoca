@@ -202,9 +202,17 @@ impl<'dae> Events<'_, 'dae> {
         if let Some(level) = level {
             self.storage.expect_closed_expression(level, provenance)?;
             let ty = self.storage.expr_type(level, provenance)?;
-            if !ty.is_scalar() || !ty.scalar_type().is_numeric() {
+            // MLS §11.2.3 types this argument as the predefined enumeration
+            // `AssertionLevel`, so `Enumeration` is the *expected* form here,
+            // not an exception to a numeric rule. Integer and Real stay
+            // accepted because the level reaches the runtime as an ordinal and
+            // a lowered literal may already be one.
+            let scalar = ty.scalar_type();
+            let accepted = ty.is_scalar()
+                && (scalar.is_numeric() || matches!(scalar, ScalarType::Enumeration));
+            if !accepted {
                 return Err(DaeConstructionError::ExpectedNumeric {
-                    found: ty.scalar_type(),
+                    found: scalar,
                     span: provenance.span(),
                 });
             }

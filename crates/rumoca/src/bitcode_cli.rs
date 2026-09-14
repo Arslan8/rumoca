@@ -681,6 +681,7 @@ fn declared_bounds(model: &RbcModel) -> std::collections::BTreeMap<&str, Declare
             rumoca_bitcode::schema::RbcExprNode::Literal { value } => match value {
                 rumoca_bitcode::schema::RbcLiteral::Real { value } => Some(*value),
                 rumoca_bitcode::schema::RbcLiteral::Integer { value } => Some(*value as f64),
+                rumoca_bitcode::schema::RbcLiteral::Enumeration { ordinal } => Some(*ordinal as f64),
                 _ => None,
             },
             _ => None,

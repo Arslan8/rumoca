@@ -124,6 +124,15 @@ pub struct RbcModel {
     /// Observation requests. Empty on export; a transformation pass adds these.
     #[serde(default)]
     pub trace_points: Vec<RbcTracePoint>,
+    /// MLS Appendix B.1c definitions: what each discrete-valued variable
+    /// (Boolean, Integer, enumeration) is equal to, and under what activation.
+    ///
+    /// Separate from `equations`, which carries only continuous residuals, and
+    /// from `events`, which carries reinit/assert/terminate actions. Without
+    /// this a `discrete_value` variable is declared and never defined, and
+    /// reconstruction rejects the artifact.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub discrete_definitions: Vec<RbcDiscreteDefinition>,
     /// Counts a consumer can check against the collections above. Present so a
     /// truncated or partially-written artifact fails loudly.
     pub summary: RbcSummary,
@@ -152,6 +161,8 @@ pub struct RbcSummary {
     pub connections: u32,
     pub components: u32,
     pub trace_points: u32,
+    #[serde(default)]
+    pub discrete_definitions: u32,
 }
 
 // ── Provenance ───────────────────────────────────────────────────────────────
@@ -444,11 +455,50 @@ pub struct RbcBranch {
     pub value: ExprId,
 }
 
+/// One MLS Appendix B.1c definition owner: a set of discrete-valued targets
+/// defined together, and the branches that give them values.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RbcDiscreteDefinition {
+    /// The discrete-valued variables this owner defines, in the order the
+    /// branches' `values` follow.
+    pub targets: Vec<VariableId>,
+    pub branches: Vec<RbcDiscreteBranch>,
+    pub provenance: RbcProvenance,
+}
+
+/// One activation branch of a B.1c definition. `values` has exactly one entry
+/// per target of the owning definition, in the same order.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RbcDiscreteBranch {
+    pub activation: RbcDiscreteActivation,
+    pub values: Vec<ExprId>,
+    pub provenance: RbcProvenance,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum RbcDiscreteActivation {
+    /// A plain equation, active whenever the model is: `b = x < 0.5`.
+    Always,
+    /// A `when` branch, active on its trigger under its guard.
+    When {
+        trigger: ConditionId,
+        guard: ConditionId,
+    },
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum RbcLiteral {
     Real { value: f64 },
     Integer { value: i64 },
+    /// An enumeration value, carried as its 1-based ordinal (MLS §4.9.5).
+    ///
+    /// This is distinct from `Integer` even though both hold an integer: the
+    /// DAE's type checker demands an `Enumeration` where the declaration says
+    /// enumeration, and rebuilding one from an `Integer` literal is rejected
+    /// with `expected Enumeration, found Integer`.
+    Enumeration { ordinal: i64 },
     Boolean { value: bool },
     String { value: String },
 }
