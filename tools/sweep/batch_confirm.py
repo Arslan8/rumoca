@@ -126,14 +126,19 @@ def confirm(candidate, triggers, model_paths, art, timeout, max_models=6) -> dic
         built = compile_model(path, model, art, timeout)
         if built is None:
             continue
-        if not exported_completely(built):
-            continue  # a partial export cannot exclude anything
         if model not in _BASELINE:
             _BASELINE[model] = simulate(built, None, timeout)
         if _BASELINE[model] != "clean":
             continue  # Rumoca cannot judge this model; try the next
         verdict = simulate(built, trigger, timeout)
         if verdict == "no-such-parameter":
+            continue
+        # Asymmetric on purpose. A partial export that *fails* still failed
+        # because of the trigger — the baseline was clean and only that value
+        # changed. A partial export that *survives* proves nothing, because the
+        # equation in question may not be in the artifact at all. So a failure
+        # counts, and a survival is not recorded as a judgement.
+        if verdict == "clean" and not exported_completely(built):
             continue
         judged.append((model, trigger, verdict))
         if verdict == "fail":

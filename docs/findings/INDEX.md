@@ -29,6 +29,19 @@ values and fails at a value its own declaration permits.
 | [BUG-006](BUG-006-bound-propagated-into-a-different-component.md) | `OpAmpCircuits.Der` | `k = 0` | isolated shape only |
 | [BUG-003](BUG-003-switchedrlc-zero-resistance.md) | `examples/models/SwitchedRLC.mo` | `R = 0` | this repo, not MSL |
 
+## Catalog — every declaration site, with source references
+
+[`catalog/`](catalog/) lists **911 declarations** in MSL 4.1.0 that accept a
+physically impossible value, each with `file:line` and its declared modifiers,
+grouped into the **17 SI type definitions** they all inherit from.
+
+Read the 17 as the defect count and the 911 as its blast radius: they share
+seventeen missing lines in `Units.mo`, and fixing those fixes every site.
+
+Each page also lists the declarations that *do* bound themselves — 43 for
+`SI.Resistance` against 281 that don't. That contrast, within one library and
+one quantity, is what makes the omissions omissions rather than a design choice.
+
 ## Studies
 
 | | |

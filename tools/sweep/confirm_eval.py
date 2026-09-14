@@ -142,14 +142,18 @@ def confirm(signature: str, occurrences: list[tuple[str, str, str]],
         artifact = compile_model(path, model, cache, timeout)
         if artifact is None:
             continue
-        if not exported_completely(artifact):
-            continue  # a partial export cannot exclude anything
         if model not in _BASELINE:
             _BASELINE[model] = simulate(artifact, None, timeout)
         if _BASELINE[model] != "clean":
             continue  # the other tool cannot judge this model
         verdict = simulate(artifact, trigger, timeout)
         if verdict == "no-such-parameter":
+            continue
+        # Asymmetric: a partial export that fails still failed because of the
+        # trigger, since the baseline was clean and only that value changed. A
+        # partial export that survives proves nothing — the equation may not be
+        # in the artifact — so it is not recorded as a judgement.
+        if verdict == "clean" and not exported_completely(artifact):
             continue
         judged += 1
         if verdict == "fail":
