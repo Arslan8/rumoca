@@ -78,6 +78,8 @@ Measured on the current set:
 | InitSan | ✅ | | | ✅ | ✅ |
 | EventSan | | ✅ | | | ✅ |
 | ZenoSan | | ✅ | | | ✅ |
+| PhysicalSan | ✅ | ✅ | | ✅ | ✅ |
+| **DivisorSan** | ✅ | | | ✅ | ✅ |
 | DeterminismSan | | comparative | | | ✅ |
 | DifferentialSan | | comparative | | | needs 2 backends |
 
