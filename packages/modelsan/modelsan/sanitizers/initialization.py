@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from ..analysis.context import AnalysisContext
 from ..instrumentation.capability import Capability
+from .base import is_cosmetic
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..runtime.anchors import CanonicalAnchor, EntityKind
@@ -93,7 +94,7 @@ class InitSan:
         """
         found = []
         for variable in model.variables:
-            if not variable.is_state:
+            if not variable.is_state or is_cosmetic(variable.name):
                 continue
             low, high = _literal(variable.minimum), _literal(variable.maximum)
             values = tuple(v for v in (low, high, 0.0) if v is not None)

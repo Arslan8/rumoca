@@ -73,3 +73,20 @@ class DifferentialOracle(Protocol):
 
     def compare(self, results: dict[str, ExecutionResult], model,
                 testcase: TestCase) -> list[Finding]: ...
+
+
+#: Parameters that configure presentation or diagnostics rather than physics.
+#: Perturbing `world.defaultFrameDiameterFraction` breaks a picture, not a
+#: model, and reporting it wastes a reviewer's attention on nothing.
+COSMETIC_MARKERS = (
+    "animation", "defaultframe", "defaultwidth", "defaultlength",
+    "defaultdiameter", "defaultarrow", "defaultheadl", "shapetype",
+    "color", "specularcoefficient", "diameterfraction", "widthfraction",
+    "lengthfraction", "enableanimation", "logging", "loglevel",
+)
+
+
+def is_cosmetic(name: str) -> bool:
+    """Whether a parameter only affects how a model is drawn or logged."""
+    lowered = name.lower()
+    return any(marker in lowered for marker in COSMETIC_MARKERS)

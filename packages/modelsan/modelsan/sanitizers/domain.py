@@ -26,6 +26,7 @@ from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..fuzz.testcase import TestCase
 from ..instrumentation.capability import Capability
+from .base import is_cosmetic
 from ..instrumentation.request import InstrumentationRequest
 from ..runtime.anchors import CanonicalAnchor, EntityKind
 from ..runtime.observations import ExpressionObservation, ObservationStream
@@ -134,6 +135,8 @@ class DomainSan:
             if len(reads) != 1 or not reads[0].is_parameter:
                 continue
             parameter = reads[0]
+            if is_cosmetic(parameter.name):
+                continue
             found.append(FuzzHint(
                 target=parameter.name,
                 values=site.forbidden_probes(),

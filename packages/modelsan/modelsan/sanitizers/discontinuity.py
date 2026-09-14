@@ -23,6 +23,7 @@ from ..dae.traversal import walk_expressions
 from ..findings.finding import Finding, Severity
 from ..fuzz.hints import FuzzHint
 from ..instrumentation.capability import Capability
+from .base import is_cosmetic
 from ..runtime.anchors import CanonicalAnchor, EntityKind
 
 from ..dae import ops
@@ -87,6 +88,8 @@ class DiscontinuitySan:
     def hints(self, model, context: AnalysisContext) -> list[FuzzHint]:
         found = []
         for node, parameter, threshold in self._thresholds(model):
+            if is_cosmetic(parameter.name):
+                continue
             scale = max(abs(threshold), 1.0)
             found.append(FuzzHint(
                 target=parameter.name,

@@ -37,6 +37,7 @@ from ..analysis.blocks import AlgebraicBlock
 from ..analysis.context import AnalysisContext
 from ..dae import BinaryOp
 from ..instrumentation.capability import Capability
+from .base import is_cosmetic
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..runtime.anchors import CanonicalAnchor, EntityKind
@@ -178,7 +179,8 @@ class SingularitySan:
                 variable_ids=(risk.parameter.id,),
             )
             for risk in self._vanishing(model)
-            if risk.declared_min is None or risk.declared_min <= 0.0
+            if (risk.declared_min is None or risk.declared_min <= 0.0)
+            and not is_cosmetic(risk.parameter.name)
         ]
 
 

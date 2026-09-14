@@ -25,6 +25,7 @@ from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..fuzz.testcase import TestCase
 from ..instrumentation.capability import Capability
+from .base import is_cosmetic
 from ..runtime.anchors import CanonicalAnchor, EntityKind
 from ..runtime.failures import FailureKind
 from ..runtime.observations import ExecutionFailureObservation, ObservationStream
@@ -67,6 +68,8 @@ class AssertSan:
                     if resolved is not None:
                         reads.add(resolved)
             for parameter in reads:
+                if is_cosmetic(parameter.name):
+                    continue
                 found.append(FuzzHint(
                     target=parameter.name,
                     values=(0.0, -1.0, 1.0),

@@ -33,6 +33,33 @@ def paths() -> dict[str, str]:
     return out
 
 
+_COMPLETE: dict[str, bool] = {}
+
+
+def exported_completely(artifact: Path) -> bool:
+    """Whether the artifact represents the whole model.
+
+    Bitcode v1 marks expressions it cannot carry as `Unsupported`. A model
+    holding any of them is a *different* model from the one the other tool ran,
+    so its surviving a trigger is not evidence the trigger is benign — it may
+    simply never have evaluated the equation.
+
+    Without this guard, three of the highest-reach findings were excluded on
+    models carrying 44, 12 and 11 unsupported expressions.
+    """
+    key = str(artifact)
+    if key in _COMPLETE:
+        return _COMPLETE[key]
+    try:
+        from rumoca_bitcode import Model, Unsupported
+        model = Model.load(artifact)
+        complete = not any(isinstance(e, Unsupported) for e in model.expressions)
+    except Exception:
+        complete = False
+    _COMPLETE[key] = complete
+    return complete
+
+
 _COMPILED: dict[str, Path | None] = {}
 
 
@@ -99,6 +126,8 @@ def confirm(candidate, triggers, model_paths, art, timeout, max_models=6) -> dic
         built = compile_model(path, model, art, timeout)
         if built is None:
             continue
+        if not exported_completely(built):
+            continue  # a partial export cannot exclude anything
         if model not in _BASELINE:
             _BASELINE[model] = simulate(built, None, timeout)
         if _BASELINE[model] != "clean":
@@ -111,6 +140,7 @@ def confirm(candidate, triggers, model_paths, art, timeout, max_models=6) -> dic
             return {"verdict": "confirmed", "via": model,
                     "trigger": f"{trigger[0]}={trigger[1]:g}",
                     "models_judged": len(judged)}
+    # `excluded` requires a *complete* export that ran cleanly and survived.
     if judged:
         return {"verdict": "excluded", "via": judged[0][0],
                 "trigger": f"{judged[0][1][0]}={judged[0][1][1]:g}",

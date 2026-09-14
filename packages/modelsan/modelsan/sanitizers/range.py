@@ -28,8 +28,16 @@ from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..fuzz.testcase import TestCase
 from ..instrumentation.capability import Capability
+from .base import is_cosmetic
 from ..runtime.anchors import EntityKind
 from ..runtime.observations import ObservationStream, VariableObservation
+
+
+#: OMC and Modelica both spell "merely positive" as a denormal lower bound.
+#: Probing there asks whether the model survives 1e-308, which is a question
+#: about floating point, not about the domain the model declared. It produced
+#: ~60 findings of the form `PI.T=2.22507e-308` before being filtered.
+DENORMAL = 1e-300
 
 
 def _literal(expression) -> float | None:
@@ -65,9 +73,10 @@ class RangeSan:
     def hints(self, model, context: AnalysisContext) -> list[FuzzHint]:
         found = []
         for _, (low, high, variable) in self._bounds(model).items():
-            if not variable.is_parameter:
+            if not variable.is_parameter or is_cosmetic(variable.name):
                 continue
-            values = tuple(v for v in (low, high) if v is not None)
+            values = tuple(v for v in (low, high)
+                           if v is not None and (v == 0.0 or abs(v) > DENORMAL))
             if values:
                 found.append(FuzzHint(
                     target=variable.name, values=values,
