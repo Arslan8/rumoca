@@ -1,0 +1,102 @@
+# BUG-002: MSL `Mass`/`Inertia` declare a bound that admits a value the model cannot integrate
+
+| | |
+|---|---|
+| **Severity** | Medium — latent; bites anyone parameterising a model programmatically |
+| **Component** | Modelica Standard Library 4.1.0, not Rumoca |
+| **Affects** | `Modelica.Mechanics.Translational.Components.Mass`, `Modelica.Mechanics.Rotational.Components.Inertia`, and every model built from them |
+| **Found by** | ModelSan parameter sweep over 74 MSL example models, 2026-09-13 |
+| **Status** | Reported, not fixed |
+
+## Summary
+
+MSL declares
+
+```modelica
+parameter SI.Mass m(min=0, start=1) "Mass of the sliding mass";
+parameter SI.Inertia J(min=0, start=1);
+```
+
+`min=0` is **inclusive**, so `m = 0` is a value the component's own
+declaration says is legal. It is not: with `m = 0` the equation
+`m * a = f` degenerates to `0 = f`, which no longer determines `a`. The
+system loses an unknown and the solve fails with a numerical error rather
+than a diagnostic about the parameter.
+
+The bound as written is a promise the component cannot keep.
+
+## Confirmed on three models
+
+| Model | Trigger | Failure |
+|---|---|---|
+| `Modelica.Mechanics.Translational.Examples.Damper` | `mass1.m = 0` | `algebraic projection did not converge at event boundary: worst scaled residual row=4 target=mass1.a value=2.5e2 ratio=2.5e12` |
+| `Modelica.Mechanics.Translational.Examples.SignConvention` | `mass1.m = 0` | same class |
+| `Modelica.Mechanics.Rotational.Examples.ElasticBearing` | `shaft.J = 0` | same class, via `Inertia J(min=0)` |
+
+All three simulate cleanly with their declared defaults. The failure appears
+only under an override that the declaration permits.
+
+## Not an artifact of exactly zero
+
+```console
+$ rumoca compile-bitcode Damper.rbc --simulate --check --param mass1.m=0.001
+[]                                          # clean
+
+$ rumoca compile-bitcode Damper.rbc --simulate --check --param mass1.m=1e-12
+"detail": "diffsol-bdf advance exhaustion failed: ODE solver error:
+           Step size is too small at time = 1.77e-17"
+```
+
+`1e-12` also satisfies `min=0`, and collapses the integrator rather than
+producing a clean rejection. The usable domain has a lower edge somewhere
+above the declared one, and the declaration does not say where.
+
+## MSL knows how to write this bound
+
+The same library gets it right elsewhere:
+
+```modelica
+// Modelica.Mechanics.Translational.Sources.QuadraticSpeedDependentForce
+parameter SI.Velocity v_nominal(min=Modelica.Constants.eps)
+  "Nominal speed";
+...
+f = -f_nominal*(v/v_nominal)^2;
+```
+
+`min=Modelica.Constants.eps` correctly forbids zero for a parameter used as a
+divisor. `Mass` and `Inertia` use `min=0` for a parameter used as a
+coefficient that must not vanish. The asymmetry is the finding.
+
+## Suggested fix
+
+Either tighten the bound:
+
+```modelica
+parameter SI.Mass m(min=Modelica.Constants.small, start=1);
+```
+
+or keep `min=0` and state the degenerate case explicitly, so a user setting it
+gets a message naming the parameter instead of a solver error naming `mass1.a`.
+
+Tightening is the smaller change and matches what `QuadraticSpeedDependentForce`
+already does.
+
+## Reproducing
+
+```bash
+cargo xtask repo modelica-deps ensure
+export PYTHONPATH=packages/rumoca-bitcode:packages/modelsan
+MSL="target/msl/ModelicaStandardLibrary-4.1.0"
+
+python3 -m modelsan.cli \
+  "$MSL/Modelica 4.1.0/Mechanics/Translational/Examples/Damper.mo" \
+  --model-name Modelica.Mechanics.Translational.Examples.Damper \
+  --source-root "$MSL" --rumoca ./target/debug/rumoca --t-end 0.5
+```
+
+## Caveat worth stating
+
+This is a *fragility*, not a crash in correct usage. Nobody simulating a damper
+deliberately sets the mass to zero. It matters because parameter sweeps,
+optimisers, and calibration loops set parameters programmatically and have only
+the declared bounds to go on — and the declared bound here says zero is fine.
