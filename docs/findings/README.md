@@ -79,20 +79,33 @@ Of the 147: 39 `zero-permitted-by-bound`, 100 `zero-permitted-by-omission`,
 8 `fails-at-its-own-positive-bound`. By where the bound is written: 31 on the
 component, 17 inherited from an SI type, 99 nowhere at all.
 
-### These are candidates, and cross-confirmation still moves them
+### All 147 were cross-confirmed — and half died
 
-Three were taken through the second tool as a sample, with decisive and
-different results:
+`tools/sweep/batch_confirm.py` ran every candidate through the second tool,
+trying up to six of its models rather than deciding a component from one
+topology:
 
-| Candidate | Reach | Verdict |
-|---|---|---|
-| `Analog.Basic.Capacitor.C` | 12 models | **confirmed** in both tools → [BUG-013](BUG-013-capacitor-zero-capacitance-topology-dependent.md) |
-| `Analog.Basic.Resistor.R` | 12 models | **single-tool** — Rumoca cannot compile any of the 12, or fails at declared values |
-| `HeatTransfer.HeatCapacitor.C` | 20 models | **excluded** — Rumoca survives the trigger |
+| | Count |
+|---|---|
+| **Confirmed** — both tools clean at declared values, both fail at the trigger | **7 components, 73 model instances** |
+| **Excluded** — Rumoca survives the trigger | **74** |
+| Single-tool — Rumoca cannot judge any of that candidate's models | 66 |
 
-`HeatCapacitor.C` was the largest `zero-permitted-by-omission` group in the
-whole sweep and it does not survive a second opinion. Nothing from the 147 is
-listed as a finding until it has been through this.
+Half of what passed static verification did not survive a second opinion. The
+largest single group in the whole sweep, `HeatTransfer.HeatCapacitor.C` at 20
+models, is among the excluded.
+
+The seven confirmed components are `Inertia.J` (29 models), `Mass.m` (17),
+`Capacitor.C` (12), `Inductor.L` (8), `GenericFluxTube.area` and
+`GenericFluxTube.l` (3 each), and `IdealGear.ratio` (1). Three of those were new
+and are filed as [BUG-014](BUG-014-genericfluxtube-geometry-divisors.md) and
+[BUG-015](BUG-015-idealgear-zero-ratio.md).
+
+**A verification bug worth recording.** The first version of the batch
+confirmer took the first model it could judge and let that decide the whole
+component. It excluded `Mass.m` and `Inertia.J` — both already confirmed by
+hand — because a component defect need not break every circuit that uses it.
+Fixed to confirm if *any* model confirms.
 
 Nearly all of them are instances of one thing, written up as a study rather
 than as 147 bug reports: [MSL components inherit SI type bounds their equations

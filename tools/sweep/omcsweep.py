@@ -43,7 +43,7 @@ def sweep_one(model: str, t_end: float, per_model: int, timeout: float) -> dict:
         out["status"] = "searched"
 
         for parameter in built.parameters[:per_model]:
-            for value in probes(parameter):
+            for value, why in probes(parameter):
                 out["trials"] += 1
                 got = run(built, {parameter.name: value}, work, timeout)
                 if got.ok:
@@ -54,7 +54,9 @@ def sweep_one(model: str, t_end: float, per_model: int, timeout: float) -> dict:
                     "declared_min": parameter.min,
                     "declared_start": parameter.start,
                     "tier": tier(parameter),
+                    "claim": why,
                     "blamed": got.blamed,
+                    "nonfinite": got.nonfinite,
                     "detail": got.detail,
                 })
                 break  # one probe per parameter is enough to establish it

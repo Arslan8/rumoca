@@ -66,6 +66,8 @@ class Run:
     detail: str = ""
     blamed: str = ""
     """The parameter OMC's own assertion names, when it names one."""
+    nonfinite: str = ""
+    """A variable that went inf or NaN while the run still reported success."""
 
 
 def _number(text: str | None) -> float | None:
@@ -130,7 +132,7 @@ def run(built: Built, overrides: dict[str, float], work: Path,
     OMC and the run still succeeds, so callers must take names from
     `built.parameters` rather than guessing them.
     """
-    command = [str(built.executable)]
+    command = [str(built.executable), "-outputFormat=csv"]
     if overrides:
         command += ["-override", ",".join(f"{k}={v:g}" for k, v in overrides.items())]
     try:
@@ -139,6 +141,16 @@ def run(built: Built, overrides: dict[str, float], work: Path,
     except subprocess.TimeoutExpired:
         return Run(ok=False, detail="simulation timeout")
     if done.returncode == 0:
+        # A zero exit is not success. An integrator can carry inf or NaN to the
+        # end of the run and report completion, which is worse than a crash:
+        # the user gets a trajectory rather than an error. Negative resistance
+        # is the case that exposed this — it does not fail, it produces a
+        # physically impossible answer cleanly.
+        bad = nonfinite_variable(built.executable.parent /
+                                 f"{built.executable.name}_res.csv")
+        if bad:
+            return Run(ok=False, detail=f"run completed with non-finite `{bad}`",
+                       nonfinite=bad)
         return Run(ok=True)
     text = (done.stdout + done.stderr).strip()
     blamed = DIVISION.search(text)
@@ -160,52 +172,76 @@ def is_data_element(parameter: Parameter) -> bool:
     return bool(ARRAY_ELEMENT.search(parameter.name))
 
 
-def probes(parameter: Parameter) -> list[float]:
-    """Values the parameter's own declaration permits, worth trying.
+def nonfinite_variable(result: Path) -> str:
+    """The first variable holding inf or NaN, if any.
 
-    Four declaration shapes, three behaviours:
+    Scanned as text rather than parsed: the files run to megabytes and the
+    question is only whether a non-finite token appears anywhere.
+    """
+    try:
+        with result.open(errors="replace") as handle:
+            header = handle.readline()
+            names = [n.strip().strip('"') for n in header.split(",")]
+            for line in handle:
+                low = line.lower()
+                if "nan" not in low and "inf" not in low:
+                    continue
+                for index, cell in enumerate(line.split(",")):
+                    token = cell.strip().strip('"').lower()
+                    if "nan" in token or "inf" in token:
+                        return names[index] if index < len(names) else "?"
+    except OSError:
+        return ""
+    return ""
 
-    * `min=0` — zero is explicitly permitted. Probe it. This is the BUG-002
-      shape and the strongest claim available.
-    * no bound — zero is permitted by omission. Probe it. Weaker, because
-      nothing was written down to contradict.
-    * `min=DBL_MIN` — OMC's spelling of "positive". Zero is excluded, and
-      DBL_MIN itself is a denormal no author chose, so probe nothing.
-    * a real positive bound — probe the bound itself, which is the value the
-      component claims to support and may not.
+
+def probes(parameter: Parameter) -> list[tuple[float, str]]:
+    """Values the parameter's own declaration permits, with what each proves.
+
+    Declaration shapes and what is worth trying:
+
+    * `min=0` — zero is explicitly permitted. The BUG-002 shape.
+    * no lower bound — zero *and every negative value* are permitted by
+      omission. Negative resistance, negative inertia and negative capacitance
+      are not physical components; nothing but the declaration can reject them,
+      and there is no declaration.
+    * `min=DBL_MIN` — OMC's spelling of "positive". Zero is excluded and
+      DBL_MIN is a denormal no author chose, so probe nothing.
+    * a real positive bound — probe the bound, the value the component claims
+      to support.
+    * an upper bound — probe it for the same reason.
     """
     if is_data_element(parameter):
         return []
 
-    declared = parameter.min
+    low, high, start = parameter.min, parameter.max, parameter.start
+    out: list[tuple[float, str]] = []
 
-    if declared is None:
-        candidates = [0.0]
-    elif declared == 0.0:
-        candidates = [0.0]
-    elif declared <= DBL_MIN:
-        candidates = []
-    else:
-        candidates = [declared]
+    if low is None:
+        out.append((0.0, "zero-permitted-by-omission"))
+        # Magnitude matched to the declared value, so the probe stays in the
+        # range the model was designed for and only the sign changes.
+        scale = abs(start) if start not in (None, 0.0) else 1.0
+        out.append((-scale, "negative-permitted-by-omission"))
+    elif low == 0.0:
+        out.append((0.0, "zero-permitted-by-bound"))
+    elif low > DBL_MIN:
+        out.append((low, "fails-at-its-own-positive-bound"))
+    elif low < 0.0:
+        out.append((low, "fails-at-its-own-negative-bound"))
+
+    if high is not None and high != start:
+        out.append((high, "fails-at-its-own-upper-bound"))
 
     return [
-        value
-        for value in candidates
-        if (parameter.max is None or value <= parameter.max)
-        and value != parameter.start
+        (value, why)
+        for value, why in out
+        if (low is None or low <= DBL_MIN or value >= low)
+        and (high is None or value <= high)
+        and value != start
     ]
 
 
 def tier(parameter: Parameter) -> str:
-    """How strong a claim a finding on this parameter supports.
-
-    `declared-permits` is airtight: the component wrote a bound that *includes*
-    the value that breaks it, so the declaration is provably a promise it
-    cannot keep — the BUG-002 shape.
-
-    `unbounded` is weaker: nothing was declared, so arguing the value is
-    reachable is a judgement about what the quantity means rather than a
-    contradiction of anything written down — the BUG-010 shape. Real, but the
-    argument has to be made rather than read off the source.
-    """
+    """Kept for the older sweep format; `probes` now returns the claim itself."""
     return "unbounded" if parameter.min is None else "declared-permits"
