@@ -1537,16 +1537,21 @@ fn build_connection_sets(
                            span: rumoca_core::Span| {
         map.entry(var).or_insert(span);
     };
-    for conn in connections {
+    // A connector endpoint expands into its members, and those members are what
+    // end up in the connection set. Without recording them here, a member falls
+    // back to its own declaration span, which points at the connector *type*
+    // (`Pin.v`) rather than the `connect(...)` that joined the instances.
+    let endpoints = connections.iter().flat_map(|conn| {
+        [conn.a.to_flat_string(), conn.b.to_flat_string()].map(|endpoint| (endpoint, conn.span))
+    });
+    for (endpoint, span) in endpoints {
+        for child in prefix_children.get(&endpoint).into_iter().flatten() {
+            record_var_span(&mut var_first_span, child.clone(), span);
+        }
         record_var_span(
             &mut var_first_span,
-            rumoca_core::VarName::new(conn.a.to_flat_string()),
-            conn.span,
-        );
-        record_var_span(
-            &mut var_first_span,
-            rumoca_core::VarName::new(conn.b.to_flat_string()),
-            conn.span,
+            rumoca_core::VarName::new(endpoint),
+            span,
         );
     }
 
