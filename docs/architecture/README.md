@@ -98,15 +98,83 @@ Overlap is expected and is not suppressed at detection. A division by zero is a
 DomainSan finding and a SolverSan finding; `findings/deduplicate.py` decides
 they are one bug, and `BugDatabase.overlap()` reports which detectors saw it.
 
+## Five rules the code enforces
+
+**1. A failed execution is still a valid execution result.**
+No backend returns `None`. A run that died in initialization returns an
+`ExecutionResult` carrying the phase it reached, a classified `ExecutionFailure`
+and the tool's raw message. `trace=None` is an explicit fact, not an absence to
+be inferred from.
+
+**2. Coverage is capability-driven and explicit.**
+Sanitizers declare `requires` per *component*, and the planner resolves it
+against the environment before anything runs:
+
+```
+Result:
+    domain.hints: enabled
+    domain.runtime: skipped (observe_expression unavailable)
+    numeric.runtime: enabled
+    range.runtime: enabled
+    solver.failure: enabled
+    solver.collapse: skipped (observe_solver_steps unavailable)
+```
+
+This exists so that "no finding" is never ambiguous. Without it, a clean model
+and an unobservable one look identical, and no finding count means anything.
+
+**3. Canonical and backend identity are different types.**
+`CanonicalAnchor` means *this is an exact entity in the DAE*. `BackendAnchor`
+means *this is what the tool called it*. Never a sentinel id, never a hashed
+name, never a sequential id standing in for a DAE id. A finding reports its
+`anchor_quality` so a reader knows which it has.
+
+**4. A missing canonical anchor never discards a finding.**
+RangeSan reports `pump.medium.X = -0.13` violating `min = 0` from OpenModelica,
+labelled `backend-only`, with a backend-namespaced signature. Losing the bug
+would cost coverage; faking the id would corrupt identity for everything
+downstream.
+
+**5. SolverSan is a failure oracle, not a root-cause sanitizer.**
+A solver failure is often the last symptom of a chain — a configuration makes a
+block singular, the block makes the solver fail. SolverSan reports that the
+execution failed and how the runtime described it, and is *not* suppressed when
+a more specific sanitizer also fires. Correlating them is the deduplicator's
+job; `sequence` preserves the order that makes it possible.
+
+## Signatures
+
+Readable, with the primary anchor spelled out rather than hashed away:
+
+```
+range:below-min:var:91:62596a8d                    canonical
+range:below-min:openmodelica/tank.level:9487dea6   backend-only
+solver:initialization-failure:exec:0a90a3f3        no entity anchor
+```
+
+The two `below-min` signatures are deliberately different. The same name in two
+tools is not known to be the same entity, and a signature must not assert it.
+Merging them is a later cross-backend deduplication step that needs evidence.
+
 ## Known gaps
 
-- `passes/` exists as a directory but no instrumentation pass is implemented, so
-  `RequestKind.OBSERVE_EXPRESSION` is unsatisfiable on every current backend and
-  DomainSan's runtime half never fires. The planner reports this as unsupported
-  rather than letting DomainSan look clean.
-- The OpenModelica backend reports variable *names*, not DAE ids, so
-  `variable_id` is -1 for its observations and RangeSan cannot anchor on them.
-  Inventing an id there would break every downstream anchor, so it is left
-  unset and the sanitizer simply does not fire.
+- `passes/` exists but no instrumentation pass is implemented, so
+  `OBSERVE_EXPRESSION` is unsatisfiable on every current backend and DomainSan's
+  runtime half cannot fire. The planner reports it as `skipped`; DomainSan's
+  hint component still runs, so the sanitizer is `PARTIAL`, not disabled.
+- No backend provides `OBSERVE_SOLVER_STEPS`, so SolverSan's timestep-collapse
+  component is skipped. Its failure component works everywhere.
+- `CANONICAL_IDENTITY` is unavailable from OpenModelica. RangeSan and NumericSan
+  work anyway, on backend anchors; a sanitizer that genuinely needs DAE identity
+  should declare that capability so the planner can stand it down.
+- `legacy/` still holds the pre-layering modules. The corpus sweep tooling runs
+  against them; they are not to be extended.
+
+## Tests
+
+`packages/modelsan/tests/test_architecture.py` — 25 assertions covering failure
+without a trajectory, unsupported instrumentation, backend-only anchors,
+canonical anchors, and backend error vs model failure. Run it directly; it uses
+doubles, so it needs no tool installed.
 - `legacy/` still holds the pre-layering modules. The corpus sweep tooling runs
   against them; they are not to be extended.

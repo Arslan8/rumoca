@@ -1,57 +1,77 @@
 """Stable identity for a bug, independent of the execution that found it.
 
-Two runs that trigger the same defect with different parameter values, at
-different times, on different models must produce the same signature. Otherwise
-every fuzzing campaign reports thousands of "unique" bugs and the count means
-nothing.
+Built only from properties of the *model*, never of the run. Two campaigns that
+trigger one defect with different values at different times must agree.
 
-The rule is: a signature is built only from things that are properties of the
-*model*, never of the *run*.
+Canonical and backend-anchored signatures are deliberately *not* interchangeable
+and are marked as such. A backend-only signature identifies "this variable name,
+in this tool"; a canonical one identifies an exact DAE entity. Merging them is a
+later cross-backend deduplication step that needs evidence, not an assumption
+made here by spelling them the same way.
 """
 
 from __future__ import annotations
 
 import hashlib
 
+from ..runtime.anchors import AnchorQuality
 from .finding import Finding
 
-# Deliberately excluded from every signature. Listed rather than merely omitted
-# so the intent survives future edits.
+# Excluded from every signature. Listed rather than merely omitted so the intent
+# survives future edits.
 NEVER_IN_SIGNATURE = frozenset({"time", "test_case", "value", "step_size", "seed"})
 
 
 def compute(finding: Finding) -> str:
-    """A short, stable identifier for what bug this is.
-
-    Built from the sanitizer, the violation kind, and whichever DAE entities the
-    sanitizer chose to anchor on. Anchoring is the sanitizer's decision because
-    it is the sanitizer that knows what makes two occurrences the same:
-    DomainSan anchors on the expression performing the unsafe operation,
-    RangeSan on the variable and the bound it broke, SingularSan on the block.
-    """
+    """A short, stable identifier for what bug this is."""
     parts = [finding.sanitizer, finding.kind]
-    for label, ids in (
-        ("eq", finding.equation_ids),
-        ("var", finding.variable_ids),
-        ("par", finding.parameter_ids),
-        ("expr", finding.expression_ids),
-    ):
-        if ids:
-            parts.append(f"{label}:{','.join(str(i) for i in sorted(set(ids)))}")
+    quality = finding.anchor_quality
 
-    # Source location is included when present, because the same defect reached
-    # through two different instantiations of one component is one bug — the
-    # DAE ids differ per model, the declaration site does not.
+    if quality is AnchorQuality.CANONICAL:
+        parts += sorted(f"{a.kind.value}:{a.dae_id}" for a in finding.canonical_anchors)
+    elif quality is AnchorQuality.BACKEND_ONLY:
+        # Namespaced by backend: the same name in two tools is not known to be
+        # the same entity, and a signature must not assert that it is.
+        parts += sorted(f"{a.backend}/{a.name}" for a in finding.backend_anchors)
+    else:
+        # No entity anchor at all — a whole-execution failure. The kind plus the
+        # failure class is as specific as the evidence supports.
+        reason = finding.evidence.get("failure_kind") or finding.evidence.get("reason", "")
+        parts.append(f"exec:{str(reason)[:60]}")
+
+    # A source location makes the same component defect one bug across the many
+    # models that instantiate it: the DAE ids differ per model, the declaration
+    # site does not.
     if finding.source_locations:
         first = finding.source_locations[0]
         parts.append(f"src:{first.file}:{first.line}")
 
-    digest = hashlib.sha1("|".join(parts).encode()).hexdigest()[:12]
-    return f"{finding.sanitizer}:{finding.kind}:{digest}"
+    # The primary anchor is spelled out rather than only folded into the hash.
+    # A signature that has to be looked up to mean anything is a worse tool for
+    # triage than one that says `range:below-min:var91` on sight; the digest is
+    # still there to keep distinct bugs distinct when the anchor is not unique.
+    digest = hashlib.sha1("|".join(parts).encode()).hexdigest()[:8]
+    return f"{finding.sanitizer}:{finding.kind}:{_anchor_label(finding)}:{digest}"
+
+
+def _anchor_label(finding: Finding) -> str:
+    """A short, readable identifier for what the finding is attached to.
+
+    Backend anchors keep their backend prefix, so a signature never suggests
+    that a name observed in one tool is known to be the same entity as the same
+    name in another.
+    """
+    quality = finding.anchor_quality
+    if quality is AnchorQuality.CANONICAL:
+        first = finding.canonical_anchors[0]
+        return f"{first.kind.value[:3]}:{first.dae_id}"
+    if quality is AnchorQuality.BACKEND_ONLY:
+        first = finding.backend_anchors[0]
+        return f"{first.backend}/{first.name}"[:64]
+    return "exec"
 
 
 def attach(findings: list[Finding]) -> list[Finding]:
-    """Fill in signatures and execution ordering for a run's findings."""
     for index, finding in enumerate(findings):
         finding.sequence = index
         finding.signature = compute(finding)

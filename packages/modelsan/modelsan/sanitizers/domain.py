@@ -25,7 +25,9 @@ from ..dae import BinaryOp, BuiltinCall, Expression
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..fuzz.testcase import TestCase
-from ..instrumentation.request import InstrumentationRequest, RequestKind
+from ..instrumentation.capability import Capability
+from ..instrumentation.request import InstrumentationRequest
+from ..runtime.anchors import CanonicalAnchor, EntityKind
 from ..runtime.observations import ExpressionObservation, ObservationStream
 
 DIVISION_OPS = frozenset({"Div", "div", "/"})
@@ -91,6 +93,15 @@ class DomainSan:
 
     name = "domain"
 
+    #: The split matters. Hints need nothing and always work; the runtime check
+    #: needs an observed sub-expression, which no current backend provides. The
+    #: planner reports the runtime half as skipped rather than letting it look
+    #: like a clean result.
+    requires = {
+        "hints": frozenset(),
+        "runtime": frozenset({Capability.OBSERVE_EXPRESSION}),
+    }
+
     def requests(self, model, context: AnalysisContext) -> list[InstrumentationRequest]:
         """Ask for each constrained operand to be observed.
 
@@ -99,8 +110,8 @@ class DomainSan:
         """
         return [
             InstrumentationRequest(
-                kind=RequestKind.OBSERVE_EXPRESSION,
-                expression_id=site.operand.id,
+                capability=Capability.OBSERVE_EXPRESSION,
+                anchor=CanonicalAnchor(EntityKind.EXPRESSION, site.operand.id),
                 label=f"{site.operation}:{site.requirement}",
                 requested_by=self.name,
             )
@@ -138,23 +149,30 @@ class DomainSan:
         one finding per sample would bury the result.
         """
         by_expression = {site.operand.id: site for site in sites(model)}
+        # Expression observations are always canonically anchored: an
+        # instrumentation request names a DAE expression, so anything answering
+        # one knows which.
         reported: set[int] = set()
         findings = []
 
         for observation in stream.of(ExpressionObservation):
-            site = by_expression.get(observation.expression_id)
-            if site is None or observation.expression_id in reported:
+            if observation.canonical is None:
+                continue
+            expression_id = observation.canonical.dae_id
+            site = by_expression.get(expression_id)
+            if site is None or expression_id in reported:
                 continue
             if site.admits(observation.value):
                 continue
-            reported.add(observation.expression_id)
+            reported.add(expression_id)
             findings.append(Finding(
                 sanitizer=self.name,
                 kind=f"{site.operation}-out-of-domain",
                 severity=Severity.HIGH,
-                expression_ids=[site.operand.id],
-                variable_ids=[v.id for v in site.operand.variables()],
+                canonical_anchors=[CanonicalAnchor(EntityKind.EXPRESSION,
+                                                   site.operand.id)],
                 source_locations=_location(site.operand),
+                phase=observation.phase,
                 time=observation.time,
                 test_case=testcase,
                 evidence={

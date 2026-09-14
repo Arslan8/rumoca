@@ -1,13 +1,15 @@
 """Wiring the layers together. The only component that knows all of them exist.
 
-Each layer below is independently testable and independently replaceable; this
-is where the flow in the architecture diagram is actually expressed:
+The ordering here encodes two rules:
 
-    DAE -> analysis -> instrumentation -> execution -> observations
-                                                          |
-                                            sanitizers <--+
-                                                |
-                                          findings -> dedup -> reporting
+**Coverage is resolved before anything runs.** The plan records, per sanitizer
+component, whether it can operate and why not — so a finding count is always
+interpretable. "No finding" from a sanitizer the planner marked unsupported does
+not mean the model was clean.
+
+**A failed execution is still judged.** Results are passed to sanitizers whether
+or not they produced a trajectory, because the failure itself is an observation
+and SolverSan exists to read it.
 """
 
 from __future__ import annotations
@@ -15,28 +17,37 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .analysis.context import AnalysisContext
-from .backends.base import ExecutionResult, Status
+from .backends.base import ExecutionResult, ExecutionStatus
 from .findings.deduplicate import BugDatabase
 from .findings.finding import Finding
 from .findings.signature import attach
 from .fuzz.hints import FuzzHint, merge
 from .fuzz.testcase import NOMINAL, TestCase
-from .instrumentation.planner import InstrumentationPlanner, Plan
+from .instrumentation.planner import CapabilityPlanner, Plan
 from .sanitizers.registry import SanitizerRegistry
 
 
 @dataclass
 class RunOutcome:
-    """Everything one campaign over one model produced."""
+    """Everything one campaign over one model produced, including what it could
+    not look at."""
 
     model_name: str
+    plan: Plan | None = None
     baseline: ExecutionResult | None = None
+    results: list[ExecutionResult] = field(default_factory=list)
     database: BugDatabase = field(default_factory=BugDatabase)
     hints: list[FuzzHint] = field(default_factory=list)
-    plan: Plan | None = None
-    executed: int = 0
-    skipped_sanitizers: set[str] = field(default_factory=set)
     note: str = ""
+
+    @property
+    def coverage(self) -> dict[str, str]:
+        """Sanitizer components that did not run, and why. Never empty silently."""
+        return self.plan.skipped_sanitizers() if self.plan else {}
+
+    @property
+    def executed(self) -> int:
+        return len(self.results)
 
 
 class Pipeline:
@@ -50,19 +61,20 @@ class Pipeline:
             hints.extend(sanitizer.hints(model, context))
         return merge(hints)
 
-    def plan_instrumentation(self, model, context: AnalysisContext) -> Plan:
+    def plan(self, model, context: AnalysisContext) -> Plan:
         requests = []
         for sanitizer in self.registry.instrumentation_requesters():
             requests.extend(sanitizer.requests(model, context))
-        capabilities = getattr(self.backend, "capabilities", frozenset())
-        return InstrumentationPlanner(capabilities).plan(requests)
+        capabilities = frozenset(getattr(self.backend, "capabilities", frozenset()))
+        return CapabilityPlanner(capabilities).plan(self.registry.active(), requests)
 
     def judge(self, result: ExecutionResult, model, context: AnalysisContext,
               testcase: TestCase) -> list[Finding]:
-        """Run every runtime observer over one execution.
+        """Run every runtime observer over one execution — success or failure.
 
-        Ordering is preserved across sanitizers so a causal chain — conditioning,
-        then step rejection, then a NaN — stays reconstructible.
+        Sanitizers are not asked to check whether a trace exists; the planner
+        already decided which of them can operate here. Ordering is preserved
+        across sanitizers so a causal chain stays reconstructible.
         """
         findings: list[Finding] = []
         for sanitizer in self.registry.runtime_observers():
@@ -73,42 +85,43 @@ class Pipeline:
 
     def run(self, model, model_path: str, model_name: str,
             testcases: list[TestCase] | None = None) -> RunOutcome:
-        outcome = RunOutcome(model_name=model_name)
         context = AnalysisContext(model)
-
+        outcome = RunOutcome(model_name=model_name)
+        outcome.plan = self.plan(model, context)
         outcome.hints = self.collect_hints(model, context)
-        outcome.plan = self.plan_instrumentation(model, context)
-        outcome.skipped_sanitizers = outcome.plan.skipped_sanitizers()
 
-        if not self.backend.prepare(model_path, model_name):
+        build_failure = self.backend.prepare(model_path, model_name)
+        if build_failure is not None:
+            # A backend error is evidence about the tool, not the model. It is
+            # still recorded and still judged — SolverSan reports it at INFO —
+            # so coverage stays visible instead of the model looking clean.
+            outcome.results.append(build_failure)
+            outcome.database.extend(self.judge(build_failure, model, context, NOMINAL))
             outcome.note = "backend could not build the model"
             return outcome
 
-        # Static analyzers do not need an execution, but they run after the
-        # build so that a model the backend cannot handle is reported as such
-        # rather than as a clean static result.
         for sanitizer in self.registry.static_analyzers():
             outcome.database.extend(attach(sanitizer.analyze(model, context)))
 
         baseline = self.backend.run(NOMINAL, outcome.plan.satisfied)
         outcome.baseline = baseline
-        outcome.executed += 1
+        outcome.results.append(baseline)
+        outcome.database.extend(self.judge(baseline, model, context, NOMINAL))
+
         if not baseline.ok:
-            # Without a clean baseline nothing can be attributed to a test case;
+            # Without a clean baseline nothing can be attributed to a test case:
             # the first candidate tried would be blamed for a pre-existing
-            # failure. Report the baseline itself and stop.
+            # failure. The baseline failure is itself reported above.
             outcome.note = ("model does not run at its declared values: "
-                            f"{baseline.message[:120]}")
+                            f"{baseline.failure}" if baseline.failure else
+                            "model does not run at its declared values")
             return outcome
 
         for testcase in (testcases or []):
             result = self.backend.run(testcase, outcome.plan.satisfied)
-            outcome.executed += 1
-            if not result.ran:
-                continue
+            outcome.results.append(result)
+            if result.status is ExecutionStatus.BACKEND_ERROR:
+                continue  # says nothing about the model
             outcome.database.extend(self.judge(result, model, context, testcase))
 
-        # The baseline is judged too: a violation present at declared values is
-        # a finding about the model that needs no perturbation at all.
-        outcome.database.extend(self.judge(baseline, model, context, NOMINAL))
         return outcome

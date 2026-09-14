@@ -10,8 +10,8 @@ from .base import (
 from .domain import DomainSan
 from .numeric import NumericSan
 from .range import RangeSan
-from .solver import SolverSan
 from .registry import SanitizerRegistry
+from .solver import SolverSan
 
 __all__ = ["DifferentialOracle", "DomainSan", "FuzzHintProvider",
            "InstrumentationRequester", "NumericSan", "RangeSan",

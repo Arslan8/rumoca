@@ -1,41 +1,64 @@
-"""What a running simulation reports back.
+"""What a running simulation reports back — including that it stopped running.
 
-These are runtime *metadata*, not a model representation. Nothing here describes
-the model; everything here describes one execution of it. A sanitizer consumes
-observations and DAE ids together — the observation says what happened, the id
-says where in the model it happened.
+Runtime *metadata*, never a model representation. Nothing here describes the
+model; everything describes one execution of it.
 
-Defining these once is what stops every sanitizer reaching into backend
-internals. A backend adapter produces observations; sanitizers never see a
-solver log, a CSV column, or a process exit code.
+Two rules this module enforces:
+
+**A failure is an observation.** A sanitizer must never have to infer that a
+run failed from the absence of data. `trace is None` is not a signal, it is a
+missing signal, and the two mean different things — "the model was clean" and
+"we could not see" must stay distinguishable.
+
+**Identity is explicit.** An observation carries a `CanonicalAnchor` when the
+producer genuinely knows the DAE entity, a `BackendAnchor` when it only knows
+what the tool called it, and neither when it is about the whole execution. No
+sentinel ids.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import Any, Iterator
 
+from .anchors import AnchorQuality, BackendAnchor, CanonicalAnchor, quality
+from .failures import ExecutionPhase, FailureKind
 
-class Phase(str, Enum):
-    """Initialization is not just "the run at t=0".
-
-    An initialization failure has different causes and different fixes than a
-    transient failure, so observations carry the phase and InitSan can filter on
-    it rather than guessing from a timestamp.
-    """
-
-    INITIALIZATION = "initialization"
-    TRANSIENT = "transient"
-    EVENT = "event"
+# Re-exported so callers have one import for "the phase of a run".
+Phase = ExecutionPhase
 
 
 @dataclass
 class Observation:
-    """Base for everything the runtime reports. `time` may be None pre-init."""
+    """Base for everything the runtime reports."""
 
     time: float | None = None
-    phase: Phase = Phase.TRANSIENT
+    phase: ExecutionPhase = ExecutionPhase.SIMULATION
+
+
+@dataclass
+class Anchored(Observation):
+    """An observation about a specific entity, however well we can identify it."""
+
+    canonical: CanonicalAnchor | None = None
+    backend: BackendAnchor | None = None
+
+    @property
+    def anchor_quality(self) -> AnchorQuality:
+        return quality([self.canonical] if self.canonical else [],
+                       [self.backend] if self.backend else [])
+
+    @property
+    def label(self) -> str:
+        """Best available human name, for reporting only."""
+        if self.canonical and self.canonical.name:
+            return self.canonical.name
+        if self.backend:
+            return self.backend.name
+        return str(self.canonical) if self.canonical else "?"
+
+
+# ── Lifecycle ────────────────────────────────────────────────────────────────
 
 
 @dataclass
@@ -51,62 +74,62 @@ class SimulationEnd(Observation):
 
 @dataclass
 class InitializationStart(Observation):
-    phase: Phase = Phase.INITIALIZATION
+    phase: ExecutionPhase = ExecutionPhase.INITIALIZATION
 
 
 @dataclass
 class InitializationEnd(Observation):
-    phase: Phase = Phase.INITIALIZATION
+    phase: ExecutionPhase = ExecutionPhase.INITIALIZATION
     converged: bool = True
     iterations: int = 0
 
 
-@dataclass
-class VariableObservation(Observation):
-    """One variable's value at one instant. `variable_id` is the DAE id."""
+# ── Values ───────────────────────────────────────────────────────────────────
 
-    variable_id: int = -1
-    name: str = ""
+
+@dataclass
+class VariableObservation(Anchored):
     value: float = 0.0
 
 
 @dataclass
-class ExpressionObservation(Observation):
+class ExpressionObservation(Anchored):
     """The value of an instrumented sub-expression.
 
-    This is what makes DomainSan able to say "the divisor was zero" rather than
+    This is what lets DomainSan say "the divisor was zero" rather than
     "something downstream became inf".
     """
 
-    expression_id: int = -1
     value: float = 0.0
-    label: str = ""
+    role: str = ""
 
 
 @dataclass
-class EquationResidual(Observation):
-    """`r = F(x, x', z, p, t)` for one equation, which should be ~0."""
+class EquationResidual(Anchored):
+    """`r = F(x, x', z, p, t)` for one equation, which should stay near zero."""
 
-    equation_id: int = -1
     residual: float = 0.0
     scale: float | None = None
 
 
+# ── Events ───────────────────────────────────────────────────────────────────
+
+
 @dataclass
-class EventTriggered(Observation):
-    phase: Phase = Phase.EVENT
-    event_id: int = -1
-    condition_id: int = -1
+class EventTriggered(Anchored):
+    phase: ExecutionPhase = ExecutionPhase.EVENT
     old_value: Any = None
     new_value: Any = None
 
 
 @dataclass
-class EventIteration(Observation):
-    phase: Phase = Phase.EVENT
-    event_id: int = -1
+class EventIteration(Anchored):
+    phase: ExecutionPhase = ExecutionPhase.EVENT
     iterations: int = 0
     converged: bool = True
+
+
+# ── Solver ───────────────────────────────────────────────────────────────────
 
 
 @dataclass
@@ -117,30 +140,75 @@ class SolverStep(Observation):
 
 
 @dataclass
-class SolverFailure(Observation):
-    reason: str = ""
-    equation_id: int | None = None
-    variable_id: int | None = None
-
-
-@dataclass
 class JacobianObservation(Observation):
-    """Conditioning of one algebraic block, for detecting trouble early."""
-
-    block_id: int = -1
+    block_id: int | None = None
     condition_estimate: float | None = None
     rank: int | None = None
     dimension: int = 0
 
 
+# ── Failures. First-class observations, not absences. ────────────────────────
+
+
+@dataclass
+class ExecutionFailureObservation(Anchored):
+    """Base for every way an execution can stop producing useful output."""
+
+    kind: FailureKind = FailureKind.UNKNOWN
+    reason: str = ""
+    raw: str = ""
+
+
+@dataclass
+class CompilationFailure(ExecutionFailureObservation):
+    phase: ExecutionPhase = ExecutionPhase.COMPILATION
+    kind: FailureKind = FailureKind.COMPILATION_ERROR
+
+
+@dataclass
+class BackendFailure(ExecutionFailureObservation):
+    """The tool itself could not run — a build error, a missing dependency.
+
+    Distinct from a model failure on purpose: this is evidence about the
+    backend, and treating it as evidence about the model is how a coverage gap
+    becomes a false bug report.
+    """
+
+    phase: ExecutionPhase = ExecutionPhase.COMPILATION
+    kind: FailureKind = FailureKind.BUILD_ERROR
+
+
+@dataclass
+class InitializationFailure(ExecutionFailureObservation):
+    phase: ExecutionPhase = ExecutionPhase.INITIALIZATION
+
+
+@dataclass
+class SolverFailure(ExecutionFailureObservation):
+    phase: ExecutionPhase = ExecutionPhase.SIMULATION
+
+
+@dataclass
+class EventIterationFailure(ExecutionFailureObservation):
+    phase: ExecutionPhase = ExecutionPhase.EVENT
+    kind: FailureKind = FailureKind.EVENT_ITERATION_FAILURE
+
+
+@dataclass
+class SimulationAbort(ExecutionFailureObservation):
+    """Stopped for a reason that is not a numerical failure — timeout, kill."""
+
+    kind: FailureKind = FailureKind.ABORTED
+
+
 @dataclass
 class ObservationStream:
-    """Everything one execution reported, in the order it happened.
+    """Everything one execution reported, in order.
 
     Order is preserved because a single defect commonly surfaces as several
-    observations in sequence — conditioning degrades, then steps are rejected,
-    then a residual blows up, then a NaN appears. Discarding the order discards
-    the evidence that those were one event.
+    observations in sequence — conditioning degrades, steps are rejected, a
+    residual grows, a NaN appears. Discarding the order discards the evidence
+    that those were one event.
     """
 
     observations: list[Observation] = field(default_factory=list)
@@ -152,6 +220,20 @@ class ObservationStream:
         for observation in self.observations:
             if isinstance(observation, kinds):
                 yield observation
+
+    @property
+    def failures(self) -> list[ExecutionFailureObservation]:
+        return list(self.of(ExecutionFailureObservation))
+
+    @property
+    def has_trace(self) -> bool:
+        """Whether any variable was actually observed.
+
+        Sanitizers do not test this themselves — the planner uses it to decide
+        which sanitizers could run at all, so that "no finding" never silently
+        means "no data".
+        """
+        return any(isinstance(o, VariableObservation) for o in self.observations)
 
     def __iter__(self) -> Iterator[Observation]:
         return iter(self.observations)

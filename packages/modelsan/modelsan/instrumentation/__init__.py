@@ -1,6 +1,14 @@
-"""Instrumentation requests, and planning them against a backend."""
+"""Capabilities, requests, and resolving coverage before anything runs."""
 
-from .planner import InstrumentationPlanner, Plan
-from .request import InstrumentationRequest, RequestKind
+from .capability import Capability
+from .planner import (
+    CapabilityPlanner,
+    ComponentSupport,
+    Plan,
+    SanitizerSupport,
+    Support,
+)
+from .request import InstrumentationRequest
 
-__all__ = ["InstrumentationPlanner", "InstrumentationRequest", "Plan", "RequestKind"]
+__all__ = ["Capability", "CapabilityPlanner", "ComponentSupport",
+           "InstrumentationRequest", "Plan", "SanitizerSupport", "Support"]

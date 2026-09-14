@@ -31,6 +31,7 @@ import math
 from ..analysis.context import AnalysisContext
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.testcase import TestCase
+from ..instrumentation.capability import Capability
 from ..runtime.observations import ObservationStream, VariableObservation
 
 # A magnitude no physical MSL quantity reaches, chosen well above any plausible
@@ -40,6 +41,10 @@ EXTREME = 1e30
 
 class NumericSan:
     name = "numeric"
+
+    #: Needs a trajectory. Declared, so the planner can report that this
+    #: sanitizer was inactive rather than letting silence read as "clean".
+    requires = {"runtime": frozenset({Capability.OBSERVE_VARIABLE})}
 
     def __init__(self, extreme_magnitude: float = EXTREME) -> None:
         self.extreme_magnitude = extreme_magnitude
@@ -53,8 +58,7 @@ class NumericSan:
             kind = self._classify(observation.value)
             if kind is None:
                 continue
-            key = (kind, observation.variable_id if observation.variable_id >= 0
-                   else observation.name)
+            key = (kind, observation.label)
             if key in seen:
                 continue
             seen.add(key)
@@ -62,14 +66,18 @@ class NumericSan:
                 sanitizer=self.name,
                 kind=kind,
                 severity=Severity.HIGH if kind != "extreme-magnitude" else Severity.MEDIUM,
-                variable_ids=[observation.variable_id] if observation.variable_id >= 0 else [],
-                source_locations=self._location(context, observation.variable_id),
+                canonical_anchors=([observation.canonical]
+                                   if observation.canonical else []),
+                backend_anchors=([observation.backend]
+                                 if observation.backend else []),
+                source_locations=self._location(context, observation.canonical),
+                phase=observation.phase,
                 time=observation.time,
                 test_case=testcase,
                 evidence={
-                    "variable": observation.name,
+                    "variable": observation.label,
                     "value": observation.value,
-                    "phase": observation.phase.value,
+                    "anchor_quality": observation.anchor_quality.value,
                 },
             ))
         return self._first_only(findings)
@@ -99,10 +107,10 @@ class NumericSan:
         return list(earliest.values())
 
     @staticmethod
-    def _location(context: AnalysisContext, variable_id: int) -> list[SourceLocation]:
-        if variable_id < 0:
+    def _location(context: AnalysisContext, anchor) -> list[SourceLocation]:
+        if anchor is None:
             return []
-        variable = context.variable(variable_id)
+        variable = context.variable(anchor.dae_id)
         source = getattr(variable, "source", None) if variable else None
         span = getattr(source, "span", None) if source else None
         if span is None:
