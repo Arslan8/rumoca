@@ -79,6 +79,7 @@ tracing = ["dep:tracing-subscriber", "rumoca-compile/tracing"]
 # rumoca-sim wraps simulation primitives, solvers, and opt-in axes for scenario
 # config, scheduling, transports, input devices, viewer web UI, and reports.
 # Library consumers select only the axes they need.
+rumoca-bitcode = { workspace = true }
 rumoca-compile = { workspace = true }
 rumoca-core = { workspace = true }
 rumoca-ir-solve = { workspace = true }

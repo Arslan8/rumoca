@@ -165,6 +165,10 @@ pub enum Commands {
     Targets(TargetsArgs),
     /// Inspect or prune the shared Rumoca cache
     Cache(CacheArgs),
+    /// Inspect, dump, validate, or convert a Rumoca Bitcode artifact
+    Bitcode(crate::bitcode_cli::BitcodeArgs),
+    /// Compile a Rumoca Bitcode artifact back into a model
+    CompileBitcode(crate::bitcode_cli::CompileBitcodeArgs),
     /// Print the build identity shared with the Python binding
     ///
     /// Exits non-zero when the identity is unavailable, so a caller comparing
@@ -314,6 +318,19 @@ pub struct CompileArgs {
     /// exactly what this compiler compiled.
     #[arg(long, conflicts_with_all = ["emit", "target", "inspect"])]
     pub emit_standard_modelica: bool,
+
+    /// Write Rumoca Bitcode for external analysis or transformation.
+    #[arg(long, value_name = "FILE", conflicts_with_all = ["emit", "target"])]
+    pub emit_bitcode: Option<PathBuf>,
+
+    /// Encoding for --emit-bitcode.
+    #[arg(long, value_enum, default_value_t = crate::bitcode_cli::BitcodeFormat::Cbor, requires = "emit_bitcode")]
+    pub bitcode_format: crate::bitcode_cli::BitcodeFormat,
+
+    /// Omit source text from --emit-bitcode. Smaller, but round-tripping then
+    /// loses the original program text behind spans.
+    #[arg(long, requires = "emit_bitcode")]
+    pub bitcode_no_sources: bool,
 
     /// Pick which IR a raw template `--target` receives (default dae). Only
     /// meaningful when --target is a `.jinja` file, e.g. `--target my.jinja
@@ -704,6 +721,8 @@ pub fn run(cli: Cli) -> Result<()> {
         }
         Commands::Targets(args) => targets_cmd::run(args.json),
         Commands::Cache(args) => cache_cmd::run_cache(args),
+        Commands::Bitcode(args) => crate::bitcode_cli::run_bitcode(args),
+        Commands::CompileBitcode(args) => crate::bitcode_cli::run_compile_bitcode(args),
         Commands::BuildInfo => run_build_info(),
     }
 }
@@ -1084,6 +1103,16 @@ fn run_compile(args: CompileArgs) -> Result<()> {
     }
 
     let (result, model) = compile_with_inferred_model(&args.input, args.diagnostics.verbose)?;
+
+    if let Some(path) = args.emit_bitcode.as_deref() {
+        return crate::bitcode_cli::emit_bitcode(
+            &result,
+            &model,
+            path,
+            args.bitcode_format,
+            !args.bitcode_no_sources,
+        );
+    }
 
     // Structural / point inspection of the lowered model (shares the `sim
     // --inspect` machinery). Structure is a compile-time artifact, so it belongs

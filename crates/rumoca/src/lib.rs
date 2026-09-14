@@ -38,6 +38,10 @@ mod error;
 #[cfg(feature = "scheduled-sim")]
 pub mod cli;
 
+// Rumoca Bitcode CLI: the external compiler interface.
+#[cfg(feature = "scheduled-sim")]
+pub mod bitcode_cli;
+
 // CLI subcommand implementations. Declared here (rather than in `main.rs`) so
 // both the binary and the reusable `cli` module can reach them; `cli` owns the
 // argument types and dispatch, these own the per-command work.

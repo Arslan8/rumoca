@@ -55,6 +55,7 @@ members = [
     "crates/rumoca-ir-galec",
     # Compile pipeline and tools
     "crates/rumoca-compile",
+    "crates/rumoca-bitcode",
     "crates/rumoca-tool-lint",
     "crates/rumoca-tool-fmt",
     "crates/rumoca-tool-lsp",
@@ -130,6 +131,7 @@ rumoca-solver-diffsol = { path = "crates/rumoca-solver-diffsol" }
 rumoca-solver-rk45 = { path = "crates/rumoca-solver-rk45" }
 rumoca-phase-typecheck = { path = "crates/rumoca-phase-typecheck" }
 rumoca-compile = { path = "crates/rumoca-compile" }
+rumoca-bitcode = { path = "crates/rumoca-bitcode" }
 rumoca-ir-galec = { path = "crates/rumoca-ir-galec" }
 rumoca-exec-cranelift = { path = "crates/rumoca-exec-cranelift" }
 rumoca-exec-mlir = { path = "crates/rumoca-exec-mlir" }
@@ -170,6 +172,7 @@ serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = { version = "1.0", features = ["preserve_order"] }
 self_cell = "1.2.2"
 bincode = "1.3"
+ciborium = "0.2"
 syn = { version = "2.0", features = ["full", "visit"] }
 proc-macro2 = "1.0"
 futures-util = "0.3"

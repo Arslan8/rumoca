@@ -1,0 +1,730 @@
+//! `rumoca compile --emit-bitcode`, `rumoca bitcode ...`, and
+//! `rumoca compile-bitcode`.
+//!
+//! These three commands are the external compiler interface: a model goes out
+//! as `.rbc`, an arbitrary tool in any language edits it, and it comes back in
+//! through validation and checked reconstruction.
+
+use std::path::{Path, PathBuf};
+
+use anyhow::{Context, Result, bail};
+use clap::{Args, Subcommand, ValueEnum};
+use rumoca_bitcode::schema::RbcModel;
+use rumoca_bitcode::{Encoding, ExportOptions};
+
+use crate::compiler::CompilationResult;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum, Default)]
+pub enum BitcodeFormat {
+    /// Compact binary (default).
+    #[default]
+    Cbor,
+    /// Human-readable, same schema.
+    Json,
+}
+
+impl From<BitcodeFormat> for Encoding {
+    fn from(format: BitcodeFormat) -> Self {
+        match format {
+            BitcodeFormat::Cbor => Encoding::Cbor,
+            BitcodeFormat::Json => Encoding::Json,
+        }
+    }
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeArgs {
+    #[command(subcommand)]
+    pub command: BitcodeCommand,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum BitcodeCommand {
+    /// Print a one-screen summary of an artifact.
+    Inspect(BitcodeInspectArgs),
+    /// Print an artifact as JSON, whatever encoding it used on disk.
+    Dump(BitcodeDumpArgs),
+    /// Validate an artifact without rebuilding a model from it.
+    Check(BitcodeCheckArgs),
+    /// Re-encode an artifact, e.g. binary to JSON and back.
+    Convert(BitcodeConvertArgs),
+    /// Prove an artifact round-trips: import it, re-export, and compare.
+    RoundTrip(BitcodeRoundTripArgs),
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeInspectArgs {
+    /// The `.rbc` artifact.
+    pub input: PathBuf,
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeDumpArgs {
+    pub input: PathBuf,
+    /// Write to a file instead of standard output.
+    #[arg(short, long)]
+    pub output: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeCheckArgs {
+    pub input: PathBuf,
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeConvertArgs {
+    pub input: PathBuf,
+    #[arg(short, long)]
+    pub output: PathBuf,
+    #[arg(long, value_enum, default_value_t = BitcodeFormat::Cbor)]
+    pub format: BitcodeFormat,
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeRoundTripArgs {
+    pub input: PathBuf,
+    /// Write the re-exported artifact here for inspection.
+    #[arg(short, long)]
+    pub output: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+#[command(arg_required_else_help = true)]
+pub struct CompileBitcodeArgs {
+    /// The `.rbc` artifact to compile.
+    pub input: PathBuf,
+    /// Code-generation target, as for `rumoca compile --target`.
+    #[arg(long, value_name = "TARGET")]
+    pub target: Option<String>,
+    /// Output path for the generated artifact.
+    #[arg(short, long)]
+    pub output: Option<PathBuf>,
+    /// Print the reconstructed model's shape and exit.
+    #[arg(long)]
+    pub summary: bool,
+    /// Simulate the reconstructed model and emit its trace points.
+    #[arg(long)]
+    pub simulate: bool,
+    /// Simulation end time.
+    #[arg(long, default_value_t = 1.0, requires = "simulate")]
+    pub t_end: f64,
+    /// Fixed output interval. Omitted lets the runtime choose.
+    #[arg(long, requires = "simulate")]
+    pub dt: Option<f64>,
+    /// Write the trace as CSV here instead of a table on standard output.
+    #[arg(long, value_name = "FILE", requires = "simulate")]
+    pub trace_out: Option<PathBuf>,
+}
+
+/// Write a compiled model as bitcode.
+pub fn emit_bitcode(
+    result: &CompilationResult,
+    model_name: &str,
+    path: &Path,
+    format: BitcodeFormat,
+    embed_sources: bool,
+) -> Result<()> {
+    let mut options = ExportOptions::default();
+    options.embed_sources = embed_sources;
+    let file = rumoca_bitcode::export(&result.dae, Some(&result.flat), model_name, &options)
+        .context("export bitcode")?;
+    rumoca_bitcode::write_file(path, &file, format.into())
+        .with_context(|| format!("write {}", path.display()))?;
+    eprintln!(
+        "wrote bitcode v{} ({}) to {}",
+        file.bitcode_version,
+        Encoding::from(format).as_str(),
+        path.display()
+    );
+    Ok(())
+}
+
+pub fn run_bitcode(args: BitcodeArgs) -> Result<()> {
+    match args.command {
+        BitcodeCommand::Inspect(args) => run_inspect(&args.input),
+        BitcodeCommand::Dump(args) => run_dump(&args.input, args.output.as_deref()),
+        BitcodeCommand::Check(args) => run_check(&args.input),
+        BitcodeCommand::Convert(args) => run_convert(&args.input, &args.output, args.format),
+        BitcodeCommand::RoundTrip(args) => run_round_trip(&args.input, args.output.as_deref()),
+    }
+}
+
+fn run_inspect(path: &Path) -> Result<()> {
+    let (file, encoding) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
+    let model = &file.model;
+    let summary = &model.summary;
+    println!("{} ({})", path.display(), encoding.as_str());
+    println!("  bitcode version  {}", file.bitcode_version);
+    println!("  producer         {}", file.producer);
+    println!("  model            {}", model.name);
+    println!();
+    println!("  variables        {}", summary.variables);
+    println!("    states         {}", summary.states);
+    println!("    parameters     {}", summary.parameters);
+    println!("    constants      {}", summary.constants);
+    println!("    inputs         {}", summary.inputs);
+    println!("    outputs        {}", summary.outputs);
+    println!("    algebraics     {}", summary.algebraics);
+    println!("    discrete real  {}", summary.discrete_reals);
+    println!("    discrete value {}", summary.discrete_values);
+    println!("  equations        {}", summary.equations);
+    println!("  initial eqs      {}", summary.initial_equations);
+    println!("  expressions      {}", summary.expressions);
+    println!("  relations        {}", summary.relations);
+    println!("  conditions       {}", summary.conditions);
+    println!("  roots            {}", summary.roots);
+    println!("  event actions    {}", summary.events);
+    println!("  time events      {}", summary.time_events);
+    println!("  components       {}", summary.components);
+    println!("  connections      {}", summary.connections);
+    println!("  trace points     {}", summary.trace_points);
+    if !model.connections.is_empty() {
+        println!();
+        println!("  connections:");
+        for connection in &model.connections {
+            println!(
+                "    [{}] {} <-> {}  ({:?})",
+                connection.id,
+                connection.left_connector,
+                connection.right_connector,
+                connection.quantity
+            );
+        }
+    }
+    Ok(())
+}
+
+fn run_dump(path: &Path, output: Option<&Path>) -> Result<()> {
+    // Dump shows the artifact as it is on disk, including any field a newer
+    // producer added that this build does not interpret.
+    let bytes = std::fs::read(path).with_context(|| format!("read {}", path.display()))?;
+    let json = rumoca_bitcode::dump_json(&bytes).map_err(anyhow::Error::from)?;
+    match output {
+        Some(output) => {
+            std::fs::write(output, json).with_context(|| format!("write {}", output.display()))?;
+            eprintln!("wrote {}", output.display());
+        }
+        None => println!("{json}"),
+    }
+    Ok(())
+}
+
+fn run_check(path: &Path) -> Result<()> {
+    let (file, _) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
+    match rumoca_bitcode::validate(&file.model, &Default::default()) {
+        Ok(()) => {
+            println!(
+                "{}: valid bitcode v{}",
+                path.display(),
+                file.bitcode_version
+            );
+            Ok(())
+        }
+        Err(errors) => {
+            for error in &errors {
+                eprintln!("  - {error}");
+            }
+            bail!("{}: {} validation error(s)", path.display(), errors.len())
+        }
+    }
+}
+
+fn run_convert(input: &Path, output: &Path, format: BitcodeFormat) -> Result<()> {
+    // Changing how an artifact is stored must not change what it contains, so
+    // this transcodes the raw document rather than round-tripping the typed
+    // schema, which would drop fields this build does not know.
+    let bytes = std::fs::read(input).with_context(|| format!("read {}", input.display()))?;
+    let (_, from) = rumoca_bitcode::decode(&bytes).map_err(anyhow::Error::from)?;
+    let converted =
+        rumoca_bitcode::transcode(&bytes, format.into()).map_err(anyhow::Error::from)?;
+    if let Some(parent) = output.parent().filter(|p| !p.as_os_str().is_empty()) {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::write(output, converted).with_context(|| format!("write {}", output.display()))?;
+    eprintln!(
+        "converted {} ({}) -> {} ({})",
+        input.display(),
+        from.as_str(),
+        output.display(),
+        Encoding::from(format).as_str()
+    );
+    Ok(())
+}
+
+/// Prove `RBC -> DAE -> RBC` is faithful.
+///
+/// Re-exporting a reconstructed DAE and comparing it to the original artifact
+/// is a stronger check than comparing counts: it compares every variable, its
+/// attributes, every expression node, every equation, and every event. A
+/// difference names the exact field that moved.
+fn run_round_trip(path: &Path, output: Option<&Path>) -> Result<()> {
+    let (original, _) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
+    let dae = rumoca_bitcode::import(&original).map_err(anyhow::Error::from)?;
+    let again = rumoca_bitcode::export(&dae, None, &original.model.name, &ExportOptions::default())
+        .map_err(anyhow::Error::from)?;
+
+    if let Some(output) = output {
+        rumoca_bitcode::write_file(output, &again, Encoding::Json).map_err(anyhow::Error::from)?;
+    }
+
+    let left = rumoca_bitcode::to_json(&original).map_err(anyhow::Error::from)?;
+    let right = rumoca_bitcode::to_json(&again).map_err(anyhow::Error::from)?;
+    if left == right {
+        println!("{}: round-trip is byte-identical", path.display());
+        return Ok(());
+    }
+
+    // Connections come from Flat, which import does not reconstruct, so they are
+    // expected to differ. Compare everything else field by field.
+    let differences = compare(&original.model, &again.model);
+    if differences.is_empty() {
+        println!(
+            "{}: round-trip preserves every compared field (connections are Flat-derived and not reconstructed)",
+            path.display()
+        );
+        return Ok(());
+    }
+    for difference in &differences {
+        eprintln!("  - {difference}");
+    }
+    bail!(
+        "{}: round-trip differs in {} place(s)",
+        path.display(),
+        differences.len()
+    )
+}
+
+fn compare(left: &RbcModel, right: &RbcModel) -> Vec<String> {
+    let mut differences = Vec::new();
+    let mut check = |label: &str, a: String, b: String| {
+        if a != b {
+            differences.push(format!("{label}: {a} != {b}"));
+        }
+    };
+    check(
+        "variables",
+        format!("{:?}", left.variables.len()),
+        format!("{:?}", right.variables.len()),
+    );
+    check(
+        "expressions",
+        format!("{:?}", left.expressions.len()),
+        format!("{:?}", right.expressions.len()),
+    );
+    check(
+        "equations",
+        format!("{:?}", left.equations.len()),
+        format!("{:?}", right.equations.len()),
+    );
+    for (a, b) in left.variables.iter().zip(&right.variables) {
+        check(
+            &format!("variable {} name", a.id),
+            a.name.clone(),
+            b.name.clone(),
+        );
+        check(
+            &format!("variable {} role", a.id),
+            format!("{:?}", a.role),
+            format!("{:?}", b.role),
+        );
+        check(
+            &format!("variable {} unit", a.id),
+            format!("{:?}", a.unit),
+            format!("{:?}", b.unit),
+        );
+    }
+    for (a, b) in left.expressions.iter().zip(&right.expressions) {
+        check(
+            &format!("expression {} node", a.id),
+            format!("{:?}", a.node),
+            format!("{:?}", b.node),
+        );
+    }
+    for (a, b) in left.equations.iter().zip(&right.equations) {
+        check(
+            &format!("equation {} residual", a.id),
+            format!("{:?}", a.residual),
+            format!("{:?}", b.residual),
+        );
+        check(
+            &format!("equation {} reads", a.id),
+            format!("{:?}", a.reads),
+            format!("{:?}", b.reads),
+        );
+    }
+    for (a, b) in left.events.iter().zip(&right.events) {
+        check(
+            &format!("event {} action", a.id),
+            format!("{:?}", a.action),
+            format!("{:?}", b.action),
+        );
+    }
+    differences
+}
+
+/// Read bitcode back into a checked DAE and continue compilation.
+pub fn run_compile_bitcode(args: CompileBitcodeArgs) -> Result<()> {
+    let (file, encoding) = rumoca_bitcode::read_file(&args.input).map_err(anyhow::Error::from)?;
+    eprintln!(
+        "reading {} (bitcode v{}, {})",
+        args.input.display(),
+        file.bitcode_version,
+        encoding.as_str()
+    );
+
+    let dae = rumoca_bitcode::import(&file).map_err(anyhow::Error::from)?;
+
+    if args.summary {
+        print_reconstructed(&file.model, &dae);
+    }
+
+    if args.simulate {
+        return run_trace(&file.model, &dae, &args);
+    }
+
+    if let Some(target) = args.target.as_deref() {
+        return run_target(&file.model, &dae, target, args.output.as_deref());
+    }
+
+    if !args.summary {
+        print_reconstructed(&file.model, &dae);
+    }
+    Ok(())
+}
+
+/// Render a code-generation target from a reconstructed model.
+///
+/// Targets whose manifest declares `ir = "dae"` or `ir = "fmi"` render from a
+/// DAE alone, so they work from bitcode unchanged — including `fmi2` and
+/// `fmi3`. Targets over Flat, AST, or Algorithm Code need artifacts bitcode
+/// does not carry, and are refused by name rather than approximated.
+fn run_target(
+    model: &RbcModel,
+    dae: &rumoca_compile::compile::Dae,
+    target: &str,
+    output: Option<&Path>,
+) -> Result<()> {
+    use rumoca_compile::codegen::targets::{
+        TargetBundle, TargetTemplateIr, render_dae_target_files, target_ir_is_dae_renderable,
+    };
+
+    let bundle = TargetBundle::load(target).with_context(|| format!("load target `{target}`"))?;
+    let manifest = bundle
+        .parse_manifest()
+        .with_context(|| format!("parse target manifest for `{target}`"))?;
+
+    if !target_ir_is_dae_renderable(manifest.ir) {
+        bail!(
+            "target `{target}` consumes {:?} IR, which bitcode does not carry. \
+             Bitcode reconstructs a checked DAE, so targets declaring `ir = \"dae\"` \
+             or `ir = \"fmi\"` render from it; {:?} additionally needs artifacts \
+             produced earlier in compilation. Compile from Modelica source for that target.",
+            manifest.ir,
+            manifest.ir
+        );
+    }
+    if manifest.ir == TargetTemplateIr::Fmi {
+        bail!(
+            "target `{target}` is an FMI packaging target. Its component lowering is \
+             reachable from a DAE, but packaging additionally needs the artifact \
+             session the `compile` path owns; that wiring is not done yet. \
+             DAE-level targets work: try `--target dae-modelica`."
+        );
+    }
+
+    let files = render_dae_target_files(&bundle, &manifest, dae, &model.name)
+        .with_context(|| format!("render target `{target}`"))?;
+
+    match output {
+        Some(directory) => {
+            std::fs::create_dir_all(directory)
+                .with_context(|| format!("create {}", directory.display()))?;
+            for file in &files {
+                let path = directory.join(&file.path);
+                if let Some(parent) = path.parent() {
+                    std::fs::create_dir_all(parent)?;
+                }
+                std::fs::write(&path, &file.content)
+                    .with_context(|| format!("write {}", path.display()))?;
+                eprintln!("  wrote {}", path.display());
+            }
+            eprintln!("Target `{target}` rendered to {}", directory.display());
+        }
+        None => {
+            // One file goes to stdout so a target can be piped; several would be
+            // ambiguous, so ask for a directory instead.
+            match files.as_slice() {
+                [single] => print!("{}", single.content),
+                _ => bail!(
+                    "target `{target}` renders {} files; pass --output DIRECTORY",
+                    files.len()
+                ),
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Simulate a reconstructed model and emit the trace points an external pass
+/// asked for.
+///
+/// This is the end of the loop: the trace points were written by a tool that
+/// never saw Rumoca's internals, and they select what a real solve reports.
+fn run_trace(
+    model: &RbcModel,
+    dae: &rumoca_compile::compile::Dae,
+    args: &CompileBitcodeArgs,
+) -> Result<()> {
+    use rumoca_sim::{SimOptions, simulate_with_diagnostics};
+
+    if model.trace_points.is_empty() {
+        bail!(
+            "this artifact declares no trace points; nothing to observe. \
+             Run an instrumentation pass first, e.g. connector_logger.py"
+        );
+    }
+
+    let options = SimOptions {
+        t_end: args.t_end,
+        dt: args.dt,
+        ..SimOptions::default()
+    };
+    eprintln!(
+        "Simulating {} to t={} with {} trace point(s)...",
+        model.name,
+        args.t_end,
+        model.trace_points.len()
+    );
+    let sim = simulate_with_diagnostics(dae, &options)
+        .map_err(|error| anyhow::anyhow!("simulation failed: {error}"))?;
+    eprintln!(
+        "Simulation complete: {} time points, {} variables",
+        sim.times.len(),
+        sim.names.len()
+    );
+
+    let plan = resolve_trace_plan(model, &sim.names);
+    let missing: Vec<&TracePlanRow> = plan.iter().filter(|row| row.column.is_none()).collect();
+    for row in &missing {
+        // A trace point naming a variable the solver does not report is a real
+        // gap, not something to silently drop: the user asked to observe it.
+        eprintln!(
+            "warning: trace point {} ({}) names `{}`, which the solver does not report",
+            row.id, row.label, row.variable
+        );
+    }
+
+    match args.trace_out.as_deref() {
+        Some(path) => write_trace_csv(path, &plan, &sim),
+        None => {
+            print_trace_table(&plan, &sim);
+            Ok(())
+        }
+    }
+}
+
+/// One resolved trace point: what to observe, and which solver column holds it.
+struct TracePlanRow {
+    id: u32,
+    label: String,
+    variable: String,
+    quantity: String,
+    unit: String,
+    connection: String,
+    column: Option<usize>,
+}
+
+fn resolve_trace_plan(model: &RbcModel, names: &[String]) -> Vec<TracePlanRow> {
+    model
+        .trace_points
+        .iter()
+        .map(|trace| {
+            let variable = model
+                .variables
+                .get(trace.variable.0 as usize)
+                .map(|variable| variable.name.clone())
+                .unwrap_or_default();
+            let connection = trace
+                .connection
+                .and_then(|id| model.connections.get(id.0 as usize))
+                .map(|connection| {
+                    format!(
+                        "{} <-> {}",
+                        connection.left_connector, connection.right_connector
+                    )
+                })
+                .unwrap_or_default();
+            TracePlanRow {
+                id: trace.id.0,
+                label: trace.label.clone(),
+                column: names.iter().position(|name| *name == variable),
+                variable,
+                quantity: trace
+                    .quantity
+                    .map(|quantity| format!("{quantity:?}").to_lowercase())
+                    .unwrap_or_default(),
+                unit: trace.unit.clone().unwrap_or_default(),
+                connection,
+            }
+        })
+        .collect()
+}
+
+fn write_trace_csv(path: &Path, plan: &[TracePlanRow], sim: &rumoca_sim::SimResult) -> Result<()> {
+    let mut out = String::from("time,trace_id,connection,variable,quantity,unit,value\n");
+    for (index, time) in sim.times.iter().enumerate() {
+        for row in plan {
+            let Some(column) = row.column else { continue };
+            let Some(value) = sim.data.get(column).and_then(|series| series.get(index)) else {
+                continue;
+            };
+            out.push_str(&format!(
+                "{time},{},{},{},{},{},{value}\n",
+                row.id, row.connection, row.variable, row.quantity, row.unit
+            ));
+        }
+    }
+    std::fs::write(path, out).with_context(|| format!("write {}", path.display()))?;
+    let observed = plan.iter().filter(|row| row.column.is_some()).count();
+    eprintln!(
+        "wrote {} ({} trace point(s) x {} time point(s))",
+        path.display(),
+        observed,
+        sim.times.len()
+    );
+    Ok(())
+}
+
+/// Print the human-readable view of the same structured trace.
+fn print_trace_table(plan: &[TracePlanRow], sim: &rumoca_sim::SimResult) {
+    // The table is one presentation of the trace; --trace-out carries the
+    // structured form.
+    println!(
+        "{:<9} {:<22} {:<14} {:<10} {:<6} {:>13}",
+        "TIME", "CONNECTION", "VARIABLE", "QUANTITY", "UNIT", "VALUE"
+    );
+    let sample_every = (sim.times.len() / 10).max(1);
+    for (index, time) in sim.times.iter().enumerate() {
+        if index % sample_every != 0 && index + 1 != sim.times.len() {
+            continue;
+        }
+        for row in plan {
+            let Some(column) = row.column else { continue };
+            let Some(value) = sim.data.get(column).and_then(|series| series.get(index)) else {
+                continue;
+            };
+            let connection = if row.connection.is_empty() {
+                row.variable.clone()
+            } else {
+                row.connection.clone()
+            };
+            println!(
+                "{time:<9.4} {connection:<22} {:<14} {:<10} {:<6} {value:>13.6}",
+                row.variable, row.quantity, row.unit
+            );
+        }
+    }
+}
+fn print_reconstructed(model: &RbcModel, dae: &rumoca_compile::compile::Dae) {
+    let (variables, equations) =
+        dae.inspect(|view| (view.variable_count(), view.continuous_equation_count()));
+    println!("reconstructed checked DAE from bitcode");
+    println!("  model      {}", model.name);
+    println!(
+        "  variables  {variables} (bitcode declared {})",
+        model.summary.variables
+    );
+    println!(
+        "  equations  {equations} (bitcode declared {})",
+        model.summary.equations
+    );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rumoca_bitcode::schema::*;
+
+    fn model_with_trace() -> RbcModel {
+        let span = RbcSpan {
+            source: SourceId(0),
+            start: 0,
+            end: 1,
+            line: 1,
+            column: 1,
+        };
+        let provenance = RbcProvenance {
+            origin: RbcOrigin::Source,
+            span,
+        };
+        RbcModel {
+            name: "T".into(),
+            sources: Vec::new(),
+            types: Vec::new(),
+            variables: vec![RbcVariable {
+                id: VariableId(0),
+                name: "motor.flange.tau".into(),
+                role: RbcRole::Algebraic,
+                causality: RbcCausality::Local,
+                value_type: TypeId(0),
+                scalar_count: 1,
+                declaration: provenance,
+                component: None,
+                unit: Some("N.m".into()),
+                description: None,
+                binding: None,
+                start: None,
+                min: None,
+                max: None,
+                nominal: None,
+                fixed: None,
+                tunable: false,
+                from_source: true,
+                connector: None,
+            }],
+            expressions: Vec::new(),
+            equations: Vec::new(),
+            initial_equations: Vec::new(),
+            relations: Vec::new(),
+            conditions: Vec::new(),
+            roots: Vec::new(),
+            events: Vec::new(),
+            time_events: Vec::new(),
+            connections: Vec::new(),
+            components: Vec::new(),
+            trace_points: vec![RbcTracePoint {
+                id: TracePointId(0),
+                variable: VariableId(0),
+                label: "flange torque".into(),
+                connection: None,
+                quantity: Some(RbcQuantityKind::Flow),
+                unit: Some("N.m".into()),
+                added_by: Some("test".into()),
+            }],
+            summary: RbcSummary::default(),
+        }
+    }
+
+    #[test]
+    fn a_trace_point_binds_to_the_solver_column_of_its_variable() {
+        let model = model_with_trace();
+        let names = vec!["time".to_string(), "motor.flange.tau".to_string()];
+        let plan = resolve_trace_plan(&model, &names);
+        assert_eq!(plan.len(), 1);
+        assert_eq!(plan[0].column, Some(1));
+        assert_eq!(plan[0].variable, "motor.flange.tau");
+        assert_eq!(plan[0].unit, "N.m");
+        assert_eq!(plan[0].quantity, "flow");
+    }
+
+    #[test]
+    fn a_trace_point_the_solver_does_not_report_is_surfaced_not_dropped() {
+        // The user asked to observe this quantity. Silently omitting it would
+        // make a missing column look like a model with nothing to say.
+        let model = model_with_trace();
+        let names = vec!["time".to_string()];
+        let plan = resolve_trace_plan(&model, &names);
+        assert_eq!(plan.len(), 1, "the row must survive for the warning path");
+        assert_eq!(plan[0].column, None);
+    }
+}

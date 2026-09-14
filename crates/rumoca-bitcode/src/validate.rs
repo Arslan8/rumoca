@@ -1,0 +1,620 @@
+//! Structural validation of an untrusted artifact.
+//!
+//! An artifact that has been through an external pass may reference objects
+//! that do not exist, declare duplicate identities, or contain an expression
+//! DAG with a cycle. This module rejects those *before* reconstruction is
+//! attempted, so failures name the offending record instead of surfacing as an
+//! opaque construction error.
+//!
+//! This is the first of two gates. It checks references, identity, and
+//! acyclicity. It deliberately does **not** re-check DAE semantics: type
+//! agreement, role legality, event ownership and the rest are enforced by the
+//! DAE's own checked constructors during [`crate::import`], which is the same
+//! machinery production compilation uses. Duplicating those rules here would
+//! create a second, weaker answer.
+
+use std::collections::BTreeSet;
+
+use crate::schema::*;
+
+#[derive(Debug, thiserror::Error, PartialEq, Eq)]
+pub enum ValidationError {
+    #[error(
+        "{collection} entry at position {position} declares id {declared}, expected {expected}"
+    )]
+    NonDenseId {
+        collection: &'static str,
+        position: u32,
+        declared: u32,
+        expected: u32,
+    },
+    #[error("{referrer} references {target} {id}, which does not exist ({count} defined)")]
+    DanglingReference {
+        referrer: String,
+        target: &'static str,
+        id: u32,
+        count: u32,
+    },
+    #[error(
+        "expression {expression} references operand {operand}, which is not strictly earlier; the arena must be topologically ordered"
+    )]
+    NonTopologicalOperand { expression: u32, operand: u32 },
+    #[error("duplicate variable name {name:?} on ids {first} and {second}")]
+    DuplicateVariableName {
+        name: String,
+        first: u32,
+        second: u32,
+    },
+    #[error("summary.{field} is {declared}, but the artifact contains {actual}")]
+    SummaryMismatch {
+        field: &'static str,
+        declared: u32,
+        actual: u32,
+    },
+    #[error("expression {expression} is an unsupported node: {detail}")]
+    UnsupportedNode { expression: u32, detail: String },
+}
+
+/// Options controlling how strict validation is.
+///
+/// Non-exhaustive: construct with `..ValidateOptions::default()` so a future
+/// option does not break callers.
+#[derive(Debug, Clone, Default)]
+#[non_exhaustive]
+pub struct ValidateOptions {
+    /// Reject `RbcExprNode::Unsupported`. Import sets this: a model containing
+    /// a node the schema could not represent cannot be faithfully rebuilt.
+    pub reject_unsupported: bool,
+}
+
+/// Validate an artifact's internal consistency. Returns every problem found,
+/// not just the first, so a pass author fixes one round of errors at a time.
+pub fn validate(model: &RbcModel, options: &ValidateOptions) -> Result<(), Vec<ValidationError>> {
+    let mut errors = Vec::new();
+
+    check_dense(&mut errors, "sources", model.sources.iter().map(|s| s.id.0));
+    check_dense(&mut errors, "types", model.types.iter().map(|t| t.id.0));
+    check_dense(
+        &mut errors,
+        "variables",
+        model.variables.iter().map(|v| v.id.0),
+    );
+    check_dense(
+        &mut errors,
+        "expressions",
+        model.expressions.iter().map(|e| e.id.0),
+    );
+    check_dense(
+        &mut errors,
+        "equations",
+        model.equations.iter().map(|e| e.id.0),
+    );
+    check_dense(
+        &mut errors,
+        "relations",
+        model.relations.iter().map(|r| r.id.0),
+    );
+    check_dense(
+        &mut errors,
+        "conditions",
+        model.conditions.iter().map(|c| c.id.0),
+    );
+    check_dense(&mut errors, "roots", model.roots.iter().map(|r| r.id.0));
+    check_dense(
+        &mut errors,
+        "components",
+        model.components.iter().map(|c| c.id.0),
+    );
+    check_dense(
+        &mut errors,
+        "connections",
+        model.connections.iter().map(|c| c.id.0),
+    );
+
+    let counts = Counts::of(model);
+
+    check_variable_names(&mut errors, model);
+    check_types(&mut errors, model, &counts);
+    check_expressions(&mut errors, model, &counts, options);
+    check_equations(&mut errors, model, &counts);
+    check_events(&mut errors, model, &counts);
+    check_connections(&mut errors, model, &counts);
+    check_trace_points(&mut errors, model, &counts);
+    check_summary(&mut errors, model);
+
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(errors)
+    }
+}
+
+struct Counts {
+    sources: u32,
+    types: u32,
+    variables: u32,
+    expressions: u32,
+    equations: u32,
+    relations: u32,
+    conditions: u32,
+    components: u32,
+    connections: u32,
+}
+
+impl Counts {
+    fn of(model: &RbcModel) -> Self {
+        Self {
+            sources: model.sources.len() as u32,
+            types: model.types.len() as u32,
+            variables: model.variables.len() as u32,
+            expressions: model.expressions.len() as u32,
+            equations: model.equations.len() as u32,
+            relations: model.relations.len() as u32,
+            conditions: model.conditions.len() as u32,
+            components: model.components.len() as u32,
+            connections: model.connections.len() as u32,
+        }
+    }
+}
+
+fn check_dense(
+    errors: &mut Vec<ValidationError>,
+    collection: &'static str,
+    ids: impl Iterator<Item = u32>,
+) {
+    for (position, declared) in ids.enumerate() {
+        let expected = position as u32;
+        if declared != expected {
+            errors.push(ValidationError::NonDenseId {
+                collection,
+                position: expected,
+                declared,
+                expected,
+            });
+        }
+    }
+}
+
+fn reference(
+    errors: &mut Vec<ValidationError>,
+    referrer: impl Into<String>,
+    target: &'static str,
+    id: u32,
+    count: u32,
+) {
+    if id >= count {
+        errors.push(ValidationError::DanglingReference {
+            referrer: referrer.into(),
+            target,
+            id,
+            count,
+        });
+    }
+}
+
+fn check_variable_names(errors: &mut Vec<ValidationError>, model: &RbcModel) {
+    let mut seen: std::collections::BTreeMap<&str, u32> = std::collections::BTreeMap::new();
+    for variable in &model.variables {
+        if let Some(first) = seen.insert(variable.name.as_str(), variable.id.0) {
+            errors.push(ValidationError::DuplicateVariableName {
+                name: variable.name.clone(),
+                first,
+                second: variable.id.0,
+            });
+        }
+    }
+}
+
+fn check_types(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for variable in &model.variables {
+        reference(
+            errors,
+            format!("variable {}", variable.id),
+            "type",
+            variable.value_type.0,
+            counts.types,
+        );
+        reference(
+            errors,
+            format!("variable {} declaration", variable.id),
+            "source",
+            variable.declaration.span.source.0,
+            counts.sources,
+        );
+        if let Some(component) = variable.component {
+            reference(
+                errors,
+                format!("variable {}", variable.id),
+                "component",
+                component.0,
+                counts.components,
+            );
+        }
+        for (label, attribute) in [
+            ("binding", variable.binding),
+            ("start", variable.start),
+            ("min", variable.min),
+            ("max", variable.max),
+            ("nominal", variable.nominal),
+        ] {
+            if let Some(expression) = attribute {
+                reference(
+                    errors,
+                    format!("variable {} {label}", variable.id),
+                    "expression",
+                    expression.0,
+                    counts.expressions,
+                );
+            }
+        }
+    }
+}
+
+fn check_expressions(
+    errors: &mut Vec<ValidationError>,
+    model: &RbcModel,
+    counts: &Counts,
+    options: &ValidateOptions,
+) {
+    for expression in &model.expressions {
+        let index = expression.id.0;
+        reference(
+            errors,
+            format!("expression {index}"),
+            "type",
+            expression.value_type.0,
+            counts.types,
+        );
+        // Operands must be strictly earlier. This is what makes the arena a DAG
+        // and lets a consumer evaluate it in one forward pass; it also makes a
+        // cycle unrepresentable rather than something to detect.
+        let mut operand = |operand: ExprId| {
+            if operand.0 >= index {
+                errors.push(ValidationError::NonTopologicalOperand {
+                    expression: index,
+                    operand: operand.0,
+                });
+            }
+        };
+        match &expression.node {
+            RbcExprNode::Literal { .. } => {}
+            RbcExprNode::Coordinate { coordinate } => {
+                if let Some(variable) = coordinate.variable() {
+                    reference(
+                        errors,
+                        format!("expression {index}"),
+                        "variable",
+                        variable.0,
+                        counts.variables,
+                    );
+                }
+            }
+            RbcExprNode::Unary { operand: inner, .. } => operand(*inner),
+            RbcExprNode::Binary { lhs, rhs, .. } => {
+                operand(*lhs);
+                operand(*rhs);
+            }
+            RbcExprNode::Conditional { branches, fallback } => {
+                for branch in branches {
+                    operand(branch.condition);
+                    operand(branch.value);
+                }
+                operand(*fallback);
+            }
+            RbcExprNode::Unsupported { detail } => {
+                if options.reject_unsupported {
+                    errors.push(ValidationError::UnsupportedNode {
+                        expression: index,
+                        detail: detail.clone(),
+                    });
+                }
+            }
+        }
+    }
+}
+
+fn check_equations(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for (label, equations) in [
+        ("equation", &model.equations),
+        ("initial equation", &model.initial_equations),
+    ] {
+        for equation in equations {
+            reference(
+                errors,
+                format!("{label} {}", equation.id),
+                "expression",
+                equation.residual.0,
+                counts.expressions,
+            );
+            for variable in equation.reads.iter().chain(&equation.reads_derivative) {
+                reference(
+                    errors,
+                    format!("{label} {} reads", equation.id),
+                    "variable",
+                    variable.0,
+                    counts.variables,
+                );
+            }
+        }
+    }
+}
+
+fn check_events(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    check_relations(errors, model, counts);
+    check_conditions(errors, model, counts);
+    check_roots(errors, model, counts);
+    check_event_actions(errors, model, counts);
+    check_time_events(errors, model, counts);
+}
+
+fn check_relations(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for relation in &model.relations {
+        reference(
+            errors,
+            format!("relation {}", relation.id),
+            "expression",
+            relation.expression.0,
+            counts.expressions,
+        );
+    }
+}
+
+fn check_conditions(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for condition in &model.conditions {
+        let index = condition.id.0;
+        let mut inner = |id: ConditionId| {
+            // A condition may only reference strictly earlier conditions, for
+            // the same reason expressions may only reference earlier nodes.
+            if id.0 >= index {
+                errors.push(ValidationError::NonTopologicalOperand {
+                    expression: index,
+                    operand: id.0,
+                });
+            }
+        };
+        match &condition.node {
+            RbcConditionNode::Initial
+            | RbcConditionNode::Always
+            | RbcConditionNode::Clock
+            | RbcConditionNode::Unsupported { .. } => {}
+            RbcConditionNode::Relation { relation } => reference(
+                errors,
+                format!("condition {index}"),
+                "relation",
+                relation.0,
+                counts.relations,
+            ),
+            RbcConditionNode::Discrete { expression } => reference(
+                errors,
+                format!("condition {index}"),
+                "expression",
+                expression.0,
+                counts.expressions,
+            ),
+            RbcConditionNode::Not { operand } => inner(*operand),
+            RbcConditionNode::And { lhs, rhs }
+            | RbcConditionNode::Or { lhs, rhs }
+            | RbcConditionNode::AnyRise { lhs, rhs } => {
+                inner(*lhs);
+                inner(*rhs);
+            }
+        }
+    }
+}
+
+fn check_roots(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for root in &model.roots {
+        reference(
+            errors,
+            format!("root {}", root.id),
+            "relation",
+            root.relation.0,
+            counts.relations,
+        );
+        reference(
+            errors,
+            format!("root {}", root.id),
+            "condition",
+            root.activation.0,
+            counts.conditions,
+        );
+    }
+}
+
+fn check_event_actions(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for event in &model.events {
+        reference(
+            errors,
+            format!("event {}", event.id),
+            "condition",
+            event.trigger.0,
+            counts.conditions,
+        );
+        reference(
+            errors,
+            format!("event {}", event.id),
+            "condition",
+            event.guard.0,
+            counts.conditions,
+        );
+        match &event.action {
+            RbcAction::Reinitialize { state, value } => {
+                reference(
+                    errors,
+                    format!("event {}", event.id),
+                    "variable",
+                    state.0,
+                    counts.variables,
+                );
+                reference(
+                    errors,
+                    format!("event {}", event.id),
+                    "expression",
+                    value.0,
+                    counts.expressions,
+                );
+            }
+            RbcAction::Assert { message, level } => {
+                reference(
+                    errors,
+                    format!("event {}", event.id),
+                    "expression",
+                    message.0,
+                    counts.expressions,
+                );
+                if let Some(level) = level {
+                    reference(
+                        errors,
+                        format!("event {} level", event.id),
+                        "expression",
+                        level.0,
+                        counts.expressions,
+                    );
+                }
+            }
+            RbcAction::Terminate { message } => reference(
+                errors,
+                format!("event {}", event.id),
+                "expression",
+                message.0,
+                counts.expressions,
+            ),
+        }
+    }
+}
+
+fn check_time_events(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for event in &model.time_events {
+        if let RbcSchedule::Dynamic { deadline } = event.schedule {
+            reference(
+                errors,
+                format!("time event {}", event.id),
+                "expression",
+                deadline.0,
+                counts.expressions,
+            );
+        }
+    }
+}
+
+fn check_connections(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for connection in &model.connections {
+        for (label, variable) in [("left", connection.left), ("right", connection.right)] {
+            reference(
+                errors,
+                format!("connection {} {label}", connection.id),
+                "variable",
+                variable.0,
+                counts.variables,
+            );
+        }
+        if let Some(equation) = connection.equation {
+            reference(
+                errors,
+                format!("connection {}", connection.id),
+                "equation",
+                equation.0,
+                counts.equations,
+            );
+        }
+    }
+}
+
+fn check_trace_points(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    let mut seen = BTreeSet::new();
+    for trace in &model.trace_points {
+        if !seen.insert(trace.id.0) {
+            errors.push(ValidationError::NonDenseId {
+                collection: "trace_points",
+                position: trace.id.0,
+                declared: trace.id.0,
+                expected: trace.id.0,
+            });
+        }
+        reference(
+            errors,
+            format!("trace point {}", trace.id),
+            "variable",
+            trace.variable.0,
+            counts.variables,
+        );
+        if let Some(connection) = trace.connection {
+            reference(
+                errors,
+                format!("trace point {}", trace.id),
+                "connection",
+                connection.0,
+                counts.connections,
+            );
+        }
+    }
+}
+
+/// The summary is denormalised, so a truncated or hand-edited artifact whose
+/// counts disagree with its contents is rejected rather than silently trusted.
+fn check_summary(errors: &mut Vec<ValidationError>, model: &RbcModel) {
+    let mut check = |field: &'static str, declared: u32, actual: usize| {
+        if declared != actual as u32 {
+            errors.push(ValidationError::SummaryMismatch {
+                field,
+                declared,
+                actual: actual as u32,
+            });
+        }
+    };
+    let summary = &model.summary;
+    check("variables", summary.variables, model.variables.len());
+    check("equations", summary.equations, model.equations.len());
+    check(
+        "initial_equations",
+        summary.initial_equations,
+        model.initial_equations.len(),
+    );
+    check("expressions", summary.expressions, model.expressions.len());
+    check("relations", summary.relations, model.relations.len());
+    check("conditions", summary.conditions, model.conditions.len());
+    check("roots", summary.roots, model.roots.len());
+    check("events", summary.events, model.events.len());
+    check("time_events", summary.time_events, model.time_events.len());
+    check("connections", summary.connections, model.connections.len());
+    check("components", summary.components, model.components.len());
+    check(
+        "trace_points",
+        summary.trace_points,
+        model.trace_points.len(),
+    );
+}
+
+/// Recompute a summary. A transformation pass calls this after editing so the
+/// artifact it writes passes [`validate`].
+pub fn recompute_summary(model: &mut RbcModel) {
+    let count = |role: RbcRole| {
+        model
+            .variables
+            .iter()
+            .filter(|variable| variable.role == role)
+            .count() as u32
+    };
+    model.summary = RbcSummary {
+        variables: model.variables.len() as u32,
+        states: count(RbcRole::State),
+        parameters: count(RbcRole::Parameter),
+        constants: count(RbcRole::Constant),
+        inputs: count(RbcRole::Input),
+        outputs: count(RbcRole::Output),
+        algebraics: count(RbcRole::Algebraic),
+        discrete_reals: count(RbcRole::DiscreteReal),
+        discrete_values: count(RbcRole::DiscreteValue),
+        equations: model.equations.len() as u32,
+        initial_equations: model.initial_equations.len() as u32,
+        expressions: model.expressions.len() as u32,
+        relations: model.relations.len() as u32,
+        conditions: model.conditions.len() as u32,
+        roots: model.roots.len() as u32,
+        events: model.events.len() as u32,
+        time_events: model.time_events.len() as u32,
+        connections: model.connections.len() as u32,
+        components: model.components.len() as u32,
+        trace_points: model.trace_points.len() as u32,
+    };
+}
