@@ -14,6 +14,7 @@ being wrong.
 | [BUG-001](BUG-001-comprehension-in-for-equation-panic.md) | High | `rumoca-phase-dae` | Compiler panics on a comprehension inside a `for`-equation. No diagnostic, process abort. 14-line reproducer. |
 | [BUG-002](BUG-002-msl-zero-mass-within-declared-bound.md) | Medium | MSL 4.1.0 | `Mass(min=0)` and `Inertia(min=0)` admit a value that makes the model structurally singular. Three MSL examples affected. |
 | [BUG-003](BUG-003-switchedrlc-zero-resistance.md) | Low | `examples/models` | `SwitchedRLC.mo` divides by an unbounded parameter. |
+| [BUG-004](BUG-004-record-array-destructured-without-subscript.md) | Medium | `rumoca-phase-flatten` | An array of records passed to a record-taking function is destructured without its subscript, producing a Flat reference nothing declares. Blocks all of `QuasiStatic.Polyphase`. 24-line reproducer. |
 
 ## Recorded limitations
 
@@ -28,6 +29,7 @@ being wrong.
 | `examples/models` + `examples/modelsan` | 17 | 15 | 3 | 1 panic (BUG-001), 1 fail-closed refusal |
 | MSL 4.1.0 examples (Electrical, Mechanics, Thermal, Blocks) | 74 | 51 | 32 | 23 refused, mostly unimplemented semantic owners |
 | CogniPilot CMM examples | 4 | 3 | 3 | 1 refused (`unsupported semantic owner`) |
+| ModelicaTest (pilot, first 40 of 336) | 40 | 23 | 16 | 4 hit BUG-004 |
 
 "Exported partially" means bitcode v1 could not represent every expression in
 the model — functions, records and general arrays are not yet carried — so any
