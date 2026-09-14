@@ -36,6 +36,7 @@ from dataclasses import dataclass
 from ..analysis.blocks import AlgebraicBlock
 from ..analysis.context import AnalysisContext
 from ..dae import BinaryOp
+from ..instrumentation.capability import Capability
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..runtime.anchors import CanonicalAnchor, EntityKind
@@ -63,7 +64,10 @@ class SingularitySan:
 
     #: Purely structural. Declaring no runtime requirement is what lets the
     #: planner run this on models nothing can execute.
-    requires = {"static": frozenset()}
+    requires = {
+        "static": frozenset({Capability.CANONICAL_MODEL}),
+        "hints": frozenset({Capability.CANONICAL_MODEL}),
+    }
 
     @staticmethod
     def _derivative_refs(expression) -> set[int]:

@@ -39,7 +39,8 @@ class AssertSan:
     name = "assert"
 
     requires = {
-        "hints": frozenset(),
+        "hints": frozenset({Capability.CANONICAL_MODEL}),
+        "static": frozenset({Capability.CANONICAL_MODEL}),
         "runtime": frozenset({Capability.OBSERVE_FAILURE}),
     }
 

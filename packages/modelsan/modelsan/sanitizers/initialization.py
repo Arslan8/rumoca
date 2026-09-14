@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from ..analysis.context import AnalysisContext
+from ..instrumentation.capability import Capability
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..runtime.anchors import CanonicalAnchor, EntityKind
@@ -33,7 +34,10 @@ def _literal(expression):
 class InitSan:
     name = "init"
 
-    requires = {"static": frozenset()}
+    requires = {
+        "static": frozenset({Capability.CANONICAL_MODEL}),
+        "hints": frozenset({Capability.CANONICAL_MODEL}),
+    }
 
     def analyze(self, model, context: AnalysisContext) -> list[Finding]:
         findings = []

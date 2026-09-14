@@ -114,6 +114,25 @@ def guarded(path: Path, leaf: str) -> bool:
 
 
 def claim(hits) -> str:
+    """Use the claim the probe recorded, not one re-derived from the value.
+
+    The sweep knows why it tried a value; re-deriving it here from the number
+    alone cannot distinguish a negative probe from a positive declared bound,
+    and silently filed every negative finding under the wrong heading.
+    """
+    recorded = [f.get("claim") for _, f in hits if f.get("claim")]
+    if recorded:
+        # Strongest claim present wins: one model where the bound explicitly
+        # admits the value is a better statement than several where it is
+        # merely unbounded.
+        order = ["zero-permitted-by-bound", "fails-at-its-own-positive-bound",
+                 "fails-at-its-own-upper-bound", "negative-permitted-by-omission",
+                 "zero-permitted-by-omission"]
+        for kind in order:
+            if kind in recorded:
+                return kind
+        return recorded[0]
+
     values = {f["value"] for _, f in hits}
     tiers = {f["tier"] for _, f in hits}
     if values == {0.0}:
@@ -177,9 +196,10 @@ def main(sweep: str, out: str):
             "omc_blames_it": sum(1 for _, f in hits if f["blamed"]),
         })
 
-    order = {"zero-permitted-by-bound": 0, "zero-permitted-by-omission": 1,
-             "fails-at-its-own-positive-bound": 2}
-    verified.sort(key=lambda v: (not v["core_library"], order[v["claim"]],
+    order = {"zero-permitted-by-bound": 0, "fails-at-its-own-positive-bound": 1,
+             "fails-at-its-own-upper-bound": 2, "negative-permitted-by-omission": 3,
+             "zero-permitted-by-omission": 4}
+    verified.sort(key=lambda v: (not v["core_library"], order.get(v["claim"], 9),
                                  -v["model_count"]))
     Path(out).write_text(json.dumps({"verified": verified, "dropped": dropped}, indent=1))
 

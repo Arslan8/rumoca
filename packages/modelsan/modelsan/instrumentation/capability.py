@@ -24,6 +24,15 @@ class Capability(str, Enum):
     """That a run failed, with a classified reason. Every backend can do this,
     which is why SolverSan works everywhere."""
 
+    CANONICAL_MODEL = "canonical_model"
+    """A canonical DAE is available for this model at all.
+
+    Rumoca compiles a minority of any real corpus, so for many models the only
+    thing present is an execution. Sanitizers that read model structure declare
+    this, and the planner then reports them as skipped rather than letting a
+    model nothing could analyse look clean.
+    """
+
     CANONICAL_IDENTITY = "canonical_identity"
     """Observations carry Rumoca DAE ids rather than only backend names. A
     sanitizer that must anchor canonically requires this; one that can work

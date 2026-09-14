@@ -22,6 +22,7 @@ values and fails at a value its own declaration permits.
 | [BUG-013](BUG-013-capacitor-zero-capacitance-topology-dependent.md) | `SI.Capacitance` → `Analog.Basic.Capacitor` | `C = 0` | both tools, 12 models |
 | [BUG-014](BUG-014-genericfluxtube-geometry-divisors.md) | `FluxTubes.GenericFluxTube` | `l = 0`, `area = 0` | both tools, 3 models each |
 | [BUG-015](BUG-015-idealgear-zero-ratio.md) | `Rotational.Components.IdealGear` | `ratio = 0` | both tools, 1 model |
+| [BUG-016](BUG-016-relational-invariant-between-two-parameters.md) | `Analog.Ideal.IdealizedOpAmpLimited` | `Vps = Vns` | both tools, 1 model |
 | [BUG-011](BUG-011-fluxtubes-b-mymax-unguarded-divisor.md) | `SoftMagnetic.BaseData` | `B_myMax = 0` | both tools, 2 models |
 | [BUG-012](BUG-012-variablepermeance-unbounded-input.md) | `FluxTubes.VariablePermeance` | permeance input ≤ 0 | both tools, 1 model |
 | [BUG-005](BUG-005-multibody-rotor1d-zero-inertia.md) | `MultiBody.Parts.Rotor1D` | `J = 0` | static only |

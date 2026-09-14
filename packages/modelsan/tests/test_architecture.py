@@ -148,7 +148,10 @@ def test_unsupported_instrumentation():
     backend = FakeBackend(
         ExecutionResult(backend="fake", status=ExecutionStatus.SUCCESS,
                         trace=Trace(times=[0.0], columns={"x": [1.0]})),
-        capabilities={Capability.OBSERVE_VARIABLE, Capability.OBSERVE_FAILURE})
+        # A model *is* supplied here, so CANONICAL_MODEL is available. What is
+        # missing is only OBSERVE_EXPRESSION, which is what this test is about.
+        capabilities={Capability.OBSERVE_VARIABLE, Capability.OBSERVE_FAILURE,
+                      Capability.CANONICAL_MODEL})
     outcome = Pipeline(registry, backend).run(model, "", "M", [])
 
     coverage = outcome.coverage
@@ -315,6 +318,35 @@ def test_event_discrimination():
           "clean periodic switching is silent")
 
 
+# ── 8. Every capability a sanitizer uses is declared ─────────────────────────
+
+
+def test_capabilities_are_declared():
+    """A sanitizer with an undeclared component is silently never run.
+
+    The planner only runs what `requires` names, so a `hints()` method with no
+    "hints" entry is dead code that looks like a working feature.
+    `SingularitySan` and `InitSan` both shipped that way and their hints — the
+    highest-value ones, naming the exact parameter that collapses a block —
+    never reached the fuzzer.
+    """
+    print("\n== declared capabilities ==")
+    from modelsan.sanitizers import COMPARATIVE, DEFAULT
+
+    problems = []
+    for cls in DEFAULT + COMPARATIVE:
+        sanitizer = cls()
+        declared = set(getattr(sanitizer, "requires", {}) or {})
+        for method, component in (("hints", "hints"), ("analyze", "static"),
+                                  ("compare", "differential")):
+            if hasattr(sanitizer, method) and component not in declared:
+                problems.append(f"{sanitizer.name}.{method}() undeclared")
+        if hasattr(sanitizer, "observe") and not (
+                declared & {"runtime", "failure", "collapse"}):
+            problems.append(f"{sanitizer.name}.observe() undeclared")
+    check(not problems, f"every implemented capability is declared ({problems})")
+
+
 def main() -> int:
     test_failure_without_trajectory()
     test_unsupported_instrumentation()
@@ -323,6 +355,7 @@ def main() -> int:
     test_backend_error_is_not_a_model_bug()
     test_operator_vocabulary()
     test_event_discrimination()
+    test_capabilities_are_declared()
     print(f"\n{'ALL PASS' if not FAILURES else str(len(FAILURES)) + ' FAILED'}")
     for failure in FAILURES:
         print(f"  - {failure}")

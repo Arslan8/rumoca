@@ -42,8 +42,9 @@ class RangeSan:
     #: Notably does *not* require CANONICAL_IDENTITY: a named observation and a
     #: declared bound are enough to establish the violation.
     requires = {
-        "runtime": frozenset({Capability.OBSERVE_VARIABLE}),
-        "hints": frozenset(),
+        "runtime": frozenset({Capability.OBSERVE_VARIABLE,
+                              Capability.CANONICAL_MODEL}),
+        "hints": frozenset({Capability.CANONICAL_MODEL}),
     }
 
     def __init__(self, relative_tolerance: float = 1e-9) -> None:

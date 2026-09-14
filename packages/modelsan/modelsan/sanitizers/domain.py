@@ -100,8 +100,9 @@ class DomainSan:
     #: planner reports the runtime half as skipped rather than letting it look
     #: like a clean result.
     requires = {
-        "hints": frozenset(),
-        "runtime": frozenset({Capability.OBSERVE_EXPRESSION}),
+        "hints": frozenset({Capability.CANONICAL_MODEL}),
+        "runtime": frozenset({Capability.OBSERVE_EXPRESSION,
+                              Capability.CANONICAL_MODEL}),
     }
 
     def requests(self, model, context: AnalysisContext) -> list[InstrumentationRequest]:

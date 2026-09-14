@@ -37,7 +37,8 @@ EPSILON = 1e-9
 class DiscontinuitySan:
     name = "discontinuity"
 
-    requires = {"hints": frozenset(), "static": frozenset()}
+    requires = {"hints": frozenset({Capability.CANONICAL_MODEL}),
+                "static": frozenset({Capability.CANONICAL_MODEL})}
 
     def _thresholds(self, model):
         """(conditional, parameter, threshold) for every switch a search can move.

@@ -79,33 +79,37 @@ Of the 147: 39 `zero-permitted-by-bound`, 100 `zero-permitted-by-omission`,
 8 `fails-at-its-own-positive-bound`. By where the bound is written: 31 on the
 component, 17 inherited from an SI type, 99 nowhere at all.
 
-### All 147 were cross-confirmed — and half died
+### Cross-confirmation, full corpus
 
-`tools/sweep/batch_confirm.py` ran every candidate through the second tool,
-trying up to six of its models rather than deciding a component from one
-topology:
+Every core-library candidate goes through the second tool, trying up to six of
+its models rather than deciding a component from one topology:
 
 | | Count |
 |---|---|
-| **Confirmed** — both tools clean at declared values, both fail at the trigger | **7 components, 73 model instances** |
-| **Excluded** — Rumoca survives the trigger | **74** |
-| Single-tool — Rumoca cannot judge any of that candidate's models | 66 |
+| **Confirmed** — both tools clean at declared values, both fail at the trigger | **8 components, 77 model instances** |
+| **Excluded** — the second tool survives the trigger | **79** |
+| Single-tool — no model of that candidate gives the second tool a clean baseline | 81 |
 
-Half of what passed static verification did not survive a second opinion. The
-largest single group in the whole sweep, `HeatTransfer.HeatCapacitor.C` at 20
-models, is among the excluded.
+**47% of what passed static verification did not survive a second opinion.**
+The largest single group in an earlier sweep — `HeatTransfer.HeatCapacitor.C`,
+20 models — is among the excluded.
 
-The seven confirmed components are `Inertia.J` (29 models), `Mass.m` (17),
-`Capacitor.C` (12), `Inductor.L` (8), `GenericFluxTube.area` and
-`GenericFluxTube.l` (3 each), and `IdealGear.ratio` (1). Three of those were new
-and are filed as [BUG-014](BUG-014-genericfluxtube-geometry-divisors.md) and
-[BUG-015](BUG-015-idealgear-zero-ratio.md).
+The eight confirmed components:
 
-**A verification bug worth recording.** The first version of the batch
-confirmer took the first model it could judge and let that decide the whole
-component. It excluded `Mass.m` and `Inertia.J` — both already confirmed by
-hand — because a component defect need not break every circuit that uses it.
-Fixed to confirm if *any* model confirms.
+| Component | Parameter | Models | Claim |
+|---|---|---|---|
+| `Rotational.Components.Inertia` | `J` | 32 | zero permitted by bound |
+| `Translational.Components.Mass` | `m` | 18 | zero permitted by bound |
+| `Analog.Basic.Capacitor` | `C` | 12 | zero permitted by bound |
+| `Analog.Basic.Inductor` | `L` | 7 | zero permitted by omission |
+| `FluxTubes.GenericFluxTube` | `area` | 3 | zero permitted by omission |
+| `FluxTubes.GenericFluxTube` | `l` | 3 | zero permitted by omission |
+| `Analog.Ideal.IdealizedOpAmpLimited` | `Vps` | 1 | **negative** permitted by omission |
+| `Rotational.Components.IdealGear` | `ratio` | 1 | zero permitted by omission |
+
+`IdealizedOpAmpLimited.Vps` is the first finding from the negative-value probe,
+and the first whose missing constraint is *relational* rather than a box —
+see [BUG-016](BUG-016-relational-invariant-between-two-parameters.md).
 
 Nearly all of them are instances of one thing, written up as a study rather
 than as 147 bug reports: [MSL components inherit SI type bounds their equations
