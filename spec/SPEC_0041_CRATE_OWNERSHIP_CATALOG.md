@@ -139,6 +139,32 @@ Simulation composition:
   runtime counters, and constants. The signal-reference language must stay in the
   simulation/config layer and MUST NOT leak into compiler IR.
 
+### 6. Analysis Pass Ownership Catalog (SPEC_0029 §3)
+
+Crate placement for the pass framework governed by
+[SPEC_0052](SPEC_0052_MODEL_ANALYSIS_PASSES.md).
+
+| Owner | Tier | Owns | MUST NOT |
+|---|---|---|---|
+| `rumoca-pass` | 2 | Pass identity, `AnalysisPass`, `AnalysisContext`, the manager, requirement resolution and result caching | Depend on any `rumoca-ir-*`, `rumoca-phase-*`, or `rumoca-eval-*` crate; the framework is IR-generic and reaches only `rumoca-core` |
+| `rumoca-analysis` | 4 | Concrete IR analyses and their owned result types; the analysis facade the CLI consumes | Own Modelica semantics, mutate IR, emit artifacts, or depend on any consumer of its results |
+| `rumoca-pass-abi` | 2 | The versioned WIT interface definition and generated host/guest bindings for SPEC_0052 §5 | Contain analysis logic, IR types, or a wasm runtime; it is the contract, not an implementation |
+| `rumoca-pass-host` | 5 | Wasm runtime embedding, plugin discovery/loading, query-service implementation over live IR, capability and resource enforcement, request validation | Be a default dependency of `rumoca-bind-wasm`, or hand a plugin any pointer, handle, or serialized IR root |
+| `rumoca` (`analyze`, `diff`, plugin commands) | 6 | Argument parsing, pipeline and plugin selection, result rendering | Depend on a phase crate directly; it reaches analyses through `rumoca-analysis` and plugins through `rumoca-pass-host` |
+
+`rumoca-analysis` is Tier 4 because it consumes `rumoca-eval-dae` and
+`rumoca-phase-structural` — two Tier 3 crates, which a Tier 3 crate may not do.
+`rumoca-pass-host` is Tier 5 because it embeds a runtime; its plugin support is
+opt-in and is excluded from the default wasm binding graph (SPEC_0052 §5.5).
+
+A pass-author SDK is deliberately absent from this catalog: plugin authors
+depend on `rumoca-pass-abi`'s published interface or on WIT bindings generated
+for their own language, never on a workspace crate.
+
+Analyses reuse existing single-source helpers (§1) rather than reimplementing
+them; `dependency_first_sccs`, the `rumoca-ir-dae::expr_query` predicates, and
+`rumoca-eval-dae`'s scalar coordinate projection are the ones this work touches.
+
 ## References
 
 - [SPEC_0029](SPEC_0029_CRATE_BOUNDARIES.md) — owning boundary rules, tier

@@ -63,6 +63,11 @@ non-cloneable checked operation so catalog and expression identity change
 atomically. Keep read-only traversal/query helpers and rewrite-shape helpers
 separate so reviewers can see observation versus mutation.
 
+Analysis consumes IR, never the reverse: an IR crate MUST NOT depend on an
+analysis crate. Reusable analyses over IR are passes governed by
+[SPEC_0052](SPEC_0052_MODEL_ANALYSIS_PASSES.md); their crate placement is
+[SPEC_0041 §6](SPEC_0041_CRATE_OWNERSHIP_CATALOG.md#6-analysis-pass-ownership-catalog-spec_0029-3).
+
 ### 3a. Foundation Types Live in rumoca-core
 
 `rumoca-core` is the **sole** Tier 1 foundation crate. It owns shared IDs,
@@ -330,10 +335,10 @@ Workspace crates use six tiers. Dependencies flow downward.
 
 ```
 Tier 6 — Binary & bindings: rumoca, bind-python, bind-wasm, contracts
-Tier 5 — Integration/runtime: codec/input/solver/sim/opt/viz/tool-lsp families
-Tier 4 — Orchestration: rumoca-compile, tool-fmt, tool-lint
+Tier 5 — Integration/runtime: codec/input/solver/sim/opt/viz/tool-lsp/pass-host families
+Tier 4 — Orchestration: rumoca-compile, tool-fmt, tool-lint, rumoca-analysis
 Tier 3 — Phases & evaluation: rumoca-phase-*, rumoca-eval-*
-Tier 2 — IR data: rumoca-ir-*
+Tier 2 — IR data: rumoca-ir-*; IR-generic pass framework: rumoca-pass
 Tier 1 — Foundation: rumoca-core
 ```
 

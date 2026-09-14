@@ -147,6 +147,8 @@ Error codes use mnemonic prefixes for readability:
 | EG0xx | GALEC IR | **G**ALEC | GALEC IR parse/validation errors |
 | EGT0xx | GALEC target projection | **G**ALEC **T**arget | DAE-to-GALEC projection/export errors |
 | EFM0xx | eFMI packaging | e**FM**I | eFMI manifest/packaging errors |
+| EA0xx | model analysis | **A**nalysis | Analysis/verification pass failures (SPEC_0052) |
+| WA0xx | model analysis | **A**nalysis | Non-fatal analysis findings and verification-pass diagnostics |
 | WP/WR/WT/etc | (same) | | Warnings per phase |
 
 The leading letter is the severity: a warning MUST NOT be minted in an `E`

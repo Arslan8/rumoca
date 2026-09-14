@@ -1,0 +1,297 @@
+# Writing an external pass
+
+A pass is a program that reads Rumoca Bitcode. That is the whole contract.
+
+You do not need a Rumoca checkout, Rust, a matching compiler version, or any
+linkage against Rumoca's crates. If your language can read a file, it can write
+a pass.
+
+---
+
+## The shortest possible pass
+
+```bash
+rumoca compile Motor.mo --model Motor --emit-bitcode motor.rbc
+```
+
+```python
+from rumoca_bitcode import Model
+
+model = Model.load("motor.rbc")
+print(model)                       # <Model 'Motor': 23 variables, 20 equations, 4 connections>
+
+for variable in model.states:
+    print(variable.name, variable.unit, variable.source.span)
+```
+
+```
+$ PYTHONPATH=packages/rumoca-bitcode python3 my_pass.py
+cap.v None Circuit.mo:40:3
+```
+
+That is an analysis pass. It reads and reports.
+
+## The two kinds of pass
+
+```
+ANALYSIS                       TRANSFORMATION
+
+model.rbc                      model.rbc
+   |                              |
+   v                              v
+ analysis                    transformation
+   |                              |
+   v                              v
+ report                       model2.rbc
+                                  |
+                                  v
+                               rumoca
+```
+
+An analysis pass produces information. A transformation pass produces another
+artifact, which Rumoca validates and rebuilds.
+
+## Installing the SDK
+
+```bash
+pip install -e packages/rumoca-bitcode
+```
+
+or just put it on your path:
+
+```bash
+export PYTHONPATH=/path/to/rumoca/packages/rumoca-bitcode
+```
+
+The SDK has **no dependencies**. A pure-Python CBOR decoder ships with it, so
+reading a `.rbc` needs nothing but the standard library. Install the optional
+`cbor2` extra if you want the faster codec.
+
+## The object model
+
+```python
+model.variables      # every variable, any role
+model.states         # role == "state"
+model.parameters     # role in ("parameter", "constant")
+model.inputs         # role == "input"
+model.outputs
+model.algebraics
+model.equations      # continuous residuals
+model.initial_equations
+model.events         # reinit / assert / terminate
+model.connections    # connect(...) relationships
+model.components     # component instances
+model.trace_points   # observation requests
+```
+
+A variable:
+
+```python
+variable.name            # "motor.flange.tau", the flattened path
+variable.role            # "state" | "parameter" | "algebraic" | ...
+variable.causality       # "input" | "output" | "local" | ...
+variable.unit            # "N.m" or None
+variable.type            # ValueType: scalar kind + dimensions
+variable.source          # Provenance
+variable.component       # Component or None
+variable.is_state
+variable.is_connector_member
+variable.quantity        # "potential" | "flow" | "stream" | None
+variable.start           # Expression or None
+```
+
+An equation:
+
+```python
+equation.residual            # Expression; the model asserts residual == 0
+equation.reads               # [Variable]  <- use this
+equation.reads_derivative    # [Variable] whose der() is read
+equation.source              # Provenance
+```
+
+## Use `reads`, do not walk the tree
+
+`equation.reads` is computed by the compiler's own dependency projection, which
+resolves function calls, structured equation families, and runtime array
+selection correctly.
+
+```python
+# right
+for variable in equation.reads:
+    ...
+
+# wrong: misses function-call dependencies and dynamic subscripts
+for node in equation.residual.walk():
+    ...
+```
+
+Walking the tree is fine when you care about *syntax* — which operator was
+used, whether a literal appears. It is the wrong tool for *dependency*.
+
+## Expressions
+
+```python
+Literal(value)
+VariableRef(kind, variable)        # kind: "state" | "derivative" | "pre_state" | ...
+TimeRef()
+UnaryOp(op, operand)
+BinaryOp(op, lhs, rhs)
+Conditional(branches, fallback)
+Unsupported(detail)
+```
+
+`der(x)`, `x` and `pre(x)` are all `VariableRef` with different `kind`s, on the
+same variable. They are different coordinates, not different variables.
+
+```python
+for node in equation.residual.walk():
+    if isinstance(node, VariableRef) and node.is_derivative:
+        print("differentiates", node.variable.name)
+```
+
+**Handle `Unsupported`.** It means bitcode v1 could not represent part of the
+model. Refuse, or narrow your claim — never treat it as a default:
+
+```python
+if any(isinstance(n, Unsupported) for e in model.equations for n in e.residual.walk()):
+    raise SystemExit("this model uses constructs bitcode v1 cannot represent")
+```
+
+## Provenance
+
+```python
+equation.source.span            # Circuit.mo:13:3
+equation.source.span.text()     # "v = p.v - n.v"   (if sources are embedded)
+equation.source.is_generated    # True for compiler-produced equations
+equation.source.generation      # "connection_equation", "flow_balance_equation", ...
+```
+
+Report `Motor.mo:52`, not `equation 17`. The line and column are precomputed,
+so this costs nothing.
+
+Two traps:
+
+- **A span is not unique.** An equation inherited through `extends` appears
+  once per instance with the same span. Use `id` for identity.
+- **Generated equations point at the nearest responsible declaration**, not at
+  the statement you might expect. A connection equation's span is the connector
+  member's declaration. Check `source.generation` before reporting a span as if
+  the user wrote it there.
+
+## Connections are not messages
+
+A Modelica connector carries *potential* quantities, equated across the
+connection, and *flow* quantities, whose signed sum is zero. Modelling a
+connection as "a sends to b" is physically wrong.
+
+```python
+for connection in model.connections:
+    print(connection.left_connector, "<->", connection.right_connector, connection.quantity)
+    if connection.is_flow:
+        ...  # conservation law, not a transfer
+```
+
+## Writing a transformation
+
+```python
+model = Model.load("motor.rbc")
+
+for connection in model.connections:
+    for variable in model.connector_members(connection.left_connector):
+        model.add_trace_point(variable, connection=connection, added_by="my_pass.py")
+
+model.save("motor-traced.rbc")
+```
+
+`save()` recomputes the summary the validator checks, so the artifact you write
+is accepted.
+
+Then hand it back:
+
+```bash
+rumoca bitcode check motor-traced.rbc
+rumoca compile-bitcode motor-traced.rbc --simulate --t-end 1.0 --trace-out traces.csv
+```
+
+```
+time,trace_id,connection,variable,quantity,unit,value
+0.1,1,inertia.b <-> spring.a,inertia.b.tau,flow,N.m,4.272051
+0.1,2,inertia.b <-> spring.a,spring.a.tau,flow,N.m,-4.272051
+```
+
+The two torques are equal and opposite because they are *flow* quantities
+either side of one connection. Your pass asked for them by name; the solver
+reported them.
+
+## Your pass is untrusted, and that is fine
+
+Rumoca does not trust what you write. Import validates references, ids,
+ordering and counts, then rebuilds through the DAE's own checked constructors —
+the same ones used when compiling from source.
+
+That means a bug in your pass produces a **clean rejection naming the offending
+record**, not a corrupt model:
+
+```
+$ rumoca compile-bitcode broken.rbc
+bitcode failed validation:
+  - equation 0 references expression 999, which does not exist (6 defined)
+  - variable 1 references type 900, which does not exist (1 defined)
+```
+
+Validation reports every problem it finds, not just the first.
+
+Prefer trace points to equation edits when you only need to observe something:
+a trace point cannot change what the model computes, so it cannot introduce a
+physics bug.
+
+## Worked examples
+
+In `examples/bitcode-passes/`:
+
+| Pass | Kind | Shows |
+|---|---|---|
+| `model_summary.py` | analysis | the minimum shape of a pass |
+| `dependency_graph.py` | analysis | `reads` edges, reachability, Graphviz as *a* renderer |
+| `connector_graph.py` | analysis | connectors, members, flow vs potential |
+| `connector_logger.py` | transformation | instrumenting every cross-component quantity |
+
+Run them:
+
+```bash
+export PYTHONPATH=packages/rumoca-bitcode
+python3 examples/bitcode-passes/model_summary.py motor.rbc
+python3 examples/bitcode-passes/dependency_graph.py motor.rbc --influences throttle
+python3 examples/bitcode-passes/connector_graph.py motor.rbc --dot | dot -Tsvg -o topology.svg
+python3 examples/bitcode-passes/connector_logger.py motor.rbc -o motor-traced.rbc
+```
+
+## Writing a pass in another language
+
+The SDK is one reader, not the interface. To write a pass in any language:
+
+1. Read the file. If the first non-whitespace byte is `{` it is JSON;
+   otherwise it is CBOR. `rumoca bitcode convert --format json` gets you JSON if
+   your language has no CBOR library.
+2. Check `magic == "RUMOCA-RBC"` and `bitcode_version == 1`. Refuse otherwise.
+3. Read `model`. Every enum is tagged by an explicit `kind` string.
+4. To write: preserve fields you do not understand, recompute `summary`, and
+   keep expression operands referencing strictly lower ids.
+
+`docs/SPEC_RUMOCA_BITCODE.md` is the normative description.
+
+## Debugging
+
+```bash
+rumoca bitcode inspect motor.rbc       # one-screen summary
+rumoca bitcode dump motor.rbc | less   # the whole artifact as JSON
+rumoca bitcode check motor.rbc         # validate, listing every problem
+rumoca bitcode round-trip motor.rbc    # prove import/export fidelity
+```
+
+JSON artifacts are ordinary text: `diff`, `jq` and an editor all work.
+
+```bash
+rumoca compile Motor.mo --model Motor --emit-bitcode motor.json --bitcode-format json
+jq '.model.connections' motor.json
+```
