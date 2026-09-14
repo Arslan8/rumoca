@@ -267,6 +267,54 @@ def test_operator_vocabulary():
     check(ops.RELATIONS <= schema, "relations are a subset of the schema")
 
 
+# ── 7. Event pathologies are distinguished, not conflated ────────────────────
+
+
+def test_event_discrimination():
+    """Chattering and Zeno are different defects with different fixes.
+
+    Chattering wants a hysteresis band or a guard; Zeno wants the accumulation
+    removed. Reporting them as one thing would be the mistake of treating three
+    consequences of one cause as three discoveries, run in reverse.
+
+    The first case is the calibration that matters: `CoupledClutches` fires a
+    pair of events ~1e-11 apart at every clutch engagement. That is ordinary
+    event iteration, and a threshold that flags it reports a stock MSL example
+    as buggy.
+    """
+    print("\n== event discrimination ==")
+    from modelsan.runtime.observations import EventTriggered
+    from modelsan.sanitizers import EventSan, ZenoSan
+
+    class Stub:
+        variables = equations = initial_equations = expressions = events = []
+
+    context = AnalysisContext(Stub())
+
+    def stream(times):
+        got = ObservationStream()
+        for when in times:
+            got.add(EventTriggered(time=when))
+        return got
+
+    def kinds(sanitizer, times):
+        return [f.kind for f in sanitizer.observe(stream(times), Stub(), context, NOMINAL)]
+
+    engagements = [1e-11, 0.4, 0.4 + 1e-11, 0.71, 0.83, 0.83 + 2.6e-10, 0.9]
+    chatter = [0.5 + i * 1e-11 for i in range(6)]
+    zeno = [1.0 - 0.5 ** i for i in range(1, 12)]
+    periodic = [0.1 * i for i in range(1, 20)]
+
+    check(kinds(EventSan(), engagements) == [],
+          "ordinary event iteration is not reported as chattering")
+    check(kinds(EventSan(), chatter) == ["chattering"], "real chattering is caught")
+    check(kinds(ZenoSan(), chatter) == [], "chattering is not reported as Zeno")
+    check(kinds(ZenoSan(), zeno) == ["zeno-accumulation"], "Zeno accumulation is caught")
+    check(kinds(EventSan(), zeno) == [], "Zeno is not reported as chattering")
+    check(kinds(EventSan(), periodic) == [] and kinds(ZenoSan(), periodic) == [],
+          "clean periodic switching is silent")
+
+
 def main() -> int:
     test_failure_without_trajectory()
     test_unsupported_instrumentation()
@@ -274,6 +322,7 @@ def main() -> int:
     test_canonical_anchor()
     test_backend_error_is_not_a_model_bug()
     test_operator_vocabulary()
+    test_event_discrimination()
     print(f"\n{'ALL PASS' if not FAILURES else str(len(FAILURES)) + ' FAILED'}")
     for failure in FAILURES:
         print(f"  - {failure}")

@@ -29,6 +29,7 @@ from ..instrumentation.capability import Capability
 from ..runtime.anchors import BackendAnchor, EntityKind
 from ..runtime.failures import ExecutionFailure, ExecutionPhase, FailureKind
 from ..runtime.observations import (
+    EventTriggered,
     InitializationFailure,
     ObservationStream,
     SimulationAbort,
@@ -44,6 +45,11 @@ ENV = {**os.environ, "CC": "gcc"}
 # OMC names the offending expression when a divisor vanishes, which is far more
 # than a generic solver error gives. Worth extracting rather than discarding.
 DIVISION_BY_ZERO = re.compile(r"division by zero.*?divisor b expression is: (\S+)")
+
+# `LOG_EVENTS | info | state event at time=0.4000000001`. Event *times* are all
+# OMC reports; it does not say which condition fired, so these observations
+# carry no anchor at all rather than a guessed one.
+EVENT_AT = re.compile(r"(state|time) event at time=([0-9.eE+-]+)")
 
 # Ordered: the first match wins, so more specific patterns come first.
 CLASSIFIERS = (
@@ -79,6 +85,7 @@ class OpenModelicaBackend:
     capabilities = frozenset({
         Capability.OBSERVE_VARIABLE,
         Capability.OBSERVE_FAILURE,
+        Capability.OBSERVE_EVENTS,
     })
 
     def __init__(self, libraries: list[str], t_end: float = 0.5,
@@ -116,7 +123,7 @@ class OpenModelicaBackend:
             return ExecutionResult.backend_error(self.name, "model was not built")
 
         work = Path(self._work.name)
-        command = [str(self._executable), "-outputFormat=csv"]
+        command = [str(self._executable), "-outputFormat=csv", "-lv", "LOG_EVENTS"]
         overrides = {**testcase.parameters, **testcase.initial_values}
         if overrides:
             command += ["-override", ",".join(f"{k}={v:g}" for k, v in overrides.items())]
@@ -138,13 +145,16 @@ class OpenModelicaBackend:
         times, columns = self._read_trace(work / f"{self._executable.name}_res.csv")
         trace = Trace(times=times, columns=columns) if times else None
         stream = self._stream(times, columns)
+        events = self._events(done.stdout + done.stderr)
+        for event in events:
+            stream.add(event)
         text = " ".join((done.stdout + done.stderr).split())
 
         if done.returncode == 0:
             stream.add(SimulationEnd(completed=True))
             return ExecutionResult(backend=self.name, status=ExecutionStatus.SUCCESS,
                                    phase=ExecutionPhase.FINALIZATION,
-                                   observations=stream, trace=trace)
+                                   observations=stream, trace=trace, events=events)
 
         failure = self._failure(text, times)
         # The failure is an observation, not an absence. Without this, a
@@ -153,7 +163,7 @@ class OpenModelicaBackend:
         stream.add(SimulationEnd(completed=False, message=failure.message))
         return ExecutionResult(
             backend=self.name, status=ExecutionStatus.FAILED, phase=failure.phase,
-            observations=stream, trace=trace, failure=failure,
+            observations=stream, trace=trace, events=events, failure=failure,
             backend_metadata={"returncode": done.returncode},
         )
 
@@ -175,6 +185,24 @@ class OpenModelicaBackend:
                if failure.phase is ExecutionPhase.INITIALIZATION else SolverFailure)
         return cls(time=failure.time, kind=failure.kind, reason=failure.message,
                    raw=failure.raw, backend=anchor)
+
+    @staticmethod
+    def _events(text: str) -> list:
+        """Event firings, in order.
+
+        OMC reports the time and whether it was a state or time event, and
+        nothing about which condition was responsible. So these carry no
+        anchor: EventSan reasons about spacing and density, which is exactly
+        what the available evidence supports.
+        """
+        found = []
+        for kind, when in EVENT_AT.findall(text):
+            try:
+                found.append(EventTriggered(time=float(when),
+                                            new_value=kind))
+            except ValueError:
+                continue
+        return found
 
     def _stream(self, times: list[float], columns: dict) -> ObservationStream:
         stream = ObservationStream()

@@ -66,12 +66,22 @@ DifferentialOracle        compares backends
 
 Measured on the current set:
 
-| Sanitizer | Static | Runtime | Instrumentation | Hints |
-|---|---|---|---|---|
-| DomainSan | | ✅ | ✅ | ✅ |
-| NumericSan | | ✅ | | |
-| RangeSan | | ✅ | | ✅ |
-| SolverSan | | ✅ | | |
+| Sanitizer | Static | Runtime | Instrumentation | Hints | Active on OMC |
+|---|---|---|---|---|---|
+| DomainSan | | ✅ | ✅ | ✅ | hints only |
+| NumericSan | | ✅ | | | ✅ |
+| RangeSan | | ✅ | | ✅ | ✅ |
+| SolverSan | | ✅ | | | failure only |
+| AssertSan | ✅ | ✅ | | ✅ | ✅ |
+| DiscontinuitySan | ✅ | | | ✅ | ✅ |
+| SingularitySan | ✅ | | | ✅ | ✅ |
+| InitSan | ✅ | | | ✅ | ✅ |
+| EventSan | | ✅ | | | ✅ |
+| ZenoSan | | ✅ | | | ✅ |
+
+13 of 15 components active against OpenModelica. The two that are not —
+DomainSan's runtime check and SolverSan's timestep collapse — are reported as
+skipped with the missing capability named, never as clean results.
 
 ## Signature vs evidence
 
@@ -155,6 +165,22 @@ solver:initialization-failure:exec:0a90a3f3        no entity anchor
 The two `below-min` signatures are deliberately different. The same name in two
 tools is not known to be the same entity, and a signature must not assert it.
 Merging them is a later cross-backend deduplication step that needs evidence.
+
+## Distinct classes, not one cause seen many ways
+
+The brief's warning is that NaN, timestep collapse and a range violation are
+often three consequences of one singularity. Two things keep that from inflating
+counts:
+
+* **Deduplication groups by signature**, and `BugDatabase.overlap()` reports
+  which bugs several sanitizers saw — so overlap is measured rather than hidden.
+* **Sanitizers that could collapse into each other are calibrated apart.**
+  Chattering and Zeno are the clearest case: both are event pathologies, but
+  chattering wants a hysteresis band and Zeno wants the accumulation removed.
+  `test_event_discrimination` pins that a burst is not reported as Zeno, an
+  accumulation is not reported as chattering, and — the calibration that
+  matters — the event *pair* MSL's `CoupledClutches` fires at every clutch
+  engagement is reported as neither.
 
 ## Known gaps
 
