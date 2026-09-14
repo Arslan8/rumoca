@@ -114,6 +114,25 @@ pub struct CompileBitcodeArgs {
     /// Write the trace as CSV here instead of a table on standard output.
     #[arg(long, value_name = "FILE", requires = "simulate")]
     pub trace_out: Option<PathBuf>,
+    /// Override a tunable parameter: `--param name=value`. Repeatable.
+    #[arg(long = "param", value_name = "NAME=VALUE")]
+    pub params: Vec<String>,
+    /// Report runtime violations (non-finite values, declared min/max breaches)
+    /// as machine-readable JSON, and exit non-zero when any is found.
+    #[arg(long, requires = "simulate")]
+    pub check: bool,
+}
+
+/// Parse one `--param name=value` pair.
+fn parse_param(text: &str) -> Result<(String, f64)> {
+    let (name, value) = text
+        .split_once('=')
+        .ok_or_else(|| anyhow::anyhow!("--param expects NAME=VALUE, got `{text}`"))?;
+    let parsed = value
+        .trim()
+        .parse::<f64>()
+        .with_context(|| format!("--param {name}: `{value}` is not a number"))?;
+    Ok((name.trim().to_string(), parsed))
 }
 
 /// Write a compiled model as bitcode.
@@ -477,31 +496,56 @@ fn run_trace(
 ) -> Result<()> {
     use rumoca_sim::{SimOptions, simulate_with_diagnostics};
 
-    if model.trace_points.is_empty() {
+    // --check inspects every solver output, so it needs no instrumentation.
+    if !args.check && model.trace_points.is_empty() {
         bail!(
             "this artifact declares no trace points; nothing to observe. \
-             Run an instrumentation pass first, e.g. connector_logger.py"
+             Run an instrumentation pass first, e.g. connector_logger.py, \
+             or use --check to test declared properties over all variables"
         );
     }
 
-    let options = SimOptions {
+    let mut options = SimOptions {
         t_end: args.t_end,
         dt: args.dt,
         ..SimOptions::default()
     };
-    eprintln!(
-        "Simulating {} to t={} with {} trace point(s)...",
-        model.name,
-        args.t_end,
-        model.trace_points.len()
-    );
-    let sim = simulate_with_diagnostics(dae, &options)
-        .map_err(|error| anyhow::anyhow!("simulation failed: {error}"))?;
+    for pair in &args.params {
+        options.param_overrides.push(parse_param(pair)?);
+    }
+    if args.check {
+        eprintln!(
+            "Simulating {} to t={} with property checks...",
+            model.name, args.t_end
+        );
+    } else {
+        eprintln!(
+            "Simulating {} to t={} with {} trace point(s)...",
+            model.name,
+            args.t_end,
+            model.trace_points.len()
+        );
+    }
+    let sim = match simulate_with_diagnostics(dae, &options) {
+        Ok(sim) => sim,
+        Err(error) if args.check => {
+            // For a search driver, a solve that refuses to run *is* the
+            // finding: this parameter configuration made the model
+            // mathematically invalid. Report it in the same structured shape as
+            // a property violation instead of failing the process generically.
+            return report_simulation_failure(&error.to_string(), &options.param_overrides);
+        }
+        Err(error) => return Err(anyhow::anyhow!("simulation failed: {error}")),
+    };
     eprintln!(
         "Simulation complete: {} time points, {} variables",
         sim.times.len(),
         sim.names.len()
     );
+
+    if args.check {
+        return report_violations(model, &sim);
+    }
 
     let plan = resolve_trace_plan(model, &sim.names);
     let missing: Vec<&TracePlanRow> = plan.iter().filter(|row| row.column.is_none()).collect();
@@ -521,6 +565,154 @@ fn run_trace(
             Ok(())
         }
     }
+}
+
+/// Report a refused solve as a structured finding.
+fn report_simulation_failure(message: &str, parameters: &[(String, f64)]) -> Result<()> {
+    let finding = serde_json::json!([{
+        "kind": "simulation-failure",
+        "detail": message,
+        "parameters": parameters
+            .iter()
+            .map(|(name, value)| serde_json::json!({"name": name, "value": value}))
+            .collect::<Vec<_>>(),
+    }]);
+    println!("{}", serde_json::to_string_pretty(&finding)?);
+    std::process::exit(2);
+}
+
+/// Report runtime property violations as JSON.
+///
+/// Two properties are checked, both of which the model itself declares:
+/// a value that stops being finite, and a value that leaves its declared
+/// `min`/`max` range. Neither is inferred physics — a violation means the
+/// model contradicted something its own author wrote down.
+#[derive(serde::Serialize)]
+struct Violation<'a> {
+    kind: &'a str,
+    variable: &'a str,
+    time: f64,
+    value: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    bound: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    source: Option<String>,
+}
+
+fn report_violations(model: &RbcModel, sim: &rumoca_sim::SimResult) -> Result<()> {
+    let bounds = declared_bounds(model);
+    let mut violations = Vec::new();
+
+    for (column, name) in sim.names.iter().enumerate() {
+        let Some(series) = sim.data.get(column) else {
+            continue;
+        };
+        // One report per variable: a diverged trajectory is one bug, not one
+        // per output point.
+        if let Some(violation) =
+            first_violation(name, series, &sim.times, bounds.get(name.as_str()))
+        {
+            violations.push(violation);
+        }
+    }
+
+    let found = !violations.is_empty();
+    println!("{}", serde_json::to_string_pretty(&violations)?);
+    if found {
+        // Non-zero so a search driver can treat "this configuration fails" as
+        // a signal without parsing output.
+        std::process::exit(2);
+    }
+    Ok(())
+}
+
+/// The first point at which one variable breaks a property it declares.
+fn first_violation<'a>(
+    name: &'a str,
+    series: &[f64],
+    times: &[f64],
+    declared: Option<&DeclaredBounds>,
+) -> Option<Violation<'a>> {
+    for (index, value) in series.iter().enumerate() {
+        let time = times.get(index).copied().unwrap_or(f64::NAN);
+        let make = |kind, bound| Violation {
+            kind,
+            variable: name,
+            time,
+            value: *value,
+            bound,
+            source: declared.and_then(|declared| declared.source.clone()),
+        };
+        if value.is_nan() {
+            return Some(make("nan", None));
+        }
+        if value.is_infinite() {
+            return Some(make("infinite", None));
+        }
+        let Some(declared) = declared else { continue };
+        match (declared.minimum, declared.maximum) {
+            (Some(minimum), _) if *value < minimum => {
+                return Some(make("below-min", Some(minimum)));
+            }
+            (_, Some(maximum)) if *value > maximum => {
+                return Some(make("above-max", Some(maximum)));
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+struct DeclaredBounds {
+    minimum: Option<f64>,
+    maximum: Option<f64>,
+    source: Option<String>,
+}
+
+/// Collect `min`/`max` a variable declares, resolved to constants.
+///
+/// Only literal bounds are used. A bound that is itself an expression may
+/// depend on a parameter this run overrode, and silently evaluating it here
+/// would be a second, weaker evaluator.
+fn declared_bounds(model: &RbcModel) -> std::collections::BTreeMap<&str, DeclaredBounds> {
+    let literal = |id: Option<rumoca_bitcode::schema::ExprId>| -> Option<f64> {
+        let index = id?.0 as usize;
+        match &model.expressions.get(index)?.node {
+            rumoca_bitcode::schema::RbcExprNode::Literal { value } => match value {
+                rumoca_bitcode::schema::RbcLiteral::Real { value } => Some(*value),
+                rumoca_bitcode::schema::RbcLiteral::Integer { value } => Some(*value as f64),
+                _ => None,
+            },
+            _ => None,
+        }
+    };
+    model
+        .variables
+        .iter()
+        .filter_map(|variable| {
+            let minimum = literal(variable.min);
+            let maximum = literal(variable.max);
+            (minimum.is_some() || maximum.is_some()).then(|| {
+                (
+                    variable.name.as_str(),
+                    DeclaredBounds {
+                        minimum,
+                        maximum,
+                        source: Some(format!(
+                            "{}:{}:{}",
+                            model
+                                .sources
+                                .get(variable.declaration.span.source.0 as usize)
+                                .map(|s| s.name.rsplit('/').next().unwrap_or(&s.name).to_string())
+                                .unwrap_or_default(),
+                            variable.declaration.span.line,
+                            variable.declaration.span.column
+                        )),
+                    },
+                )
+            })
+        })
+        .collect()
 }
 
 /// One resolved trace point: what to observe, and which solver column holds it.
