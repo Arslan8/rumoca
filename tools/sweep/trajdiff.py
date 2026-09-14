@@ -13,7 +13,7 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path[:0] = ["packages/rumoca-bitcode", "packages/modelsan"]
-from modelsan.differential import Disagreement, OmcResult
+from modelsan.legacy.differential import Disagreement, OmcResult
 
 RUMOCA = "./target/debug/rumoca"
 TRACE_ALL = "examples/bitcode-passes/trace_all.py"

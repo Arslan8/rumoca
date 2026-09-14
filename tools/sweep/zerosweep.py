@@ -13,8 +13,8 @@ from pathlib import Path
 
 sys.path[:0] = ["packages/rumoca-bitcode", "packages/modelsan"]
 from rumoca_bitcode import Model
-from modelsan.analysis import _literal_value
-from modelsan.runner import export, run
+from modelsan.legacy.analysis import _literal_value
+from modelsan.legacy.runner import export, run
 
 RUMOCA = "./target/debug/rumoca"
 

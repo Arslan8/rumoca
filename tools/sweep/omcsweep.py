@@ -10,7 +10,7 @@ import json, sys, tempfile
 from pathlib import Path
 
 sys.path[:0] = ["packages/rumoca-bitcode", "packages/modelsan"]
-from modelsan.omc_backend import build, probes, run, tier
+from modelsan.legacy.omc_backend import build, probes, run, tier
 
 MSL = ("/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/"
        "Modelica 4.1.0/package.mo")

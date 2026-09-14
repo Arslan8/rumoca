@@ -4,11 +4,11 @@ import json, re, subprocess, sys, tempfile, time
 from pathlib import Path
 sys.path[:0] = ["packages/rumoca-bitcode", "packages/modelsan"]
 from rumoca_bitcode import Model
-from modelsan.analysis import (declared_ranges, find_domain_sites, find_singular_risks,
+from modelsan.legacy.analysis import (declared_ranges, find_domain_sites, find_singular_risks,
                                incomplete, search_knobs)
-from modelsan.mutate import candidates, minimize
-from modelsan.runner import export, run
-from modelsan import differential as diff
+from modelsan.legacy.mutate import candidates, minimize
+from modelsan.legacy.runner import export, run
+from modelsan.legacy import differential as diff
 
 RUMOCA = "./target/debug/rumoca"
 
