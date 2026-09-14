@@ -185,8 +185,31 @@ The brief's warning is that NaN, timestep collapse and a range violation are
 often three consequences of one singularity. Two things keep that from inflating
 counts:
 
-* **Deduplication groups by signature**, and `BugDatabase.overlap()` reports
-  which bugs several sanitizers saw — so overlap is measured rather than hidden.
+* **Two different questions, two mechanisms.** `BugDatabase` groups by
+  signature and answers *have we seen this bug before?*. It cannot answer *are
+  these findings one bug?*, because a signature begins with the sanitizer's
+  name on purpose — DomainSan's view of a division by zero and SolverSan's view
+  of the resulting failure are different statements about the model.
+
+  So `BugDatabase.overlap()` is structurally almost always empty, and that is
+  correct rather than a defect. Cross-sanitizer grouping is
+  `findings/correlate.py`, which builds **episodes**: findings from one
+  execution that share an anchor or occur within a few solver steps of each
+  other.
+
+  ```
+    init  singularity    vanishing-coefficient
+   0.300  solver         timestep-collapse
+   0.310  numeric        nan
+  ```
+
+  Three findings, one episode, causal order preserved. It deliberately does not
+  name a root cause — co-occurrence is not causation, and asserting otherwise
+  would be the same overreach as calling a single-tool failure a model defect.
+
+  `summarize()` reports `findings`, `episodes` and `multi_sanitizer_episodes`
+  separately, which is what says whether the suite is diverse or merely
+  redundant.
 * **Sanitizers that could collapse into each other are calibrated apart.**
   Chattering and Zeno are the clearest case: both are event pathologies, but
   chattering wants a hysteresis band and Zeno wants the accumulation removed.

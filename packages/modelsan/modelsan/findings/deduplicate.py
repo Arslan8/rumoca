@@ -69,9 +69,16 @@ class BugDatabase:
         return counts
 
     def overlap(self) -> list[Bug]:
-        """Bugs more than one sanitizer reported.
+        """Bugs several sanitizers reported *under the same signature*.
 
-        A NaN, a collapsed timestep and a range violation are frequently one
-        singularity seen three ways. These are the candidates for that.
+        This is structurally almost always empty, and that is correct rather
+        than a defect: a signature begins with the sanitizer's name, because
+        DomainSan's view of a division by zero and SolverSan's view of the
+        resulting failure are different statements about the model and should
+        not collapse into one.
+
+        For "did several sanitizers see one event", use
+        `findings.correlate.summarize`, which groups across sanitizers by
+        shared anchors and execution order instead.
         """
         return [bug for bug in self._bugs.values() if len(bug.sanitizers) > 1]

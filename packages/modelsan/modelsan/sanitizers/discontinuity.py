@@ -34,6 +34,23 @@ RELATIONS = ops.RELATIONS
 EPSILON = 1e-9
 
 
+def _numeric(literal) -> float | None:
+    """A literal's value as a float, or None when it is not numeric.
+
+    A relation can compare against a String or an enumeration — `mode == Mode.Off`
+    is a switching condition too. Those are real thresholds but not ones a
+    numeric fuzzer can place itself on, and calling `float()` on them crashed
+    the harness on 34 of the first 201 corpus models.
+    """
+    value = getattr(literal, "value", None)
+    if isinstance(value, bool) or value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 class DiscontinuitySan:
     name = "discontinuity"
 
@@ -59,9 +76,12 @@ class DiscontinuitySan:
                                     (condition.rhs, condition.lhs)):
                     if not isinstance(right, Literal):
                         continue
+                    threshold = _numeric(right)
+                    if threshold is None:
+                        continue  # a String or enumeration literal is not a threshold
                     reads = left.variables()
                     if len(reads) == 1 and reads[0].is_parameter:
-                        found.append((node, reads[0], float(right.value)))
+                        found.append((node, reads[0], threshold))
         return found
 
     def hints(self, model, context: AnalysisContext) -> list[FuzzHint]:

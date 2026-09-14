@@ -347,6 +347,63 @@ def test_capabilities_are_declared():
     check(not problems, f"every implemented capability is declared ({problems})")
 
 
+# ── 9. One cause seen several ways is one episode ────────────────────────────
+
+
+def test_cross_sanitizer_correlation():
+    """A cascade must count as one event, not four discoveries.
+
+    A singular block collapses the timestep and then produces a NaN. Three
+    sanitizers see it and all three are right; counting three bugs would
+    inflate every number an evaluation reports.
+
+    `BugDatabase` cannot express this — a signature begins with the sanitizer
+    name on purpose — so correlation is a separate step, and this pins that it
+    merges transitively rather than by arrival order.
+    """
+    print("\n== cross-sanitizer correlation ==")
+    from modelsan.findings import Severity, correlate, summarize
+    from modelsan.findings.finding import Finding
+    from modelsan.findings.signature import attach
+    from modelsan.runtime.anchors import CanonicalAnchor, EntityKind
+
+    case = TestCase(parameters={"m": 0.0})
+    other = TestCase(parameters={"k": 1.0})
+    shared = CanonicalAnchor(EntityKind.VARIABLE, 91, "mass1.a")
+
+    findings = [
+        Finding("singularity", "vanishing-coefficient", Severity.MEDIUM,
+                canonical_anchors=[shared], test_case=case),
+        Finding("solver", "timestep-collapse", Severity.MEDIUM,
+                test_case=case, time=0.30),
+        Finding("numeric", "nan", Severity.HIGH,
+                canonical_anchors=[shared], test_case=case, time=0.31),
+        Finding("range", "below-min", Severity.MEDIUM,
+                canonical_anchors=[CanonicalAnchor(EntityKind.VARIABLE, 7, "x")],
+                test_case=other, time=0.9),
+    ]
+    attach(findings)
+    report = summarize(findings)
+
+    check(report["episodes"] == 2, f"4 findings group into 2 episodes ({report})")
+    check(report["multi_sanitizer_episodes"] == 1, "one episode spans sanitizers")
+
+    episodes = correlate(findings)
+    cascade = next(e for e in episodes if e.is_multi_sanitizer)
+    check(cascade.sanitizers == ["singularity", "solver", "numeric"],
+          f"the causal order is preserved ({cascade.sanitizers})")
+    check(len(cascade.timeline()) == 3, "the timeline is reconstructible")
+    # The step collapse has no anchor and reaches the episode only through the
+    # NaN's time proximity; taking the first match instead of merging would
+    # leave it stranded in its own episode.
+    check(any("solver" in line for line in cascade.timeline()),
+          "an unanchored finding joins via time proximity, not arrival order")
+
+    separate = next(e for e in episodes if not e.is_multi_sanitizer)
+    check(separate.test_case_description == "k=1",
+          "a different test case is a different episode")
+
+
 def main() -> int:
     test_failure_without_trajectory()
     test_unsupported_instrumentation()
@@ -356,6 +413,7 @@ def main() -> int:
     test_operator_vocabulary()
     test_event_discrimination()
     test_capabilities_are_declared()
+    test_cross_sanitizer_correlation()
     print(f"\n{'ALL PASS' if not FAILURES else str(len(FAILURES)) + ' FAILED'}")
     for failure in FAILURES:
         print(f"  - {failure}")
