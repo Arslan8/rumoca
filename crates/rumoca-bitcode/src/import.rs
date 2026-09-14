@@ -395,6 +395,15 @@ fn build_expression<'dae>(
             let fallback = resolve(built, fallback.0, "expression", ctx)?;
             owner.at(at).conditional(arms, fallback)?
         }
+        RbcExprNode::Builtin { name, arguments } => {
+            let builtin = builtin_of(name)
+                .ok_or_else(|| ctx.unsupported(format!("unknown built-in `{name}`")))?;
+            let mut operands = Vec::with_capacity(arguments.len());
+            for argument in arguments {
+                operands.push(resolve(built, argument.0, "expression", ctx)?);
+            }
+            owner.at(at).builtin(builtin, operands)?
+        }
         RbcExprNode::Unsupported { detail } => {
             return Err(ctx.unsupported(format!(
                 "expression {} is unsupported: {detail}",
@@ -687,6 +696,56 @@ fn literal_of(literal: &RbcLiteral) -> dae::DaeLiteral {
         RbcLiteral::Boolean { value } => dae::DaeLiteral::Boolean(*value),
         RbcLiteral::String { value } => dae::DaeLiteral::String(value.clone()),
     }
+}
+
+fn builtin_of(name: &str) -> Option<dae::PureBuiltin> {
+    use dae::PureBuiltin as B;
+    Some(match name {
+        "abs" => B::Abs,
+        "sign" => B::Sign,
+        "sqrt" => B::Sqrt,
+        "div" => B::Div,
+        "mod" => B::Mod,
+        "rem" => B::Rem,
+        "floor" => B::Floor,
+        "ceil" => B::Ceil,
+        "integer" => B::Integer,
+        "sin" => B::Sin,
+        "cos" => B::Cos,
+        "tan" => B::Tan,
+        "asin" => B::Asin,
+        "acos" => B::Acos,
+        "atan" => B::Atan,
+        "atan2" => B::Atan2,
+        "sinh" => B::Sinh,
+        "cosh" => B::Cosh,
+        "tanh" => B::Tanh,
+        "exp" => B::Exp,
+        "log" => B::Log,
+        "log10" => B::Log10,
+        "smooth" => B::Smooth,
+        "noEvent" => B::NoEvent,
+        "homotopy" => B::Homotopy,
+        "min" => B::Min,
+        "max" => B::Max,
+        "sum" => B::Sum,
+        "product" => B::Product,
+        "size" => B::Size,
+        "zeros" => B::Zeros,
+        "ones" => B::Ones,
+        "fill" => B::Fill,
+        "linspace" => B::Linspace,
+        "cross" => B::Cross,
+        "identity" => B::Identity,
+        "vector" => B::Vector,
+        "transpose" => B::Transpose,
+        "diagonal" => B::Diagonal,
+        "outerProduct" => B::OuterProduct,
+        "skew" => B::Skew,
+        "cat1" => B::PromotedCat1,
+        "cat2" => B::PromotedCat2,
+        _ => return None,
+    })
 }
 
 fn unary_of(op: RbcUnaryOp) -> dae::UnaryOperator {

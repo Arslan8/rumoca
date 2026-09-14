@@ -465,6 +465,19 @@ fn expression_node(
                 }
             }
         }
+        dae::ExpressionOperation::Builtin { builtin, arguments } => {
+            let mut operands = Vec::with_capacity(arguments.len());
+            for position in 0..arguments.len() {
+                let argument = arguments
+                    .get(position)
+                    .ok_or_else(|| ExportError::Projection("builtin argument".into()))?;
+                operands.push(check(argument)?);
+            }
+            RbcExprNode::Builtin {
+                name: builtin_name(builtin).to_string(),
+                arguments: operands,
+            }
+        }
         _ => unsupported("expression form not in bitcode v1", options)?,
     };
     Ok(node)
@@ -532,6 +545,60 @@ fn coordinate_of(coordinate: dae::CoordinateView<'_>) -> Option<RbcCoordinate> {
         C::Time => RbcCoordinate::Time,
         _ => return None,
     })
+}
+
+/// Modelica spelling of a pure built-in.
+///
+/// Names are the contract, not enum ordinals: a consumer matches `"sqrt"`, and
+/// appending a variant upstream cannot silently change what an existing
+/// artifact means.
+fn builtin_name(builtin: dae::PureBuiltin) -> &'static str {
+    use dae::PureBuiltin as B;
+    match builtin {
+        B::Abs => "abs",
+        B::Sign => "sign",
+        B::Sqrt => "sqrt",
+        B::Div => "div",
+        B::Mod => "mod",
+        B::Rem => "rem",
+        B::Floor => "floor",
+        B::Ceil => "ceil",
+        B::Integer => "integer",
+        B::Sin => "sin",
+        B::Cos => "cos",
+        B::Tan => "tan",
+        B::Asin => "asin",
+        B::Acos => "acos",
+        B::Atan => "atan",
+        B::Atan2 => "atan2",
+        B::Sinh => "sinh",
+        B::Cosh => "cosh",
+        B::Tanh => "tanh",
+        B::Exp => "exp",
+        B::Log => "log",
+        B::Log10 => "log10",
+        B::Smooth => "smooth",
+        B::NoEvent => "noEvent",
+        B::Homotopy => "homotopy",
+        B::Min => "min",
+        B::Max => "max",
+        B::Sum => "sum",
+        B::Product => "product",
+        B::Size => "size",
+        B::Zeros => "zeros",
+        B::Ones => "ones",
+        B::Fill => "fill",
+        B::Linspace => "linspace",
+        B::Cross => "cross",
+        B::Identity => "identity",
+        B::Vector => "vector",
+        B::Transpose => "transpose",
+        B::Diagonal => "diagonal",
+        B::OuterProduct => "outerProduct",
+        B::Skew => "skew",
+        B::PromotedCat1 => "cat1",
+        B::PromotedCat2 => "cat2",
+    }
 }
 
 fn unary_of(operator: dae::UnaryOperator) -> Option<RbcUnaryOp> {

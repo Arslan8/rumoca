@@ -294,6 +294,11 @@ fn check_expressions(
                 operand(*lhs);
                 operand(*rhs);
             }
+            RbcExprNode::Builtin { arguments, .. } => {
+                for argument in arguments {
+                    operand(*argument);
+                }
+            }
             RbcExprNode::Conditional { branches, fallback } => {
                 for branch in branches {
                     operand(branch.condition);

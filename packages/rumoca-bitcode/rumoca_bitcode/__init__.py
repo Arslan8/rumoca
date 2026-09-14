@@ -28,6 +28,7 @@ from .model import (
     VERSION,
     BinaryOp,
     BitcodeError,
+    BuiltinCall,
     Component,
     Conditional,
     Connection,
@@ -65,6 +66,7 @@ __all__ = [
     "TimeRef",
     "UnaryOp",
     "BinaryOp",
+    "BuiltinCall",
     "Conditional",
     "Unsupported",
     "BitcodeError",
@@ -331,6 +333,15 @@ class Model:
                         node["op"],
                         built[node["lhs"]],
                         built[node["rhs"]],
+                    )
+                )
+            elif kind == "builtin":
+                built.append(
+                    BuiltinCall(
+                        identifier,
+                        provenance,
+                        node["name"],
+                        [built[index] for index in node["arguments"]],
                     )
                 )
             elif kind == "conditional":

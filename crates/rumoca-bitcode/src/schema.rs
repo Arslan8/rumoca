@@ -421,6 +421,14 @@ pub enum RbcExprNode {
         branches: Vec<RbcBranch>,
         fallback: ExprId,
     },
+    /// A pure built-in call: `sqrt(x)`, `log(x)`, `abs(x)`, `min(a, b)`, ...
+    ///
+    /// `name` is the Modelica spelling in lower case, so a consumer matches on
+    /// `"sqrt"` rather than on an enum ordinal that could shift.
+    Builtin {
+        name: String,
+        arguments: Vec<ExprId>,
+    },
     /// A node this schema version cannot represent. A consumer must treat the
     /// containing model as not fully understood rather than assume a default.
     /// Producers only emit this when explicitly asked to tolerate gaps.

@@ -133,7 +133,7 @@ class Literal(Expression):
         self.value = value
 
     def __repr__(self) -> str:
-        return f"Literal({self.value!r})"
+        return repr(self.value) if self.kind == "string" else f"{self.value}"
 
 
 class VariableRef(Expression):
@@ -184,8 +184,10 @@ class UnaryOp(Expression):
     def children(self) -> list[Expression]:
         return [self.operand]
 
+    _SYMBOLS = {"negate": "-", "not": "not "}
+
     def __repr__(self) -> str:
-        return f"UnaryOp({self.op!r}, {self.operand!r})"
+        return f"{self._SYMBOLS.get(self.op, self.op + ' ')}{self.operand!r}"
 
 
 class BinaryOp(Expression):
@@ -200,8 +202,17 @@ class BinaryOp(Expression):
     def children(self) -> list[Expression]:
         return [self.lhs, self.rhs]
 
+    _SYMBOLS = {
+        "add": "+", "subtract": "-", "multiply": "*", "divide": "/", "power": "^",
+        "equal": "==", "not_equal": "<>", "less": "<", "less_equal": "<=",
+        "greater": ">", "greater_equal": ">=", "and": "and", "or": "or",
+    }
+
     def __repr__(self) -> str:
-        return f"BinaryOp({self.op!r}, {self.lhs!r}, {self.rhs!r})"
+        # Infix, fully parenthesised: a report a human reads should look like
+        # the model they wrote, and explicit parentheses beat guessing at
+        # precedence.
+        return f"({self.lhs!r} {self._SYMBOLS.get(self.op, self.op)} {self.rhs!r})"
 
 
 class Conditional(Expression):
@@ -222,7 +233,31 @@ class Conditional(Expression):
         return out
 
     def __repr__(self) -> str:
-        return f"Conditional({len(self.branches)} branch(es))"
+        arms = " ".join(
+            f"if {condition!r} then {value!r}" for condition, value in self.branches
+        )
+        return f"({arms} else {self.fallback!r})"
+
+
+class BuiltinCall(Expression):
+    """A pure built-in: `sqrt(x)`, `log(x)`, `min(a, b)`, ...
+
+    `name` is the Modelica spelling, so a consumer matches on `"sqrt"` rather
+    than on an ordinal that could shift between compiler versions.
+    """
+
+    __slots__ = ("name", "arguments")
+
+    def __init__(self, id, provenance, name: str, arguments) -> None:
+        super().__init__(id, provenance)
+        self.name = name
+        self.arguments = arguments
+
+    def children(self) -> list[Expression]:
+        return list(self.arguments)
+
+    def __repr__(self) -> str:
+        return f"{self.name}({', '.join(repr(a) for a in self.arguments)})"
 
 
 class Unsupported(Expression):
