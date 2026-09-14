@@ -27,6 +27,22 @@ being wrong.
 |---|---|---|---|---|
 | `examples/models` + `examples/modelsan` | 17 | 15 | 3 | 1 panic (BUG-001), 1 fail-closed refusal |
 | MSL 4.1.0 examples (Electrical, Mechanics, Thermal, Blocks) | 74 | 51 | 32 | 23 refused, mostly unimplemented semantic owners |
+
+MSL outcome in detail (74 models, 513 s):
+
+| | Count |
+|---|---|
+| Compiled to bitcode | 51 |
+| Refused at compile (fail-closed) | 23 |
+| Exported partially (bitcode v1 gaps) | 32 |
+| No property to search | 3 |
+| Failed with declared values, no search attributable | 2 (LIMITATION-001) |
+| Searched | 46 |
+| **Parameter-triggered failures found** | **3** (all BUG-002) |
+
+Three findings across 46 searched models, all the same root cause, with zero
+false positives after the baseline fix. The same sweep before that fix reported
+five, of which two were misattributed.
 | CogniPilot CMM examples | 4 | 3 | 3 | 1 refused (`unsupported semantic owner`) |
 
 "Exported partially" means bitcode v1 could not represent every expression in
