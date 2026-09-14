@@ -78,8 +78,10 @@ Measured on the current set:
 | InitSan | ✅ | | | ✅ | ✅ |
 | EventSan | | ✅ | | | ✅ |
 | ZenoSan | | ✅ | | | ✅ |
+| DeterminismSan | | comparative | | | ✅ |
+| DifferentialSan | | comparative | | | needs 2 backends |
 
-13 of 15 components active against OpenModelica. The two that are not —
+15 of 17 components active against OpenModelica. The two that are not —
 DomainSan's runtime check and SolverSan's timestep collapse — are reported as
 skipped with the missing capability named, never as clean results.
 
@@ -165,6 +167,17 @@ solver:initialization-failure:exec:0a90a3f3        no entity anchor
 The two `below-min` signatures are deliberately different. The same name in two
 tools is not known to be the same entity, and a signature must not assert it.
 Merging them is a later cross-backend deduplication step that needs evidence.
+
+### Comparative oracles
+
+`DeterminismSan` and `DifferentialSan` judge a *set* of results rather than one,
+so `Pipeline.run_comparative` schedules the extra executions. They are opt-in
+rather than part of `DEFAULT` because those executions cost real time.
+
+`DifferentialSan` is the one sanitizer that can adjudicate the others: a failure
+only one backend produces is that backend's gap, not the model's defect. Its
+findings say so explicitly, because treating a single-tool failure as a model
+bug already produced two false MSL findings in this project.
 
 ## Distinct classes, not one cause seen many ways
 

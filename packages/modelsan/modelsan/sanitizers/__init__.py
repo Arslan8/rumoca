@@ -8,6 +8,8 @@ from .base import (
     RuntimeObserver,
     StaticAnalyzer,
 )
+from .determinism import DeterminismSan
+from .differential import DifferentialSan
 from .discontinuity import DiscontinuitySan
 from .event import EventSan
 from .domain import DomainSan
@@ -23,7 +25,13 @@ from .zeno import ZenoSan
 DEFAULT = (DomainSan, NumericSan, RangeSan, SolverSan, AssertSan,
            DiscontinuitySan, SingularitySan, InitSan, EventSan, ZenoSan)
 
-__all__ = ["AssertSan", "DEFAULT", "DifferentialOracle", "DiscontinuitySan",
+#: Oracles that judge several executions against each other rather than one
+#: execution against a property. The pipeline has to schedule extra runs for
+#: these, so they are opt-in rather than part of DEFAULT.
+COMPARATIVE = (DeterminismSan, DifferentialSan)
+
+__all__ = ["AssertSan", "COMPARATIVE", "DEFAULT", "DeterminismSan",
+           "DifferentialSan", "DifferentialOracle", "DiscontinuitySan",
            "DomainSan", "EventSan", "FuzzHintProvider", "InitSan",
            "InstrumentationRequester",
            "NumericSan", "RangeSan", "RuntimeObserver", "SanitizerRegistry",

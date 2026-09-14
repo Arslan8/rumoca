@@ -83,6 +83,37 @@ class Pipeline:
         findings.sort(key=lambda f: (f.time if f.time is not None else 0.0))
         return attach(findings)
 
+    def compare(self, results: dict, model, context: AnalysisContext,
+                testcase: TestCase) -> list[Finding]:
+        """Run every differential oracle over a set of results for one case."""
+        findings: list[Finding] = []
+        for sanitizer in self.registry.differential_oracles():
+            findings.extend(sanitizer.compare(results, model, testcase))
+        return attach(findings)
+
+    def run_comparative(self, model, model_path: str, model_name: str,
+                        backends: dict, testcase: TestCase | None = None,
+                        repeats: int = 1) -> list[Finding]:
+        """Execute one case across several backends and/or repeats, then compare.
+
+        Separate from `run` because it is a different shape of campaign: the
+        unit of judgement is a *set* of results rather than one, and the extra
+        executions cost real time. `repeats` covers DeterminismSan, where the
+        several results come from one backend rather than several.
+        """
+        testcase = testcase or NOMINAL
+        context = AnalysisContext(model)
+        results: dict[str, ExecutionResult] = {}
+        for name, backend in backends.items():
+            failure = backend.prepare(model_path, model_name)
+            if failure is not None:
+                results[name] = failure
+                continue
+            for attempt in range(max(1, repeats)):
+                label = name if repeats == 1 else f"{name}#{attempt + 1}"
+                results[label] = backend.run(testcase)
+        return self.compare(results, model, context, testcase)
+
     def run(self, model, model_path: str, model_name: str,
             testcases: list[TestCase] | None = None) -> RunOutcome:
         context = AnalysisContext(model)
