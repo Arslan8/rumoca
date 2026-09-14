@@ -5,7 +5,7 @@
 | **Severity** | High — the library states the value is supported, so a user has every reason to use it |
 | **Target** | MSL 4.1.0, `Modelica.Electrical.Analog.Basic.Inductor` |
 | **Trigger** | `L = 0` |
-| **Confirmed in** | Rumoca **and** OpenModelica 1.27.0-dev, on 3 MSL example models |
+| **Confirmed in** | Rumoca **and** OpenModelica 1.27.0-dev, on 3 MSL example models; 8 models in the full OMC sweep |
 | **Found by** | ModelSan parameter sweep over 847 models, cross-confirmed against OMC, 2026-09-13 |
 | **Status** | Reported, not fixed |
 
@@ -54,7 +54,7 @@ The cross-check matters. A failure in one tool is ambiguous — it could be that
 tool not re-indexing a degenerate equation. Two independent implementations
 failing on a value the library says is supported is not ambiguous.
 
-## `Capacitor` makes the identical claim and honours it
+## `Capacitor` makes the identical claim and honours it only sometimes
 
 ```modelica
 // Electrical/Analog/Basic/Capacitor.mo
@@ -70,13 +70,21 @@ BASE: OMC OK
 C=0:  OMC OK
 ```
 
-`C = 0` works, because `i = 0` is an open circuit — well-posed. `L = 0` does
-not, because `0 = v` constrains a variable the rest of the circuit also
-determines. The two components carry the same sentence and only one of them is
-true.
+`C = 0` works *here*, because `i = 0` is an open circuit and the rest of this
+network still determines the node. It is not universally safe:
+`ChuaCircuit` with `C1.C = 0` fails in both tools. Zero capacitance is
+topology-dependent — see
+[BUG-013](BUG-013-capacitor-zero-capacitance-topology-dependent.md).
 
-That asymmetry is the finding. It is not that zero inductance is a strange
-thing to ask for — it is that the library says yes and then cannot deliver.
+`L = 0` is different in kind: `0 = v` imposes a constraint on a variable the
+rest of the circuit also determines, and it failed in every model tested (3 of
+3 confirmed, 8 in the wider sweep).
+
+**The asymmetry that survives this correction is the declaration, not the
+outcome.** `SI.Capacitance` declares `min=0`, so zero is a value the library
+deliberately admits. `SI.Inductance` declares *nothing*, so zero and negative
+inductance are admitted by omission — and MSL separately defines
+`SelfInductance = Inductance(min=0)` which `Basic.Inductor` does not use.
 
 ## Negative inductance is permitted too
 

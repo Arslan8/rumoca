@@ -57,31 +57,46 @@ The two excluded are `Rotational.Examples.CompareBrakingTorque` and
 `Translational.Examples.CompareBrakingForce`. Without this stage they would have
 been reported as MSL bugs, and they are not.
 
-## In progress: OpenModelica-backed sweep
+## Full-corpus sweep, OpenModelica backend
 
-The findings above came from Rumoca, which compiles 332 of 847 models. The
-dynamic search now also runs through OpenModelica, which builds ~93% — see
-[the method note](../method/README.md) for why the pipeline is dual-backend
-rather than switched.
+The findings above were found through Rumoca, which compiles 332 of 847 models.
+The dynamic search also runs through OpenModelica, which reaches far more of the
+corpus. See [the method note](../method/README.md) for why the pipeline is
+dual-backend rather than switched.
 
-**Provisional, at 453 of 827 models swept:**
+**Complete, 827 models:**
 
-| | Count |
-|---|---|
-| Candidate (class, parameter) groups | 394 |
-| Verified past guard, reachability and attribution | 261 |
-| …in core library rather than Examples/Utilities | **73** |
-| — `zero-permitted-by-bound` (strongest claim) | 16 |
-| — `zero-permitted-by-omission` | 54 |
-| — `fails-at-its-own-positive-bound` | 3 |
+| | Rumoca backend | OMC backend |
+|---|---|---|
+| Searched (clean baseline, parameters varied) | 289 | **739** |
+| Trials | ~4 000 | 14 000 |
+| Failing (model, parameter) pairs | 19 | 1 167 |
+| Candidate (class, parameter) groups | — | 623 |
+| Verified past attribution, guards, reachability | — | 398 |
+| …in core library rather than Examples/Utilities | — | **147** |
 
-These are **not yet filed as findings.** They still need cross-confirmation in
-Rumoca where it can compile the model, and 133 were dropped for a known recall
-gap — parameters declared in a base class, which the lookup does not follow yet.
+Of the 147: 39 `zero-permitted-by-bound`, 100 `zero-permitted-by-omission`,
+8 `fails-at-its-own-positive-bound`. By where the bound is written: 31 on the
+component, 17 inherited from an SI type, 99 nowhere at all.
 
-Nearly all of them are instances of one thing, which is written up as a study
-rather than as 73 bug reports: [MSL components inherit SI type bounds their
-equations cannot honour](si-type-bounds.md).
+### These are candidates, and cross-confirmation still moves them
+
+Three were taken through the second tool as a sample, with decisive and
+different results:
+
+| Candidate | Reach | Verdict |
+|---|---|---|
+| `Analog.Basic.Capacitor.C` | 12 models | **confirmed** in both tools → [BUG-013](BUG-013-capacitor-zero-capacitance-topology-dependent.md) |
+| `Analog.Basic.Resistor.R` | 12 models | **single-tool** — Rumoca cannot compile any of the 12, or fails at declared values |
+| `HeatTransfer.HeatCapacitor.C` | 20 models | **excluded** — Rumoca survives the trigger |
+
+`HeatCapacitor.C` was the largest `zero-permitted-by-omission` group in the
+whole sweep and it does not survive a second opinion. Nothing from the 147 is
+listed as a finding until it has been through this.
+
+Nearly all of them are instances of one thing, written up as a study rather
+than as 147 bug reports: [MSL components inherit SI type bounds their equations
+cannot honour](si-type-bounds.md).
 
 ## Studies
 

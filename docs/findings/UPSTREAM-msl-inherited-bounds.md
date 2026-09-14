@@ -2,8 +2,9 @@
 
 **Status: DRAFT. Not filed anywhere.**
 Target: `modelica/ModelicaStandardLibrary` · Version examined: MSL 4.1.0
-Verify the instance counts against the completed sweep before filing; the
-numbers below were taken mid-sweep and can only grow.
+Counts below are from the completed 827-model sweep. Rows are marked with
+whether they survived cross-confirmation in a second tool; **only the confirmed
+rows should be filed.**
 
 ---
 
@@ -55,10 +56,12 @@ division by zero
 
 Confirmed on `ChuaCircuit`, `ParallelResonance`, `SeriesResonance`.
 
-**`Capacitor` carries the identical sentence and honours it.** `i = C*der(v)` at
-`C = 0` is an open circuit — well posed — and `CauerLowPassAnalog` simulates
-fine with `C1.C = 0`. So the documentation is accurate for one component and not
-for the other.
+`Capacitor` carries the identical sentence, and honours it *conditionally*:
+`i = C*der(v)` at `C = 0` is an open circuit, which `CauerLowPassAnalog`
+survives and `ChuaCircuit` does not. So zero capacitance is topology-dependent,
+while zero inductance failed in every model tested. Both are reported, but they
+are different defects — the inductor has no bound at all, the capacitor has a
+deliberate one whose validity the declaration cannot express.
 
 **MSL already defines the type that would fix it:**
 
@@ -80,14 +83,19 @@ type. `Capacitor.mo` contains no `min` at all — it comes from:
 type Capacitance = Real(final quantity="Capacitance", final unit="F", min=0);
 ```
 
-| Type / component | Bound | Equation | Confirmed on |
-|---|---|---|---|
-| `SI.Capacitance` → `Basic.Capacitor.C` | `min=0` | `i = C*der(v)` | 10 models |
-| `SI.Temperature` → `Semiconductors.NPN.Tnom`, `PNP.Tnom`, `Diode.TNOM` | `min=0` | thermal voltage `~ k*T/q` | 5 models |
-| `Rotational.Components.Inertia.J` | `min=0` on the component | `J*a = tau` | 12 models |
-| `Translational.Components.Mass.m` | `min=0` (via `SI.Mass`) | `m*a = f` | 4 models |
-| `SI.Resistance` → `Basic.Resistor.R` | **none** | `v = R*i` | 12 models |
-| `SI.Inductance` → `Basic.Inductor.L` | **none** | `L*der(i) = v` | 7 models |
+| Type / component | Bound | Equation | Reach | Two tools? |
+|---|---|---|---|---|
+| `Rotational.Components.Inertia.J` | `min=0` on the component | `J*a = tau` | 29 models | **yes** |
+| `Translational.Components.Mass.m` | `min=0` (via `SI.Mass`) | `m*a = f` | 17 models | **yes** |
+| `SI.Capacitance` → `Basic.Capacitor.C` | `min=0` | `i = C*der(v)` | 12 models | **yes** (topology-dependent) |
+| `SI.Inductance` → `Basic.Inductor.L` | **none** | `L*der(i) = v` | 8 models | **yes** |
+| `SI.Resistance` → `Basic.Resistor.R` | **none** | `v = R*i` | 12 models | *single tool — hold* |
+| `SI.Temperature` → `Semiconductors.NPN.Tnom`, `PNP.Tnom`, `Diode.TNOM` | `min=0` | thermal voltage `~ k*T/q` | 5 models | *single tool — hold* |
+| `SI.Density` → `FluidHeatFlow.Media.Medium.rho` | `min=0` | divisor | 8 models | *single tool — hold* |
+
+One candidate of the same shape was **discarded**: `HeatTransfer.HeatCapacitor.C`
+reached 20 models — the largest group in the sweep — and the second tool
+survives the trigger. It is not in this report.
 
 `min=0` on a temperature is correct physics — absolute zero is the floor — and
 simultaneously fatal to any equation dividing by `T`. The bound is right as a
@@ -141,9 +149,10 @@ this into separate issues if that suits your workflow better.
 
 ## Reviewer checklist before filing
 
-- [ ] Re-run instance counts against the completed 827-model sweep
-- [ ] Cross-confirm the `Resistor.R` and `Temperature` rows the same way
-      `Inductor` and `Mass` were (currently single-tool from the OMC sweep)
+- [x] Re-run instance counts against the completed 827-model sweep
+- [ ] Cross-confirm `Resistor.R`, `Temperature` and `Density` rows, or delete
+      them from the report. `Resistor.R` resisted a first attempt: Rumoca
+      cannot compile any of the 12 models, or fails at their declared values.
 - [ ] Decide: one issue, or `Inductor` alone first as the sharpest case
 - [ ] Name the second tool explicitly, or describe it neutrally as here
 - [ ] Attach `tools/sweep/` reproduction commands
