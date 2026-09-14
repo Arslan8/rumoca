@@ -146,4 +146,7 @@ def search_knobs(model: Model, sites: list[Site]) -> list:
     if declared_ranges(model):
         seen = {p.id for p in ordered}
         ordered += [p for p in model.parameters if p.id not in seen]
-    return ordered
+
+    # Only real-valued parameters have a numeric boundary to sit on. A Boolean
+    # switch or a String tag is a structural choice, not a value to perturb.
+    return [p for p in ordered if p.type.scalar in ("real", "integer")]

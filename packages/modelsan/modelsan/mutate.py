@@ -43,7 +43,18 @@ def boundary_values(parameter) -> list[tuple[float, str]]:
     values: list[tuple[float, str]] = []
 
     def literal(expression):
-        return getattr(expression, "value", None) if expression is not None else None
+        """A numeric literal, or nothing.
+
+        A parameter may be a String or an enumeration, and a bound may be an
+        expression rather than a literal. Neither is something to coerce: a
+        non-numeric value has no boundary to sit on.
+        """
+        if expression is None:
+            return None
+        value = getattr(expression, "value", None)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return None
+        return float(value)
 
     minimum = literal(parameter.minimum)
     maximum = literal(parameter.maximum)
@@ -65,13 +76,27 @@ def boundary_values(parameter) -> list[tuple[float, str]]:
     if default is not None:
         values.append((-float(default), "negated default"))
 
+    # Drop values the declaration forbids. A user cannot legally set a
+    # parameter outside its own `min`/`max`, so a "failure" there is not a
+    # finding — it is ModelSan breaking a rule the model already stated.
+    # The `min - epsilon` / `max + epsilon` probes are the deliberate exception:
+    # they test whether the bound is actually enforced.
+    def permitted(value: float, why: str) -> bool:
+        if "declared" in why:
+            return True
+        if minimum is not None and value < float(minimum):
+            return False
+        if maximum is not None and value > float(maximum):
+            return False
+        return True
+
     # Deduplicate while preserving order, so the most suspicious value wins its
     # rationale.
     seen: set[float] = set()
     unique = []
     for value, why in values:
         key = round(value, 15)
-        if key in seen or not math.isfinite(value):
+        if key in seen or not math.isfinite(value) or not permitted(value, why):
             continue
         seen.add(key)
         unique.append((value, why))

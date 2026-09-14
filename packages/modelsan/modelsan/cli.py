@@ -68,7 +68,25 @@ def main(argv: list[str] | None = None) -> int:
             print("\n[+] no parameters gate those operations; nothing to search")
             return 0
 
-        print(f"\n[+] Exploring parameter space over {len(knobs)} parameter(s)...")
+        # Baseline first. A model that already fails with its declared values
+        # has nothing to attribute to a parameter, and reporting the first
+        # candidate as the "trigger" would be a false accusation.
+        baseline = run(rumoca, artifact, {}, t_end=args.t_end)
+        if not baseline.ok and baseline.kind != "tool-error":
+            print("\n[!] Model already fails with its declared parameter values")
+            print(f"\nType:\n    {baseline.kind}")
+            print(f"\nDetail:\n    {baseline.detail}")
+            location = resolve_span(model, baseline.detail)
+            if location:
+                print(f"\nSource:\n    {location}")
+            print(
+                "\nNo parameter search was run: there is nothing to attribute,"
+                "\nbecause the failure does not depend on any override."
+            )
+            return 1
+
+        print(f"\n[+] Baseline simulation is clean")
+        print(f"[+] Exploring parameter space over {len(knobs)} parameter(s)...")
         trials = candidates(knobs)[: args.max_trials]
 
         failures = 0
