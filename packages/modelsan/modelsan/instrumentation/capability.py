@@ -24,6 +24,20 @@ class Capability(str, Enum):
     """That a run failed, with a classified reason. Every backend can do this,
     which is why SolverSan works everywhere."""
 
+    OBSERVE_CONNECTOR = "observe_connector"
+    """A connector member observed *with the node it belongs to*.
+
+    Distinct from `OBSERVE_VARIABLE`, which is satisfied by a column of
+    numbers. A conservation law is carried jointly by the members of a node,
+    and observing each of them without knowing which node they share answers
+    every part of the request except the question."""
+
+    CONNECTION_GRAPH = "connection_graph"
+    """The artifact carries connection sets: what each `connect` set equates
+    and conserves. Static, like `CANONICAL_MODEL`, and separate from it —
+    artifacts produced before the exporter emitted sets have one and not the
+    other, and a network pass must report itself skipped rather than clean."""
+
     CANONICAL_MODEL = "canonical_model"
     """A canonical DAE is available for this model at all.
 

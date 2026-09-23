@@ -1,0 +1,77 @@
+# Modelica.Electrical.Machines.Examples.InductionMachines.IMC_YDarc
+
+71 findings.
+
+| ID | Reached as | Kind | |
+|---|---|---|---|
+| [FINDING-02013](../FINDING-02013-imc-ydarc-lm.md) | `aimc.airGap.Lm` | `physical-domain-unenforced` |  |
+| [FINDING-02014](../FINDING-02014-imc-ydarc-l.md) | `aimc.airGap.L` | `physical-domain-unenforced` |  |
+| [FINDING-02015](../FINDING-02015-imc-ydarc-ron.md) | `switchYDwithArc.idealCloser.Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02016](../FINDING-02016-imc-ydarc-goff.md) | `switchYDwithArc.idealCloser.Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02017](../FINDING-02017-imc-ydarc-gcref.md) | `aimc.statorCore.coreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02018](../FINDING-02018-imc-ydarc-gcref.md) | `aimc.statorCoreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02019](../FINDING-02019-imc-ydarc-gcref.md) | `aimcData.statorCoreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02020](../FINDING-02020-imc-ydarc-lline.md) | `LLine` | `physical-domain-unenforced` |  |
+| [FINDING-02021](../FINDING-02021-imc-ydarc-wload.md) | `wLoad` | `divisor-reachable-zero` |  |
+| [FINDING-02022](../FINDING-02022-imc-ydarc-jload.md) | `JLoad` | `physical-domain-unenforced` |  |
+| [FINDING-02023](../FINDING-02023-imc-ydarc-fnominal.md) | `fNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02024](../FINDING-02024-imc-ydarc-rline.md) | `RLine` | `physical-domain-unenforced` |  |
+| [FINDING-02025](../FINDING-02025-imc-ydarc-lm.md) | `aimc.Lm` | `physical-domain-unenforced` |  |
+| [FINDING-02026](../FINDING-02026-imc-ydarc-lrsigma.md) | `aimc.Lrsigma` | `physical-domain-unenforced` |  |
+| [FINDING-02027](../FINDING-02027-imc-ydarc-rr.md) | `aimc.Rr` | `physical-domain-unenforced` |  |
+| [FINDING-02028](../FINDING-02028-imc-ydarc-rr.md) | `aimcData.Rr` | `physical-domain-unenforced` |  |
+| [FINDING-02029](../FINDING-02029-imc-ydarc-lm.md) | `aimcData.Lm` | `physical-domain-unenforced` |  |
+| [FINDING-02030](../FINDING-02030-imc-ydarc-lrsigma.md) | `aimcData.Lrsigma` | `physical-domain-unenforced` |  |
+| [FINDING-02031](../FINDING-02031-imc-ydarc-ron.md) | `idealCloser.Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02032](../FINDING-02032-imc-ydarc-goff.md) | `idealCloser.Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02033](../FINDING-02033-imc-ydarc-ron.md) | `idealCloser.idealClosingSwitch[1].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02034](../FINDING-02034-imc-ydarc-ron.md) | `idealCloser.idealClosingSwitch[2].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02035](../FINDING-02035-imc-ydarc-ron.md) | `idealCloser.idealClosingSwitch[3].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02036](../FINDING-02036-imc-ydarc-goff.md) | `idealCloser.idealClosingSwitch[1].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02037](../FINDING-02037-imc-ydarc-goff.md) | `idealCloser.idealClosingSwitch[2].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02038](../FINDING-02038-imc-ydarc-goff.md) | `idealCloser.idealClosingSwitch[3].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02039](../FINDING-02039-imc-ydarc-ron.md) | `switchYDwithArc.idealCloser.closerWithArc[1].Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02040](../FINDING-02040-imc-ydarc-ron.md) | `switchYDwithArc.idealCloser.closerWithArc[2].Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02041](../FINDING-02041-imc-ydarc-ron.md) | `switchYDwithArc.idealCloser.closerWithArc[3].Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02042](../FINDING-02042-imc-ydarc-ron.md) | `switchYDwithArc.idealOpener.openerWithArc[1].Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02043](../FINDING-02043-imc-ydarc-ron.md) | `switchYDwithArc.idealOpener.openerWithArc[2].Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02044](../FINDING-02044-imc-ydarc-ron.md) | `switchYDwithArc.idealOpener.openerWithArc[3].Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02045](../FINDING-02045-imc-ydarc-goff.md) | `switchYDwithArc.idealCloser.closerWithArc[1].Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02046](../FINDING-02046-imc-ydarc-goff.md) | `switchYDwithArc.idealCloser.closerWithArc[2].Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02047](../FINDING-02047-imc-ydarc-goff.md) | `switchYDwithArc.idealCloser.closerWithArc[3].Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02048](../FINDING-02048-imc-ydarc-goff.md) | `switchYDwithArc.idealOpener.openerWithArc[1].Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02049](../FINDING-02049-imc-ydarc-goff.md) | `switchYDwithArc.idealOpener.openerWithArc[2].Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02050](../FINDING-02050-imc-ydarc-goff.md) | `switchYDwithArc.idealOpener.openerWithArc[3].Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02051](../FINDING-02051-imc-ydarc-rs.md) | `aimcData.Rs` | `physical-domain-unenforced` |  |
+| [FINDING-02052](../FINDING-02052-imc-ydarc-lszero.md) | `aimcData.Lszero` | `physical-domain-unenforced` |  |
+| [FINDING-02053](../FINDING-02053-imc-ydarc-lssigma.md) | `aimcData.Lssigma` | `physical-domain-unenforced` |  |
+| [FINDING-02054](../FINDING-02054-imc-ydarc-m.md) | `aimcData.m` | `divisor-reachable-zero` |  |
+| [FINDING-02055](../FINDING-02055-imc-ydarc-jr.md) | `aimcData.Jr` | `physical-domain-unenforced` |  |
+| [FINDING-02056](../FINDING-02056-imc-ydarc-js.md) | `aimcData.Js` | `physical-domain-unenforced` |  |
+| [FINDING-02057](../FINDING-02057-imc-ydarc-fsnominal.md) | `aimcData.fsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02058](../FINDING-02058-imc-ydarc-fsnominal.md) | `aimcData.fsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02059](../FINDING-02059-imc-ydarc-l.md) | `aimc.lssigma.L` | `physical-domain-unenforced` |  |
+| [FINDING-02060](../FINDING-02060-imc-ydarc-l.md) | `inductor.L` | `physical-domain-unenforced` |  |
+| [FINDING-02061](../FINDING-02061-imc-ydarc-l.md) | `aimc.lszero.L` | `physical-domain-unenforced` |  |
+| [FINDING-02062](../FINDING-02062-imc-ydarc-l.md) | `inductor.inductor[1].L` | `physical-domain-unenforced` |  |
+| [FINDING-02063](../FINDING-02063-imc-ydarc-l.md) | `inductor.inductor[2].L` | `physical-domain-unenforced` |  |
+| [FINDING-02064](../FINDING-02064-imc-ydarc-l.md) | `inductor.inductor[3].L` | `physical-domain-unenforced` |  |
+| [FINDING-02065](../FINDING-02065-imc-ydarc-j.md) | `aimc.inertiaRotor.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02066](../FINDING-02066-imc-ydarc-j.md) | `aimc.inertiaStator.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02067](../FINDING-02067-imc-ydarc-j.md) | `loadInertia.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02068](../FINDING-02068-imc-ydarc-ron.md) | `switchYDwithArc.idealOpener.Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02069](../FINDING-02069-imc-ydarc-goff.md) | `switchYDwithArc.idealOpener.Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02070](../FINDING-02070-imc-ydarc-rs.md) | `aimc.Rs` | `physical-domain-unenforced` |  |
+| [FINDING-02071](../FINDING-02071-imc-ydarc-zsref.md) | `aimc.ZsRef` | `physical-domain-unenforced` |  |
+| [FINDING-02072](../FINDING-02072-imc-ydarc-pi.md) | `aimc.pi` | `divisor-reachable-zero` |  |
+| [FINDING-02073](../FINDING-02073-imc-ydarc-lszero.md) | `aimc.Lszero` | `physical-domain-unenforced` |  |
+| [FINDING-02074](../FINDING-02074-imc-ydarc-lssigma.md) | `aimc.Lssigma` | `physical-domain-unenforced` |  |
+| [FINDING-02075](../FINDING-02075-imc-ydarc-jr.md) | `aimc.Jr` | `physical-domain-unenforced` |  |
+| [FINDING-02076](../FINDING-02076-imc-ydarc-js.md) | `aimc.Js` | `physical-domain-unenforced` |  |
+| [FINDING-02077](../FINDING-02077-imc-ydarc-r.md) | `aimc.rs.R` | `physical-domain-unenforced` |  |
+| [FINDING-02078](../FINDING-02078-imc-ydarc-r.md) | `resistor.R` | `physical-domain-unenforced` |  |
+| [FINDING-02079](../FINDING-02079-imc-ydarc-m.md) | `aimc.spacePhasorS.m` | `divisor-reachable-zero` |  |
+| [FINDING-02080](../FINDING-02080-imc-ydarc-lrsigma.md) | `aimc.squirrelCageR.Lrsigma` | `physical-domain-unenforced` |  |
+| [FINDING-02081](../FINDING-02081-imc-ydarc-rr.md) | `aimc.squirrelCageR.Rr` | `physical-domain-unenforced` |  |
+| [FINDING-02082](../FINDING-02082-imc-ydarc-ron.md) | `switchYDwithArc.Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02083](../FINDING-02083-imc-ydarc-goff.md) | `switchYDwithArc.Goff` | `physical-domain-unenforced` |  |

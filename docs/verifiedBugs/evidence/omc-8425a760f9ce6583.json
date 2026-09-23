@@ -1,0 +1,32 @@
+{
+  "command": [
+    "omc",
+    "/data/mrumoca/rumoca/target/bug-review-20260915/omc-8425a760f9ce6583/verify.mos"
+  ],
+  "cwd": "/data/mrumoca/rumoca/target/bug-review-20260915/omc-8425a760f9ce6583",
+  "status": "completed",
+  "returncode": 0,
+  "seconds": 5.775,
+  "stdout": "true\ntrue\ntrue\ntrue\ntrue\ntrue\n\"Notification: Automatically loaded package Complex 4.1.0 due to uses annotation from Modelica.\nNotification: Automatically loaded package ModelicaServices 4.1.0 due to uses annotation from Modelica.\n\"\nAUDIT_CASE Baseline\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/bug-review-20260915/omc-8425a760f9ce6583/Baseline_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-4, method = 'dassl', fileNamePrefix = 'Baseline', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.005430944,\n    timeBackend = 0.014255944000000001,\n    timeSimCode = 0.003320164,\n    timeTemplates = 0.02116618,\n    timeCompile = 1.233173374,\n    timeSimulation = 0.058371769000000004,\n    timeTotal = 1.3358670529999999\nend SimulationResult;\n\"\"\nAUDIT_CASE BUG024\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-4, method = 'dassl', fileNamePrefix = 'BUG024', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Simulation execution failed for model: BUG024\nLOG_ASSERT        | debug   | division by zero at time 0, (a=0.05997752247752248) / (b=0), where divisor b expression is: opAmp.Vps - opAmp.Vns\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n\",\n    timeFrontend = 0.004937061,\n    timeBackend = 0.013312297,\n    timeSimCode = 0.0030859140000000004,\n    timeTemplates = 0.03356404,\n    timeCompile = 1.22775745,\n    timeSimulation = 0.019049703,\n    timeTotal = 1.301845935\nend SimulationResult;\n\"\"\nAUDIT_CASE FinalBUG024\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-4, method = 'dassl', fileNamePrefix = 'FinalBUG024', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Simulation execution failed for model: FinalBUG024\nLOG_ASSERT        | debug   | division by zero at time 0, (a=0.05997752247752248) / (b=0), where divisor b expression is: -15.0 - opAmp.Vns\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n\",\n    timeFrontend = 0.004979123,\n    timeBackend = 0.013554680000000001,\n    timeSimCode = 0.0031488130000000003,\n    timeTemplates = 0.004711695,\n    timeCompile = 1.217337487,\n    timeSimulation = 0.019556865,\n    timeTotal = 1.263431302\nend SimulationResult;\n\"\"\nAUDIT_OVERRIDE BUG024\n\nLOG_ASSERT        | debug   | division by zero at time 0, (a=0.05997752247752248) / (b=0), where divisor b expression is: opAmp.Vps - opAmp.Vns\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n255\n",
+  "stderr": "",
+  "model": "Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator",
+  "cases": [
+    [
+      "Baseline",
+      null,
+      null
+    ],
+    [
+      "BUG024",
+      "opAmp.Vps",
+      -15.0
+    ],
+    [
+      "FinalBUG024",
+      "opAmp.Vps",
+      -15.0
+    ]
+  ],
+  "modelica_source": "model Baseline\n  extends Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator;\nend Baseline;\nmodel BUG024\n  extends Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator(opAmp(Vps=-15));\nend BUG024;\nmodel FinalBUG024\n  extends Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator(opAmp(final Vps=-15));\nend FinalBUG024;\n",
+  "mos": "setCommandLineOptions(\"--numProcs=1 --evaluateFinalParameters=true\");\nsetCompiler(\"gcc\");\nsetCXXCompiler(\"g++\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/Modelica/package.mo\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/package.mo\");\nloadFile(\"Cases.mo\");\ngetErrorString();\nprint(\"AUDIT_CASE Baseline\\n\");\nsimulate(Baseline, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE BUG024\\n\");\nsimulate(BUG024, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FinalBUG024\\n\");\nsimulate(FinalBUG024, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_OVERRIDE BUG024\\n\");\nsystem(\"./Baseline -override opAmp.Vps=-15 -r=BUG024_override.csv\");\n"
+}

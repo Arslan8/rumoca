@@ -10,6 +10,10 @@ pub struct SessionConfig {
     pub parallel: bool,
     /// Maximum concrete class/component nesting allowed during instantiation.
     pub instantiation_depth_limit: usize,
+    /// Replace a derived parameter's declaration binding with the constant it
+    /// evaluates to. Enabled by default; see
+    /// [`InstantiateOptions::fold_parameter_declaration_bindings`].
+    pub fold_parameter_declaration_bindings: bool,
 }
 
 impl Default for SessionConfig {
@@ -17,6 +21,7 @@ impl Default for SessionConfig {
         Self {
             parallel: false,
             instantiation_depth_limit: DEFAULT_INSTANTIATION_DEPTH_LIMIT,
+            fold_parameter_declaration_bindings: true,
         }
     }
 }
@@ -25,6 +30,7 @@ impl SessionConfig {
     pub(super) fn instantiate_options(&self) -> InstantiateOptions {
         InstantiateOptions {
             depth_limit: self.instantiation_depth_limit,
+            fold_parameter_declaration_bindings: self.fold_parameter_declaration_bindings,
             ..InstantiateOptions::default()
         }
     }

@@ -40,6 +40,12 @@ pub struct BitcodeArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum BitcodeCommand {
+    /// Lower equations into editable public Solve programs.
+    LowerExecution(crate::bitcode_execution::LowerArgs),
+    /// Validate executable structure, freshness and backend capabilities.
+    CheckExecution(BitcodeInspectArgs),
+    /// Execute a saved program without re-lowering equations.
+    Run(crate::bitcode_execution::RunArgs),
     /// Print a one-screen summary of an artifact.
     Inspect(BitcodeInspectArgs),
     /// Print an artifact as JSON, whatever encoding it used on disk.
@@ -50,6 +56,54 @@ pub enum BitcodeCommand {
     Convert(BitcodeConvertArgs),
     /// Prove an artifact round-trips: import it, re-export, and compare.
     RoundTrip(BitcodeRoundTripArgs),
+    /// Print an artifact as a readable listing, resolving the expression graph.
+    Disasm(BitcodeDisasmArgs),
+    /// Write the parseable textual IR — the `.ll` to the `.rbc`.
+    EmitText(BitcodeEmitTextArgs),
+    /// Assemble the textual IR back into a binary artifact.
+    Assemble(BitcodeAssembleArgs),
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeEmitTextArgs {
+    /// The `.rbc` artifact.
+    pub input: PathBuf,
+    /// Where to write the text. Standard output when omitted.
+    #[arg(short, long)]
+    pub output: Option<PathBuf>,
+    /// Include each source file's full text.
+    ///
+    /// Off by default: it is most of the artifact's bytes and none of its
+    /// semantics. Required for a byte-exact assemble back.
+    #[arg(long)]
+    pub sources: bool,
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeAssembleArgs {
+    /// The textual IR.
+    pub input: PathBuf,
+    /// Where to write the artifact.
+    #[arg(short, long)]
+    pub output: PathBuf,
+    /// Encoding for the result.
+    #[arg(long, value_enum, default_value_t = BitcodeFormat::Cbor)]
+    pub format: BitcodeFormat,
+}
+
+#[derive(Args, Debug)]
+pub struct BitcodeDisasmArgs {
+    /// The `.rbc` artifact.
+    pub input: PathBuf,
+    /// Also print the flat expression table, the artifact's constant pool.
+    #[arg(long)]
+    pub expressions: bool,
+    /// Annotate each equation with the source span it came from.
+    #[arg(long)]
+    pub provenance: bool,
+    /// Print expression ids alongside the rendered form.
+    #[arg(long)]
+    pub ids: bool,
 }
 
 #[derive(Args, Debug)]
@@ -69,6 +123,13 @@ pub struct BitcodeDumpArgs {
 #[derive(Args, Debug)]
 pub struct BitcodeCheckArgs {
     pub input: PathBuf,
+    /// Also reject nodes the schema could not represent.
+    ///
+    /// Plain `check` proves the artifact is internally consistent, which an
+    /// artifact full of `Unsupported` nodes still is. This is the question a
+    /// consumer actually has: can this be rebuilt into a model?
+    #[arg(long)]
+    pub strict: bool,
 }
 
 #[derive(Args, Debug)]
@@ -160,11 +221,26 @@ pub fn emit_bitcode(
 
 pub fn run_bitcode(args: BitcodeArgs) -> Result<()> {
     match args.command {
+        BitcodeCommand::LowerExecution(args) => crate::bitcode_execution::lower(args),
+        BitcodeCommand::CheckExecution(args) => crate::bitcode_execution::check_path(&args.input),
+        BitcodeCommand::Run(args) => crate::bitcode_execution::run(args),
         BitcodeCommand::Inspect(args) => run_inspect(&args.input),
         BitcodeCommand::Dump(args) => run_dump(&args.input, args.output.as_deref()),
-        BitcodeCommand::Check(args) => run_check(&args.input),
+        BitcodeCommand::Check(args) => run_check(&args.input, args.strict),
         BitcodeCommand::Convert(args) => run_convert(&args.input, &args.output, args.format),
         BitcodeCommand::RoundTrip(args) => run_round_trip(&args.input, args.output.as_deref()),
+        BitcodeCommand::EmitText(args) =>
+            run_emit_text(&args.input, args.output.as_deref(), args.sources),
+        BitcodeCommand::Assemble(args) =>
+            run_assemble(&args.input, &args.output, args.format),
+        BitcodeCommand::Disasm(args) => crate::bitcode_disasm::run_disasm(
+            &args.input,
+            crate::bitcode_disasm::DisasmOptions {
+                expressions: args.expressions,
+                provenance: args.provenance,
+                ids: args.ids,
+            },
+        ),
     }
 }
 
@@ -228,14 +304,18 @@ fn run_dump(path: &Path, output: Option<&Path>) -> Result<()> {
     Ok(())
 }
 
-fn run_check(path: &Path) -> Result<()> {
+fn run_check(path: &Path, strict: bool) -> Result<()> {
     let (file, _) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
-    match rumoca_bitcode::validate(&file.model, &Default::default()) {
+    if file.execution.is_some() { crate::bitcode_execution::check(&file)?; }
+    let mut options = rumoca_bitcode::validate::ValidateOptions::default();
+    options.reject_unsupported = strict;
+    match rumoca_bitcode::validate(&file.model, &options) {
         Ok(()) => {
             println!(
-                "{}: valid bitcode v{}",
+                "{}: valid bitcode v{}{}",
                 path.display(),
-                file.bitcode_version
+                file.bitcode_version,
+                if strict { " (strict)" } else { "" }
             );
             Ok(())
         }
@@ -246,6 +326,55 @@ fn run_check(path: &Path) -> Result<()> {
             bail!("{}: {} validation error(s)", path.display(), errors.len())
         }
     }
+}
+
+fn run_emit_text(input: &Path, output: Option<&Path>, sources: bool) -> Result<()> {
+    let (file, _) = rumoca_bitcode::read_file(input).map_err(anyhow::Error::from)?;
+    if file.execution.is_some() || !file.model.connectors.is_empty() { bail!("text profile does not carry execution/connector declarations; use bitcode dump or convert"); }
+    let text = rumoca_bitcode::text::print_text_with(
+        &file,
+        rumoca_bitcode::text::TextOptions { sources },
+    )
+    .map_err(anyhow::Error::from)?;
+    match output {
+        Some(path) => {
+            if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
+                std::fs::create_dir_all(parent)?;
+            }
+            std::fs::write(path, &text)
+                .with_context(|| format!("write {}", path.display()))?;
+            eprintln!("wrote {} ({} bytes){}", path.display(), text.len(),
+                      if sources { "" } else { ", source text omitted" });
+        }
+        None => print!("{text}"),
+    }
+    Ok(())
+}
+
+fn run_assemble(input: &Path, output: &Path, format: BitcodeFormat) -> Result<()> {
+    let text = std::fs::read_to_string(input)
+        .with_context(|| format!("read {}", input.display()))?;
+    let file = rumoca_bitcode::text::parse_text(&text).map_err(anyhow::Error::from)?;
+
+    // Validated before it is written. The textual form is the one a person
+    // edits by hand, so it is the one most likely to be internally
+    // inconsistent — a dangling expression id, an equation reading a variable
+    // that is not declared — and catching that here names the problem instead
+    // of deferring it to whatever loads the artifact next.
+    rumoca_bitcode::validate::validate(&file.model, &Default::default())
+        .map_err(|errors| anyhow::anyhow!(
+            "assembled artifact is not valid:\n{}",
+            errors.iter().map(|e| format!("  - {e}")).collect::<Vec<_>>().join("\n")
+        ))?;
+
+    let bytes = rumoca_bitcode::encode(&file, format.into()).map_err(anyhow::Error::from)?;
+    if let Some(parent) = output.parent().filter(|p| !p.as_os_str().is_empty()) {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::write(output, bytes).with_context(|| format!("write {}", output.display()))?;
+    eprintln!("assembled {} -> {} ({})", input.display(), output.display(),
+              Encoding::from(format).as_str());
+    Ok(())
 }
 
 fn run_convert(input: &Path, output: &Path, format: BitcodeFormat) -> Result<()> {
@@ -278,6 +407,7 @@ fn run_convert(input: &Path, output: &Path, format: BitcodeFormat) -> Result<()>
 /// difference names the exact field that moved.
 fn run_round_trip(path: &Path, output: Option<&Path>) -> Result<()> {
     let (original, _) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
+    if original.execution.is_some() || !original.model.connectors.is_empty() { bail!("DAE re-export would discard execution/connector declarations; use bitcode convert for a lossless container round-trip"); }
     let dae = rumoca_bitcode::import(&original).map_err(anyhow::Error::from)?;
     let again = rumoca_bitcode::export(&dae, None, &original.model.name, &ExportOptions::default())
         .map_err(anyhow::Error::from)?;
@@ -384,6 +514,7 @@ fn compare(left: &RbcModel, right: &RbcModel) -> Vec<String> {
 /// Read bitcode back into a checked DAE and continue compilation.
 pub fn run_compile_bitcode(args: CompileBitcodeArgs) -> Result<()> {
     let (file, encoding) = rumoca_bitcode::read_file(&args.input).map_err(anyhow::Error::from)?;
+    if file.execution.is_some() { bail!("compile-bitcode would discard executable edits; use bitcode run --execution=require"); }
     eprintln!(
         "reading {} (bitcode v{}, {})",
         args.input.display(),
@@ -838,64 +969,22 @@ mod tests {
     use super::*;
     use rumoca_bitcode::schema::*;
 
+    /// A model with one traced connector variable.
+    ///
+    /// Built rather than written out: the struct-literal version named every
+    /// field of `RbcModel` and `RbcVariable`, so it broke on every schema
+    /// addition — four times in one week, each a mechanical repair.
     fn model_with_trace() -> RbcModel {
-        let span = RbcSpan {
-            source: SourceId(0),
-            start: 0,
-            end: 1,
-            line: 1,
-            column: 1,
-        };
-        let provenance = RbcProvenance {
-            origin: RbcOrigin::Source,
-            span,
-        };
-        RbcModel {
-            name: "T".into(),
-            sources: Vec::new(),
-            types: Vec::new(),
-            variables: vec![RbcVariable {
-                id: VariableId(0),
-                name: "motor.flange.tau".into(),
-                role: RbcRole::Algebraic,
-                causality: RbcCausality::Local,
-                value_type: TypeId(0),
-                scalar_count: 1,
-                declaration: provenance,
-                component: None,
-                unit: Some("N.m".into()),
-                description: None,
-                binding: None,
-                start: None,
-                min: None,
-                max: None,
-                nominal: None,
-                fixed: None,
-                tunable: false,
-                from_source: true,
-                connector: None,
-            }],
-            expressions: Vec::new(),
-            equations: Vec::new(),
-            initial_equations: Vec::new(),
-            relations: Vec::new(),
-            conditions: Vec::new(),
-            roots: Vec::new(),
-            events: Vec::new(),
-            time_events: Vec::new(),
-            connections: Vec::new(),
-            components: Vec::new(),
-            trace_points: vec![RbcTracePoint {
-                id: TracePointId(0),
-                variable: VariableId(0),
-                label: "flange torque".into(),
-                connection: None,
-                quantity: Some(RbcQuantityKind::Flow),
-                unit: Some("N.m".into()),
-                added_by: Some("test".into()),
-            }],
-            summary: RbcSummary::default(),
-        }
+        use rumoca_bitcode::build::Builder;
+
+        let mut builder = Builder::new("T");
+        let torque = builder.variable("motor.flange.tau", RbcRole::Algebraic);
+        builder.trace_point(torque, "flange torque", "test");
+        let mut model = builder.finish();
+        model.variables[torque.0 as usize].unit = Some("N.m".into());
+        model.trace_points[0].quantity = Some(RbcQuantityKind::Flow);
+        model.trace_points[0].unit = Some("N.m".into());
+        model
     }
 
     #[test]

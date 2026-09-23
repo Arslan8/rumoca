@@ -117,7 +117,15 @@ impl MeRetainedComponent {
         self,
         options: MeSessionOptions,
     ) -> Result<MeComponentHost<'static>, MeSessionError> {
-        let host = build_host_state(self.kernel, self.pristine, options)?;
+        self.into_lease_with_observer(options, None)
+    }
+
+    pub fn into_lease_with_observer(
+        self,
+        options: MeSessionOptions,
+        observer: Option<Box<dyn super::PublicationObserver>>,
+    ) -> Result<MeComponentHost<'static>, MeSessionError> {
+        let host = build_host_state(self.kernel, self.pristine, options, observer)?;
         Ok(MeComponentHost {
             host,
             lease: PhantomData,
@@ -128,7 +136,12 @@ impl MeRetainedComponent {
         &self,
         options: MeSessionOptions,
     ) -> Result<MeComponentHost<'_>, MeSessionError> {
-        let host = build_host_state(Rc::clone(&self.kernel), self.pristine.clone(), options)?;
+        let host = build_host_state(
+            Rc::clone(&self.kernel),
+            self.pristine.clone(),
+            options,
+            None,
+        )?;
         Ok(MeComponentHost {
             host,
             lease: PhantomData,
@@ -145,7 +158,13 @@ fn build_host_state(
     kernel: Rc<RefCell<SolveMeKernel>>,
     pristine: super::MeFmuState,
     options: MeSessionOptions,
+    observer: Option<Box<dyn super::PublicationObserver>>,
 ) -> Result<MeHostState, MeSessionError> {
+    if observer.is_some() && !options.records_trace() {
+        return Err(MeSessionError::Contract {
+            reason: "executable publication requires host trace observations".into(),
+        });
+    }
     let (state_count, indicator_count, names, meta, input_names, max_step_duration_reference) = {
         let borrowed = kernel.borrow();
         let description = borrowed.model_description();
@@ -160,6 +179,7 @@ fn build_host_state(
     };
     let capacity = trace_capacity(&options);
     let mut trace = MeTraceRecorder::new(names, meta, state_count, capacity)?;
+    trace.set_observer(observer);
     let outcome =
         run_fmi_initialization(&mut kernel.borrow_mut(), &options, options.records_trace())?;
     let policy = build_policy(&options, &outcome, state_count)?;
@@ -267,6 +287,11 @@ impl MeComponentHost<'_> {
 
     pub fn output_meta(&self) -> Vec<SimVariableMeta> {
         self.host.output_meta()
+    }
+
+    /// Publish the trace of a run that terminated during initialization.
+    pub fn finish_publication(&mut self) -> Result<(), MeSessionError> {
+        self.host.trace.finish_observer().map_err(Into::into)
     }
 
     /// Publish the trace of a run that terminated during initialization.
@@ -500,6 +525,11 @@ impl MeSimulationSession<'_, '_> {
             })?;
         self.advance_to(stop, cursor)?;
         Ok(())
+    }
+
+    /// Publish the trace the session owns.
+    pub fn finish_publication(&mut self) -> Result<(), MeSessionError> {
+        self.host.trace.finish_observer().map_err(Into::into)
     }
 
     /// Publish the trace the session owns.

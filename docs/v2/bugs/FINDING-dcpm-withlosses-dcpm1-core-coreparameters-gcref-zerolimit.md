@@ -1,0 +1,141 @@
+# FINDING-01608: `dcpm1.core.coreParameters.GcRef` in `DCPM_withLosses`
+
+|  |  |
+|---|---|
+| **Tier** | **Candidate** — static only, not execution-confirmed |
+| **Model** | `Modelica.Electrical.Machines.Examples.DCMachines.DCPM_withLosses` |
+| **Reached as** | `dcpm1.core.coreParameters.GcRef` |
+| **Found by** | **PhysicalSan** — `packages/modelsan/modelsan/sanitizers/physical.py`, rule `elec.conductance.positive` |
+| **Reported as** | `physical-zero-is-a-supported-limit` |
+| **Severity** | low |
+| **Declaration** | `target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Losses/CoreParameters.mo:18` |
+| **Signature** | `physical:physical-zero-is-a-supported-limit:var:99:e467442c` |
+| **From run** | `docs/runs/data/STATIC_INTENT_DEFAULT.jsonl`, `tools/sweep/static_eval.py` over `tools/sweep/ALL.list`, default flags |
+| **Status** | **candidate — no execution has decided it either way** |
+
+
+## The claim
+
+The positivity rule does **not** apply: this component documents zero as a meaningful limit, so a missing-bound claim would contradict its contract.
+
+It does **not** claim that anything is wrong — this records a rule that was considered and correctly declined, with the contract that declined it.
+
+## Why PhysicalSan fired
+
+PhysicalSan binds each variable to a physical role from its `quantity`, unit and declaring class, then checks the domain invariant that role carries.
+
+The shared zero contract that decided this, and how strongly it is held:
+
+```
+contract    Modelica.Electrical.Machines.Losses.CoreParameters.GcRef: feature_disabled (declared, from bound) — the declaration's own binding evaluates to zero at the declared configuration, so zero is the value the library chose rather than one it failed to exclude
+behavior    feature_disabled
+confidence  declared
+source      bound
+```
+
+`confidence` is the field to read first. **proven** means the model's own equations establish it, **declared** means the component's catalog entry does, and **assumed** means a user contract supplied it and it is an input to the analysis rather than a result of it.
+
+The rule it applied is `elec.conductance.positive`:
+
+> the reciprocal of a passive resistance
+
+It bound this variable to that rule on this evidence — this is the step to check first if you think the rule does not apply here:
+
+```
+{'quantity': 'Conductance', 'unit': 'S', 'confidence': 'QUANTITY_AND_UNIT', 'premise_state': 'unknown', 'authority': 'quantity_or_unit', 'canonical_declaration': 'Modelica.Electrical.Machines.Losses.CoreParameters.GcRef'}
+```
+
+
+## Evidence
+
+| key | value |
+|---|---|
+| `domain` | electrical |
+| `rule` | elec.conductance.positive |
+| `observed` | 0.0 |
+| `required` | dcpm1.core.coreParameters.GcRef &gt; 0 |
+| `where` | declaration |
+| `contract` | Modelica.Electrical.Machines.Losses.CoreParameters.GcRef: feature_disabled (declared, from bound) — the declaration&#x27;s own binding evaluates to zero at the declared configuration, so zero is the value the library chose rather than one it failed to exclude |
+| `contract_behavior` | feature_disabled |
+| `contract_confidence` | declared |
+| `contract_source` | bound |
+| `note` | the declared value is zero and this component documents zero as a meaningful limit, so the positivity rule does not apply here |
+
+
+## How to verify
+
+**1. Reproduce this exact finding** (seconds):
+
+```console
+$ python3 tools/sweep/check_one.py Modelica.Electrical.Machines.Examples.DCMachines.DCPM_withLosses \
+      --target dcpm1.core.coreParameters.GcRef --sanitizer physical
+```
+
+This compiles the one model, runs the one sanitizer, and prints what it finds.
+It should print the evidence table above.
+
+The flags matter and are not optional: they are the ones the run in the header
+used. Adding `--keep-parameter-chains` keeps derived parameter bindings
+symbolic, which changes *which* parameter a divisor finding names, so a
+reproduce command with different flags can legitimately print nothing.
+
+**2. Read the declaration it points at.** The finding is about what the
+declaration permits, so this is the check that decides whether it is right:
+
+```console
+$ sed -n '18p' "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Losses/CoreParameters.mo"
+```
+
+That line is the declaration. Read its `min`: a declaration with no `min`, or
+with `min=0`, permits the trigger value. Check the *type* too — a bound can be
+inherited, and an inherited bound would refute the finding.
+
+**3. See it in the IR, if the claim is about reach rather than a bound:**
+
+```console
+$ python3 tools/sweep/check_one.py Modelica.Electrical.Machines.Examples.DCMachines.DCPM_withLosses --keep-artifact /tmp/m.rbc \
+      --sanitizer physical >/dev/null
+$ ./target/debug/rumoca bitcode disasm /tmp/m.rbc | grep -n "dcpm1.core.coreParameters.GcRef"
+```
+
+**4. Decide it by execution** — this is what would move it out of the candidate
+tier, and nothing here has done it:
+
+```console
+$ ./target/debug/rumoca compile-bitcode /tmp/m.rbc --simulate --check
+$ ./target/debug/rumoca compile-bitcode /tmp/m.rbc --simulate --check --param dcpm1.core.coreParameters.GcRef=0
+```
+
+The second command applies **the witness this finding names**, not an arbitrary
+zero. A finding that claims a denominator vanishes has already been checked
+arithmetically; what execution adds is whether the vanishing matters.
+
+A clean baseline and a failing perturbation makes this **confirmed**. A failing
+baseline makes it **undecidable** — the model does not run, so nothing can be
+attributed to the parameter.
+
+
+## What would disprove this
+
+- The semantic binding is wrong: the `matched_by` block above says why this variable was given this physical role. If the quantity or the declaring class does not mean what the rule assumes, the finding does not apply.
+- The value is excluded elsewhere — by an `assert`, by a guard, or by a bound on the *type* rather than the declaration.
+- The variable is a documented sentinel.
+
+
+## Where the fix goes
+
+At the declaration, not in this model. Every model that reaches the same declaration is a separate file here; one edit closes all of them. Use the declaration line above to find the others:
+
+```console
+$ grep -rl '| `target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Losses/CoreParameters.mo:18` |' docs/v2/bugs/
+```
+
+## How strong is this?
+
+| Tier | Evidence |
+|---|---|
+| **Confirmed** | fails under **two independent tools**, and the model is clean at its declared values |
+| -> **Candidate** | static analysis of the canonical DAE reached it; **no execution has decided it either way** |
+| **Latent** | a declaration *permits* a physically impossible value; **nothing has been observed failing** |
+
+This instance is in the **Candidate** tier.

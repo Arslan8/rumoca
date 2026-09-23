@@ -59,6 +59,27 @@ SOURCE = '''package D
     der(x) = -x / p;
   end Guarded;
 
+  model NamedBound
+    // The bound is a named constant, not a literal. Reading only literals made
+    // this read as *unbounded*, and the sanitizer proposed zero for a parameter
+    // whose declaration already forbids it — which is how ElastoGap.s_ref and
+    // Blocks.Continuous.PI.T reached the confirmed set as false positives.
+    constant Real tiny = 1e-60;
+    parameter Real p(min = tiny) = 4;
+    Real x(start = 1, fixed = true);
+  equation
+    der(x) = -x / p;
+  end NamedBound;
+
+  model DerivedBound
+    constant Real tiny = 1e-60;
+    parameter Real scale = 2;
+    parameter Real p(min = scale * tiny) = 4;
+    Real x(start = 1, fixed = true);
+  equation
+    der(x) = -x / p;
+  end DerivedBound;
+
   model NoDivision
     parameter Real m = 2;
     Real v(start = 1, fixed = true);
@@ -121,6 +142,19 @@ def main() -> int:
         _, findings = analyze(work, "Guarded")
         check(findings == [], "Guarded: a declared min excludes zero, so nothing "
                               "is reported")
+
+        # TOOLBUG-010. A bound written as a named constant is still a bound.
+        # Reading only bare literals made these read as unbounded, and produced
+        # findings against models that are correct — `ElastoGap.s_ref` declares
+        # `min=Modelica.Constants.eps` and `Blocks.Continuous.PI.T` declares
+        # `min=Modelica.Constants.small`, and both reached the confirmed set.
+        _, findings = analyze(work, "NamedBound")
+        check(findings == [], "NamedBound: `min = tiny` excludes zero as surely "
+                              "as `min = 1e-60` would")
+
+        _, findings = analyze(work, "DerivedBound")
+        check(findings == [], "DerivedBound: a bound computed from constants is "
+                              "still a bound")
 
         _, findings = analyze(work, "NoDivision")
         check(findings == [], "NoDivision: a vanishing coefficient is not a "

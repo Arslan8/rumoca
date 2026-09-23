@@ -1,0 +1,126 @@
+; /tmp/tmp.U9jRX0LxXt/chua.rbc (cbor)
+; bitcode v1, produced by rumoca 0.10.0
+; model Modelica.Electrical.Analog.Examples.ChuaCircuit
+
+variables (60)
+  [  0] state      L.i                          unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Basic.Inductor start=0
+  [  1] algebraic  L.v                          unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Basic.Inductor start=0
+  [  2] algebraic  L.p.v                        unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [  3] algebraic  L.p.i                        unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [  4] algebraic  L.n.v                        unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [  5] algebraic  L.n.i                        unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [  6] parameter  L.L                          unit=H quantity=Inductance from=Modelica.Electrical.Analog.Basic.Inductor start=1 binding=18
+  [  7] algebraic  Ro.i                         unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Basic.Resistor start=0
+  [  8] algebraic  Ro.v                         unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Basic.Resistor start=0
+  [  9] algebraic  Ro.p.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 10] algebraic  Ro.p.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 11] algebraic  Ro.n.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 12] algebraic  Ro.n.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 13] parameter  Ro.useHeatPort               from=Modelica.Electrical.Analog.Basic.Resistor start=false binding=false
+  [ 14] parameter  Ro.T                         unit=K quantity=ThermodynamicTemperature from=Modelica.Electrical.Analog.Basic.Resistor start=Ro.T_ref binding=Ro.T_ref
+  [ 15] algebraic  Ro.LossPower                 unit=W quantity=Power from=Modelica.Electrical.Analog.Basic.Resistor start=0
+  [ 16] algebraic  Ro.T_heatPort                unit=K quantity=ThermodynamicTemperature from=Modelica.Electrical.Analog.Basic.Resistor start=0
+  [ 17] parameter  Ro.R                         unit=Ohm quantity=Resistance from=Modelica.Electrical.Analog.Basic.Resistor start=1 binding=0.0125
+  [ 18] parameter  Ro.T_ref                     unit=K quantity=ThermodynamicTemperature from=Modelica.Electrical.Analog.Basic.Resistor start=300.15 binding=300.15
+  [ 19] parameter  Ro.alpha                     unit=1/K quantity=LinearTemperatureCoefficient from=Modelica.Electrical.Analog.Basic.Resistor start=0 binding=0
+  [ 20] algebraic  Ro.R_actual                  unit=Ohm quantity=Resistance from=Modelica.Electrical.Analog.Basic.Resistor start=0
+  [ 21] algebraic  G.i                          unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Basic.Conductor start=0
+  [ 22] algebraic  G.v                          unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Basic.Conductor start=0
+  [ 23] algebraic  G.p.v                        unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 24] algebraic  G.p.i                        unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 25] algebraic  G.n.v                        unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 26] algebraic  G.n.i                        unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 27] parameter  G.useHeatPort                from=Modelica.Electrical.Analog.Basic.Conductor start=false binding=false
+  [ 28] parameter  G.T                          unit=K quantity=ThermodynamicTemperature from=Modelica.Electrical.Analog.Basic.Conductor start=G.T_ref binding=G.T_ref
+  [ 29] algebraic  G.LossPower                  unit=W quantity=Power from=Modelica.Electrical.Analog.Basic.Conductor start=0
+  [ 30] algebraic  G.T_heatPort                 unit=K quantity=ThermodynamicTemperature from=Modelica.Electrical.Analog.Basic.Conductor start=0
+  [ 31] parameter  G.G                          unit=S quantity=Conductance from=Modelica.Electrical.Analog.Basic.Conductor start=1 binding=0.565
+  [ 32] parameter  G.T_ref                      unit=K quantity=ThermodynamicTemperature from=Modelica.Electrical.Analog.Basic.Conductor start=300.15 binding=300.15
+  [ 33] parameter  G.alpha                      unit=1/K quantity=LinearTemperatureCoefficient from=Modelica.Electrical.Analog.Basic.Conductor start=0 binding=0
+  [ 34] algebraic  G.G_actual                   unit=S quantity=Conductance from=Modelica.Electrical.Analog.Basic.Conductor start=0
+  [ 35] algebraic  C1.i                         unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Basic.Capacitor start=0
+  [ 36] state      C1.v                         unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Basic.Capacitor start=4
+  [ 37] algebraic  C1.p.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 38] algebraic  C1.p.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 39] algebraic  C1.n.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 40] algebraic  C1.n.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 41] parameter  C1.C                         unit=F quantity=Capacitance from=Modelica.Electrical.Analog.Basic.Capacitor start=1 binding=10
+  [ 42] algebraic  C2.i                         unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Basic.Capacitor start=0
+  [ 43] state      C2.v                         unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Basic.Capacitor start=0
+  [ 44] algebraic  C2.p.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 45] algebraic  C2.p.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 46] algebraic  C2.n.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 47] algebraic  C2.n.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 48] parameter  C2.C                         unit=F quantity=Capacitance from=Modelica.Electrical.Analog.Basic.Capacitor start=1 binding=100
+  [ 49] algebraic  Nr.i                         unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor start=0
+  [ 50] algebraic  Nr.v                         unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor start=0
+  [ 51] algebraic  Nr.p.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 52] algebraic  Nr.p.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.PositivePin start=0
+  [ 53] algebraic  Nr.n.v                       unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 54] algebraic  Nr.n.i                       unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.NegativePin start=0
+  [ 55] parameter  Nr.Ga                        unit=S quantity=Conductance from=Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor min=-1 binding=-0.757576
+  [ 56] parameter  Nr.Gb                        unit=S quantity=Conductance from=Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor min=-1 binding=-0.409091
+  [ 57] parameter  Nr.Ve                        unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor binding=1
+  [ 58] algebraic  Gnd.p.v                      unit=V quantity=ElectricPotential from=Modelica.Electrical.Analog.Interfaces.Pin start=0
+  [ 59] algebraic  Gnd.p.i                      unit=A quantity=ElectricCurrent from=Modelica.Electrical.Analog.Interfaces.Pin start=0
+
+equations (44)
+  [  0]  0 = (0 - (L.p.i + L.n.i))   ; OnePort.mo:7
+  [  1]  0 = (L.i - L.p.i)   ; OnePort.mo:8
+  [  2]  0 = (L.v - (L.p.v - L.n.v))   ; TwoPin.mo:10
+  [  3]  0 = ((L.L * der(L.i)) - L.v)   ; Inductor.mo:7
+  [  4]  0 = (0 - (Ro.p.i + Ro.n.i))   ; OnePort.mo:7
+  [  5]  0 = (Ro.i - Ro.p.i)   ; OnePort.mo:8
+  [  6]  0 = (Ro.v - (Ro.p.v - Ro.n.v))   ; TwoPin.mo:10
+  [  7]  0 = (Ro.T_heatPort - Ro.T)   ; ConditionalHeatPort.mo:17
+  [  8]  0 = (Ro.R_actual - (Ro.R * (1 + (Ro.alpha * (Ro.T_heatPort - Ro.T_ref)))))   ; Resistor.mo:17
+  [  9]  0 = (Ro.v - (Ro.R_actual * Ro.i))   ; Resistor.mo:18
+  [ 10]  0 = (Ro.LossPower - (Ro.v * Ro.i))   ; Resistor.mo:19
+  [ 11]  0 = (0 - (G.p.i + G.n.i))   ; OnePort.mo:7
+  [ 12]  0 = (G.i - G.p.i)   ; OnePort.mo:8
+  [ 13]  0 = (G.v - (G.p.v - G.n.v))   ; TwoPin.mo:10
+  [ 14]  0 = (G.T_heatPort - G.T)   ; ConditionalHeatPort.mo:17
+  [ 15]  0 = (G.G_actual - (G.G / (1 + (G.alpha * (G.T_heatPort - G.T_ref)))))   ; Conductor.mo:16
+  [ 16]  0 = (G.i - (G.G_actual * G.v))   ; Conductor.mo:17
+  [ 17]  0 = (G.LossPower - (G.v * G.i))   ; Conductor.mo:18
+  [ 18]  0 = (0 - (C1.p.i + C1.n.i))   ; OnePort.mo:7
+  [ 19]  0 = (C1.i - C1.p.i)   ; OnePort.mo:8
+  [ 20]  0 = (C1.v - (C1.p.v - C1.n.v))   ; TwoPin.mo:10
+  [ 21]  0 = (C1.i - (C1.C * der(C1.v)))   ; Capacitor.mo:7
+  [ 22]  0 = (0 - (C2.p.i + C2.n.i))   ; OnePort.mo:7
+  [ 23]  0 = (C2.i - C2.p.i)   ; OnePort.mo:8
+  [ 24]  0 = (C2.v - (C2.p.v - C2.n.v))   ; TwoPin.mo:10
+  [ 25]  0 = (C2.i - (C2.C * der(C2.v)))   ; Capacitor.mo:7
+  [ 26]  0 = (0 - (Nr.p.i + Nr.n.i))   ; OnePort.mo:7
+  [ 27]  0 = (Nr.i - Nr.p.i)   ; OnePort.mo:8
+  [ 28]  0 = (Nr.v - (Nr.p.v - Nr.n.v))   ; TwoPin.mo:10
+  [ 29]  0 = (Nr.i - (if (Nr.v < -Nr.Ve) then ((Nr.Gb * (Nr.v + Nr.Ve)) - (Nr.Ga * Nr.Ve)) else (if (Nr.v > Nr.Ve) then ((Nr.Gb * (Nr.v - Nr.Ve)) + (Nr.Ga * Nr.Ve)) else (Nr.Ga * Nr.v))))   ; NonlinearResistor.mo:9
+  [ 30]  0 = (Gnd.p.v - 0)   ; Ground.mo:9
+  [ 31]  0 = (L.n.i + Ro.p.i)   ; ChuaCircuit.mo:33
+  [ 32]  0 = ((C2.p.i + G.p.i) + L.p.i)   ; ChuaCircuit.mo:34
+  [ 33]  0 = ((G.n.i + Nr.p.i) + C1.p.i)   ; ChuaCircuit.mo:38
+  [ 34]  0 = ((((Ro.n.i + Gnd.p.i) + C2.n.i) + C1.n.i) + Nr.n.i)   ; ChuaCircuit.mo:42
+  [ 35]  0 = (L.n.v - Ro.p.v)   ; ChuaCircuit.mo:33
+  [ 36]  0 = (C2.p.v - G.p.v)   ; ChuaCircuit.mo:34
+  [ 37]  0 = (G.p.v - L.p.v)   ; ChuaCircuit.mo:34
+  [ 38]  0 = (G.n.v - Nr.p.v)   ; ChuaCircuit.mo:38
+  [ 39]  0 = (Nr.p.v - C1.p.v)   ; ChuaCircuit.mo:38
+  [ 40]  0 = (Ro.n.v - Gnd.p.v)   ; ChuaCircuit.mo:42
+  [ 41]  0 = (Gnd.p.v - C2.n.v)   ; ChuaCircuit.mo:42
+  [ 42]  0 = (C2.n.v - C1.n.v)   ; ChuaCircuit.mo:42
+  [ 43]  0 = (C1.n.v - Nr.n.v)   ; ChuaCircuit.mo:42
+
+events (2)
+  [  0] assert(.., "Temperature outside scope of model!")
+  [  1] assert(.., "Temperature outside scope of model!")
+
+connections (9)
+  [  0] L.n <-> Ro.p  (Potential)
+  [  1] C2.p <-> G.p  (Potential)
+  [  2] G.p <-> L.p  (Potential)
+  [  3] G.n <-> Nr.p  (Potential)
+  [  4] Nr.p <-> C1.p  (Potential)
+  [  5] Ro.n <-> Gnd.p  (Potential)
+  [  6] Gnd.p <-> C2.n  (Potential)
+  [  7] C2.n <-> C1.n  (Potential)
+  [  8] C1.n <-> Nr.n  (Potential)

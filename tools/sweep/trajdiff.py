@@ -164,7 +164,7 @@ def main():
     # Rumoca exposes no solver-tolerance flag, so a small gap cannot be
     # attributed to either tool: two integrators at their own defaults differ
     # by ~0.1% on smooth states and that is not a defect. Only a qualitative
-    # gap is reportable. See docs/bugs/LIMITATION-002.
+    # gap is reportable. See docs/toolbugs/LIMITATION-002-no-solver-tolerance-control.md.
     p.add_argument("--rtol", type=float, default=0.05)
     p.add_argument("--atol", type=float, default=1e-6)
     a = p.parse_args()

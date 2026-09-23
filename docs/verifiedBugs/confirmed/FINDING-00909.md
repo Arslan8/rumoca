@@ -1,0 +1,63 @@
+# FINDING-00909: Integrator circuit has an unguarded design denominator
+
+| Field | Value |
+|---|---|
+| Verdict | confirmed |
+| Scope / group | opamp-design-integrator |
+| Model | Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Integrator |
+| Target | k |
+| Student classification | divisor-reachable-zero |
+| Original report | [FINDING-integrator-k-divzero-2.md](../../v2/bugs/FINDING-integrator-k-divzero-2.md) — reviewed as `FINDING-00909-integrator-k.md`, which a later run renamed |
+| Original SHA-256 | c0484bde1c5d62aebb91f03e8f3b5cb61b99645135f87577e3707abbcf7721f2 |
+
+## Verification and root cause
+
+The source binding is C=1/k/(2*pi*f*R). The reported parameter is an explicit divisor with no zero handling. At the zero witness the nominal design cannot produce finite capacitance. This declaration has a reproduced instance in the evidence; a declaration-only report is linked to that shared proof, not claimed to have its own executable model.
+
+## Source evidence
+
+Compiler/source-resolved declaration: `Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Integrator.mo:5`. Role: `parameter`; binding: `1`; effective min: `0`; effective max: `None`. 
+
+[Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Integrator.mo — source snapshot](../evidence/sources/ea69c7eb54c29e22-Integrator.mo)
+
+```modelica
+3:   extends PartialOpAmp(v2(start=0));
+4:   import Modelica.Constants.pi;
+5:   parameter Real k(final min=0)=1 "Desired amplification at frequency f";
+6:   parameter SI.Frequency f "Frequency";
+7:   parameter SI.Resistance R=1000 "Resistance at negative input of OpAmp";
+8:   parameter SI.Capacitance C=1/k/(2*pi*f*R) "Calculated capacitance to reach desired amplification k";
+```
+
+[Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Integrator.mo — source snapshot](../evidence/sources/ea69c7eb54c29e22-Integrator.mo)
+
+```modelica
+4:   import Modelica.Constants.pi;
+5:   parameter Real k(final min=0)=1 "Desired amplification at frequency f";
+6:   parameter SI.Frequency f "Frequency";
+7:   parameter SI.Resistance R=1000 "Resistance at negative input of OpAmp";
+8:   parameter SI.Capacitance C=1/k/(2*pi*f*R) "Calculated capacitance to reach desired amplification k";
+9:   SI.Voltage v(start=0)=c.v "Capacitor voltage = state";
+10:   Basic.Capacitor  c(final C=C)
+```
+
+
+## Execution evidence
+
+[Rumoca commands, return codes, integrity hashes, bounded output and metadata](../evidence/7dc19d0ea1d633fc.json). Baseline: **reported-failure**.
+
+No independent runtime override was executed for this target in this audit; this is not a pass.
+
+## Proposed fix
+
+Validate the denominator parameters at OpAmpCircuits.Integrator, before evaluating C. Use positive domain constraints for the intended passive design and a guarded calculation plus clear assertions. If zero gain is supported, implement a dedicated zero-gain branch instead of dividing by it.
+
+## Fix validation
+
+Add a nominal regression and the exact boundary witness below. Require a clear domain diagnostic (or a documented finite limiting model), never NaN/Inf or an unrelated solver error. Re-run both engines.
+
+## Scope and limitations
+
+A source-level verdict addresses the reported declaration/claim, not every possible connected system. Tests cover 0–0.5 seconds and are not a proof of long-run stability. Shared instances are not distinct root causes. A missing bound, timeout, compiler error or failed nominal run alone never counts as a verified bug or a false positive. Fixes are proposals; no library/compiler implementation was changed.
+
+[Group and related reports](../groups/opamp-design-integrator.md) · [Index](../README.md)

@@ -164,6 +164,102 @@ fn merge_missing_type_string_attrs_from_expr(
     }
 }
 
+/// The value expression a modification gives `attr_name`, if it gives one.
+///
+/// The string counterpart renders to a `String`, which is right for `unit` and
+/// wrong for `min`: a bound may be `Modelica.Constants.eps` or `-1e40`, and it
+/// has to reach Flat as the expression it is so later phases can evaluate it.
+fn extract_attr_expr_from_modification_expr(
+    expr: &ast::Expression,
+    attr_name: &str,
+) -> Option<ast::Expression> {
+    match expr {
+        ast::Expression::Modification { target, value, .. } => {
+            (target.parts.last()?.ident.text.as_ref() == attr_name)
+                .then(|| value.as_ref().clone())
+        }
+        ast::Expression::NamedArgument { name, value, .. } => {
+            (name.text.as_ref() == attr_name).then(|| value.as_ref().clone())
+        }
+        ast::Expression::ClassModification { modifications, .. } => modifications
+            .iter()
+            .find_map(|m| extract_attr_expr_from_modification_expr(m, attr_name)),
+        _ => None,
+    }
+}
+
+/// Fill missing `min`/`max`/`nominal` from the declared type hierarchy.
+///
+/// MLS §4.8: a type's attribute modifications are part of the variable's type,
+/// so `type Mass = Real(min=0)` bounds every `SI.Mass` whether or not the
+/// declaration repeats it. Only the string attributes were inherited here, so
+/// the numeric ones were silently dropped:
+///
+/// ```text
+/// parameter SI.Mass m1 = 1;           DAE min: None   <- the type says 0
+/// parameter SI.Mass m2(min=0) = 1;    DAE min: 0
+/// ```
+///
+/// Anything reading the DAE therefore saw no bound on 29 of MSL's SI types.
+/// For this project's own sanitizers that was **6424 of 10942 findings** — 59%
+/// — reporting "nothing bounds this declaration" about declarations the library
+/// does bound.
+///
+/// A declaration's own modifier still wins: it is more specific, and MLS §7.2.5
+/// lets it narrow the inherited one.
+pub(super) fn merge_type_hierarchy_numeric_attributes(
+    tree: &ast::ClassTree,
+    class_def: Option<&ast::ClassDef>,
+    attrs: &mut ExtractedAttributes,
+) {
+    const NUMERIC: [&str; 3] = ["min", "max", "nominal"];
+    if attrs.min.is_some() && attrs.max.is_some() && attrs.nominal.is_some() {
+        return;
+    }
+
+    let mut stack: Vec<&ast::ClassDef> = class_def.into_iter().collect();
+    let mut visited = std::collections::HashSet::<DefId>::new();
+
+    while let Some(class) = stack.pop() {
+        if let Some(def_id) = class.def_id
+            && !visited.insert(def_id)
+        {
+            continue;
+        }
+
+        for ext in &class.extends {
+            for modification in &ext.modifications {
+                for name in NUMERIC {
+                    let slot = match name {
+                        "min" => &mut attrs.min,
+                        "max" => &mut attrs.max,
+                        _ => &mut attrs.nominal,
+                    };
+                    if slot.is_none() {
+                        *slot = extract_attr_expr_from_modification_expr(
+                            &modification.expr, name);
+                    }
+                }
+            }
+        }
+
+        if attrs.min.is_some() && attrs.max.is_some() && attrs.nominal.is_some() {
+            break;
+        }
+
+        for ext in &class.extends {
+            let base_name = ext.base_name.to_string();
+            if let Some(base_class) = ext
+                .base_def_id
+                .and_then(|def_id| tree.get_class_by_def_id(def_id))
+                .or_else(|| find_class_in_tree(tree, &base_name))
+            {
+                stack.push(base_class);
+            }
+        }
+    }
+}
+
 /// Fill missing quantity/unit/displayUnit attributes from the declared type hierarchy.
 ///
 /// This is needed for Modelica type aliases (for example

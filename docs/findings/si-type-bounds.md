@@ -68,7 +68,7 @@ this purpose. `Modelica.Electrical.Analog.Basic.Inductor` declares plain
 
 The fix is one word, and MSL already made the decision; the component just does
 not reflect it. See
-[BUG-010](BUG-010-inductor-documents-zero-it-cannot-honour.md), where the same
+[BUG-010](../verified%20bugs/BUG-010-inductor-documents-zero-it-cannot-honour.md), where the same
 component's documentation separately promises that zero works.
 
 ## Why this is one finding and not forty

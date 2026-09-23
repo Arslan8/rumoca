@@ -1,0 +1,8 @@
+# Roles the model cannot state: rad/s does not say wheel, fan or motor shaft.
+[semantics]
+"v_veh" = "automotive.vehicle_speed"
+"w_fl"  = "automotive.wheel.angular_velocity"
+"r_fl"  = "automotive.wheel.radius"
+
+[physicalsan]
+profiles = ["automotive"]

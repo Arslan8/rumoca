@@ -1,0 +1,14 @@
+{
+  "input_report_count": 6440,
+  "output_report_count": 6440,
+  "all_input_ids_accounted_for": true,
+  "unique_ids": true,
+  "broken_internal_links": [],
+  "counts": {
+    "false-positive": 3373,
+    "confirmed": 830,
+    "unresolved": 1555,
+    "candidate": 44,
+    "advisory": 638
+  }
+}

@@ -380,6 +380,7 @@ fn resolve_config_bench_input(args: &SimBenchArgs, config_path: &str) -> Result<
             options: ModelOptions {
                 model: Some(model_name),
                 source_roots,
+                no_fold_parameter_bindings: false,
             },
         },
         t_end: args.t_end.unwrap_or(config.sim.t_end),

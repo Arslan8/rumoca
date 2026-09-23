@@ -443,18 +443,26 @@ pub(super) fn generate_flow_equation(
         .collect();
     let sum = create_sum(flow_exprs, provenance);
 
-    let signed_vars: Vec<String> = variables
+    let members: Vec<rumoca_ir_flat::FlowMember> = variables
         .iter()
-        .map(|v| {
-            if is_outside_flow_var_for_scope(v, scope, interface_flow_vars_by_scope) {
-                format!("-{}", v.as_str())
+        .map(|v| rumoca_ir_flat::FlowMember {
+            variable: v.as_str().to_string(),
+            negated: is_outside_flow_var_for_scope(v, scope, interface_flow_vars_by_scope),
+        })
+        .collect();
+    let signed_vars: Vec<String> = members
+        .iter()
+        .map(|m| {
+            if m.negated {
+                format!("-{}", m.variable)
             } else {
-                v.as_str().to_string()
+                m.variable.clone()
             }
         })
         .collect();
     let origin = rumoca_ir_flat::EquationOrigin::FlowSum {
         description: format!("{} = 0", signed_vars.join(" + ")),
+        members,
     };
     let preferred_dims = variables
         .iter()

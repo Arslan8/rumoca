@@ -4,6 +4,7 @@
 //! way a malformed artifact could reach reconstruction must be a clean
 //! rejection rather than a panic or an invalid model.
 
+use crate::build::Builder;
 use crate::codec::{Encoding, decode, encode};
 use crate::schema::*;
 use crate::validate::{ValidateOptions, ValidationError, recompute_summary, validate};
@@ -28,92 +29,44 @@ fn source_provenance() -> RbcProvenance {
 }
 
 /// `der(x) = -k*x` in bitcode form: two variables, one residual.
+/// `der(x) = -k*x`, the fixture most of this file is written against.
+///
+/// Built rather than spelled out. The struct-literal version named every field
+/// of `RbcModel`, so every field added to the schema broke it — three times in
+/// one week — and each repair was a mechanical edit that taught nobody
+/// anything. The builder fills a new field with its default, so a schema
+/// addition is a schema change and stops being a fixture change.
 fn decay_model() -> RbcModel {
-    let mut model = RbcModel {
-        name: "Decay".into(),
-        sources: vec![RbcSource {
-            id: SourceId(0),
-            name: "Decay.mo".into(),
-            text: Some("model Decay end Decay;".into()),
-        }],
-        types: vec![RbcType {
-            id: TypeId(0),
-            scalar: RbcScalar::Real,
-            dimensions: Vec::new(),
-        }],
-        variables: vec![
-            variable(0, "x", RbcRole::State),
-            variable(1, "k", RbcRole::Parameter),
-        ],
-        expressions: vec![
-            expression(
-                0,
-                RbcExprNode::Coordinate {
-                    coordinate: RbcCoordinate::Derivative {
-                        variable: VariableId(0),
-                    },
-                },
-            ),
-            expression(
-                1,
-                RbcExprNode::Coordinate {
-                    coordinate: RbcCoordinate::Parameter {
-                        variable: VariableId(1),
-                    },
-                },
-            ),
-            expression(
-                2,
-                RbcExprNode::Coordinate {
-                    coordinate: RbcCoordinate::State {
-                        variable: VariableId(0),
-                    },
-                },
-            ),
-            expression(
-                3,
-                RbcExprNode::Binary {
-                    op: RbcBinaryOp::Multiply,
-                    lhs: ExprId(1),
-                    rhs: ExprId(2),
-                },
-            ),
-            expression(
-                4,
-                RbcExprNode::Unary {
-                    op: RbcUnaryOp::Negate,
-                    operand: ExprId(3),
-                },
-            ),
-            expression(
-                5,
-                RbcExprNode::Binary {
-                    op: RbcBinaryOp::Subtract,
-                    lhs: ExprId(0),
-                    rhs: ExprId(4),
-                },
-            ),
-        ],
-        equations: vec![RbcEquation {
-            id: EquationId(0),
-            residual: ExprId(5),
-            provenance: source_provenance(),
-            reads: vec![VariableId(0), VariableId(1)],
-            reads_derivative: vec![VariableId(0)],
-        }],
-        initial_equations: Vec::new(),
-        relations: Vec::new(),
-        conditions: Vec::new(),
-        roots: Vec::new(),
-        events: Vec::new(),
-        time_events: Vec::new(),
-        connections: Vec::new(),
-        components: Vec::new(),
-        trace_points: Vec::new(),
-        discrete_definitions: Vec::new(),
-        summary: RbcSummary::default(),
+    let mut builder = Builder::new("Decay");
+    // `x` before `k`, because tests here index the variable table directly and
+    // the order is part of what the fixture is.
+    let x = builder.state("x", 1.0);
+    let k = builder.parameter("k", 1.0);
+    let scaled = {
+        let left = builder.parameter_ref(k);
+        let right = builder.state_ref(x);
+        builder.binary(RbcBinaryOp::Multiply, left, right)
     };
-    recompute_summary(&mut model);
+    let rhs = builder.negate_of(scaled);
+    builder.derivative_equation(x, rhs);
+    let mut model = builder.finish();
+    // The fixture's provenance is `Source`, because several tests here assert
+    // on what a *compiled* artifact looks like rather than a synthesised one.
+    for variable in &mut model.variables {
+        variable.declaration = source_provenance();
+        variable.from_source = true;
+    }
+    for expression in &mut model.expressions {
+        expression.provenance = source_provenance();
+    }
+    for equation in &mut model.equations {
+        equation.provenance = source_provenance();
+    }
+    model.sources = vec![RbcSource {
+        id: SourceId(0),
+        name: "Decay.mo".into(),
+        text: Some("model Decay end Decay;".into()),
+    }];
     model
 }
 
@@ -125,10 +78,13 @@ fn variable(id: u32, name: &str, role: RbcRole) -> RbcVariable {
         causality: RbcCausality::Local,
         value_type: TypeId(0),
         scalar_count: 1,
+        discrete_input: false,
+        contract: None,
         declaration: source_provenance(),
         component: None,
         unit: None,
         physical_quantity: None,
+        declaring_class: None,
         description: None,
         binding: None,
         start: None,
@@ -142,17 +98,9 @@ fn variable(id: u32, name: &str, role: RbcRole) -> RbcVariable {
     }
 }
 
-fn expression(id: u32, node: RbcExprNode) -> RbcExpr {
-    RbcExpr {
-        id: ExprId(id),
-        value_type: TypeId(0),
-        node,
-        provenance: source_provenance(),
-    }
-}
-
 fn file(model: RbcModel) -> RbcFile {
     RbcFile {
+        execution: None,
         magic: RBC_MAGIC.into(),
         bitcode_version: RBC_VERSION,
         producer: "test".into(),
@@ -196,6 +144,7 @@ fn a_discrete_value_variable_carries_its_definition() {
         id: TypeId(1),
         scalar: RbcScalar::Boolean,
         dimensions: Vec::new(),
+        record: None,
     });
     let target = VariableId(model.variables.len() as u32);
     let mut flag = variable(target.0, "b", RbcRole::DiscreteValue);
@@ -268,6 +217,7 @@ fn a_discrete_value_variable_with_no_definition_is_rejected() {
         id: TypeId(1),
         scalar: RbcScalar::Boolean,
         dimensions: Vec::new(),
+        record: None,
     });
     let id = model.variables.len() as u32;
     let mut flag = variable(id, "b", RbcRole::DiscreteValue);
@@ -293,6 +243,7 @@ fn a_discrete_branch_must_match_its_target_count() {
         id: TypeId(1),
         scalar: RbcScalar::Boolean,
         dimensions: Vec::new(),
+        record: None,
     });
     let target = VariableId(model.variables.len() as u32);
     let mut flag = variable(target.0, "b", RbcRole::DiscreteValue);
@@ -334,6 +285,7 @@ fn enumeration_literal_keeps_its_type_through_the_codec() {
         id: TypeId(1),
         scalar: RbcScalar::Enumeration,
         dimensions: Vec::new(),
+        record: None,
     });
     let id = ExprId(model.expressions.len() as u32);
     model.expressions.push(RbcExpr {
@@ -604,6 +556,7 @@ fn rejects_trace_point_naming_a_missing_variable() {
         variable: VariableId(77),
         label: "ghost".into(),
         connection: None,
+        connection_set: None,
         quantity: None,
         unit: None,
         added_by: Some("test".into()),
@@ -712,4 +665,531 @@ fn export_import_export_is_stable() {
     {
         assert_eq!(format!("{:?}", before.node), format!("{:?}", after.node));
     }
+}
+
+#[test]
+fn unary_plus_survives_a_round_trip() {
+    // MLS §3.4 unary plus reaches the DAE intact whenever constant folding does
+    // not consume it, which `--no-fold-parameter-bindings` arranges for every
+    // Real parameter. `Modelica.Electrical.Analog.Examples.InvertingAmp`
+    // declares `parameter SI.Voltage Vps=+15` and
+    // `...OpAmps.Comparator` did likewise: both exported, then failed their own
+    // import with "unary operator not in bitcode v1", so a model that
+    // simulated by default stopped simulating under the flag.
+    let mut model = decay_model();
+    let operand = ExprId(model.expressions.len() as u32 - 1);
+    model.expressions.push(RbcExpr {
+        id: ExprId(model.expressions.len() as u32),
+        value_type: TypeId(0),
+        node: RbcExprNode::Unary {
+            op: RbcUnaryOp::Plus,
+            operand,
+        },
+        provenance: source_provenance(),
+    });
+    recompute_summary(&mut model);
+
+    let original = file(model);
+    let dae = crate::import(&original).expect("unary plus must import");
+    let again =
+        crate::export(&dae, None, &original.model.name, &Default::default()).expect("re-export");
+    assert!(
+        again
+            .model
+            .expressions
+            .iter()
+            .any(|expression| matches!(
+                expression.node,
+                RbcExprNode::Unary {
+                    op: RbcUnaryOp::Plus,
+                    ..
+                }
+            )),
+        "unary plus must survive the round trip rather than be dropped or refused"
+    );
+}
+
+#[test]
+fn textual_ir_round_trips_exactly() {
+    // The property that makes it an IR rather than a listing: print, parse,
+    // and the artifact is the one you started with.
+    let original = file(decay_model());
+    let text = crate::text::print_text_with(
+        &original,
+        crate::text::TextOptions { sources: true },
+    )
+    .expect("print");
+    let parsed = crate::text::parse_text(&text).expect("parse");
+
+    assert_eq!(original.model.name, parsed.model.name);
+    assert_eq!(original.model.variables.len(), parsed.model.variables.len());
+    assert_eq!(original.model.expressions.len(), parsed.model.expressions.len());
+    assert_eq!(original.model.equations.len(), parsed.model.equations.len());
+    // Serialize both: field-by-field equality is what "exactly" has to mean,
+    // and comparing the encodings checks every field including ones added
+    // after this test was written.
+    let left = serde_json::to_value(&original.model).expect("encode original");
+    let right = serde_json::to_value(&parsed.model).expect("encode parsed");
+    assert_eq!(left, right, "textual round-trip must preserve the whole model");
+}
+
+#[test]
+fn textual_ir_omits_only_source_text_by_default() {
+    // Source text is most of an artifact's bytes and none of its semantics, so
+    // it is opt-in. That is the *only* thing the default drops, and this pins
+    // it: anything else going missing is a silent loss, which the format is
+    // supposed to make impossible.
+    let original = file(decay_model());
+    let text = crate::text::print_text(&original).expect("print");
+    let mut parsed = crate::text::parse_text(&text).expect("parse");
+
+    assert!(original.model.sources.iter().any(|s| s.text.is_some()),
+            "the fixture must carry source text for this to test anything");
+    assert!(parsed.model.sources.iter().all(|s| s.text.is_none()),
+            "the default must omit source text");
+
+    for (source, restored) in original.model.sources.iter()
+        .zip(parsed.model.sources.iter_mut())
+    {
+        restored.text = source.text.clone();
+    }
+    assert_eq!(
+        serde_json::to_value(&original.model).expect("encode original"),
+        serde_json::to_value(&parsed.model).expect("encode parsed"),
+        "with source text put back, nothing else differs"
+    );
+}
+
+#[test]
+fn textual_ir_reports_the_line_of_a_syntax_error() {
+    let text = "rbc 1\nproducer \"x\"\nmodel \"M\"\n$0 type nonsense\n";
+    let error = crate::text::parse_text(text).expect_err("must refuse");
+    assert_eq!(error.line, 4, "the error must name the offending line");
+    assert!(error.message.contains("nonsense"), "and quote what it saw: {error}");
+}
+
+#[test]
+fn textual_ir_refuses_an_unclosed_block() {
+    let text = "rbc 1\nmodel \"M\"\ndisc 1 targets %0\n";
+    let error = crate::text::parse_text(text).expect_err("must refuse");
+    assert!(error.message.contains("never closed"), "got: {error}");
+}
+
+#[test]
+fn connection_ids_are_dense_after_filtering() {
+    // `export_connections` numbered by the pre-filter index, so an endpoint
+    // that is not a DAE variable — a clocked signal removed during lowering —
+    // dropped its entry and left a hole. `SubSample` exported `[0, 2]`, and
+    // the artifact then failed its own validator, which requires
+    // `position == id`. 28 of 35 Clocked models were unloadable for this.
+    //
+    // The property is structural, so it is asserted structurally rather than
+    // by rebuilding that model: ids must be 0..n over whatever survives.
+    let mut model = decay_model();
+    model.connections = vec![
+        RbcConnection {
+            id: ConnectionId(0),
+            left: VariableId(0),
+            right: VariableId(1),
+            quantity: RbcQuantityKind::Potential,
+            left_connector: "a".into(),
+            right_connector: "b".into(),
+            equation: None,
+            provenance: source_provenance(),
+        },
+        RbcConnection {
+            id: ConnectionId(2), // the hole a pre-filter index leaves
+            left: VariableId(0),
+            right: VariableId(1),
+            quantity: RbcQuantityKind::Potential,
+            left_connector: "c".into(),
+            right_connector: "d".into(),
+            equation: None,
+            provenance: source_provenance(),
+        },
+    ];
+    recompute_summary(&mut model);
+
+    let failures = errors(&model);
+    assert!(
+        failures.iter().any(|e| e.to_string().contains("connections entry at position 1")),
+        "a hole in the connection ids must be a validation error, got {failures:?}"
+    );
+
+    model.connections[1].id = ConnectionId(1);
+    assert!(
+        validate(&model, &ValidateOptions::default()).is_ok(),
+        "dense ids must validate"
+    );
+}
+
+#[test]
+fn equation_families_are_exported_and_round_trip() {
+    // TOOLBUG-014. Array and `for` equations live in the DAE as *families*,
+    // and `export_equations` only walked the scalar list, so they were absent:
+    // `Real x[3]` with a `for` equation exported three unknowns and zero
+    // equations, and the artifact validated cleanly. Any consumer reasoning
+    // about solvability read an incomplete system with no way to detect it.
+    let mut model = decay_model();
+    let body = ExprId(model.expressions.len() as u32 - 1);
+    model.domains.push(loop_domain(0, 3));
+    model.equation_families.push(RbcEquationFamily {
+        id: FamilyId(0),
+        domain: DomainId(0),
+        bodies: vec![body],
+        scalar_rows: 3,
+        extents: vec![3],
+        scalar_view: RbcScalarView::BinderSubstitution,
+        reads: Vec::new(),
+        reads_derivative: Vec::new(),
+        reads_previous: Vec::new(),
+        provenance: source_provenance(),
+    });
+    recompute_summary(&mut model);
+
+    // The summary must count the rows, not the families: a balance check needs
+    // to know the family stands for three equations, not one.
+    assert_eq!(model.summary.equation_families, 1);
+    assert_eq!(model.summary.family_scalar_rows, 3);
+
+    // Import rebuilds it. Earlier the schema carried no domain, so import had
+    // to refuse outright: a DAE reconstructed without the domain would be
+    // missing three equations and would still validate, which is the bug this
+    // whole change exists to remove.
+    let original = file(model);
+    let dae = crate::import(&original).expect("a family with its domain imports");
+    let again = crate::export(&dae, None, "test", &crate::ExportOptions::default())
+        .expect("re-export");
+    assert_eq!(
+        again.model.summary.family_scalar_rows, 3,
+        "the rebuilt DAE must still stand for three scalar equations"
+    );
+}
+
+/// One `for i in 1:extent` axis.
+fn loop_domain(id: u32, extent: i64) -> RbcDomain {
+    RbcDomain {
+        id: DomainId(id),
+        binders: vec![RbcBinder {
+            id: 0,
+            display_name: "i".into(),
+            lower: 1,
+            upper: extent,
+            step: 1,
+        }],
+        parent: None,
+        extents: vec![extent as u32],
+        scalar_count: extent as u32,
+        provenance: source_provenance(),
+    }
+}
+
+#[test]
+fn the_textual_ir_carries_equation_families() {
+    // The textual form is the other place a family could silently vanish.
+    let mut model = decay_model();
+    let body = ExprId(model.expressions.len() as u32 - 1);
+    model.domains.push(loop_domain(0, 4));
+    model.equation_families.push(RbcEquationFamily {
+        id: FamilyId(0),
+        domain: DomainId(0),
+        bodies: vec![body],
+        scalar_rows: 4,
+        extents: vec![2, 2],
+        scalar_view: RbcScalarView::BinderPrefixProjection { binder_count: 1 },
+        reads: Vec::new(),
+        reads_derivative: Vec::new(),
+        reads_previous: Vec::new(),
+        provenance: source_provenance(),
+    });
+    recompute_summary(&mut model);
+
+    let original = file(model);
+    let text = crate::text::print_text_with(
+        &original,
+        crate::text::TextOptions { sources: true },
+    )
+    .expect("print");
+    let parsed = crate::text::parse_text(&text).expect("parse");
+    assert_eq!(
+        serde_json::to_value(&original.model).expect("encode original"),
+        serde_json::to_value(&parsed.model).expect("encode parsed"),
+        "a family, its extents and its scalar view must all survive the text form"
+    );
+}
+
+// ── Computational power ──────────────────────────────────────────────────────
+//
+// Rumoca Bitcode is deliberately *not* Turing complete, and every static
+// analysis built on it depends on that: a witness search, an interval
+// propagation and a maximum-flow matching all terminate without a step budget
+// because the artifact they read cannot express unbounded iteration.
+//
+// That is a property of the schema, so it is checked against the schema. The
+// classification below is an exhaustive `match` with no wildcard arm: adding a
+// node kind does not silently inherit "bounded", it fails to compile until
+// somebody classifies it. A doc comment claiming totality would not have that
+// property, which is why this is a test and not a paragraph.
+
+/// What a construct can cost to evaluate.
+#[derive(Debug, PartialEq, Eq)]
+enum Cost {
+    /// Bounded by the size of the artifact: one forward pass over the arena.
+    Bounded,
+    /// Bounded by an index domain whose extents the artifact fixes.
+    BoundedByDomain,
+    /// Calls out of the artifact. The callee's cost is not ours to bound, and
+    /// this is one of the three named holes in the totality claim.
+    Opaque,
+    /// Would introduce unbounded iteration. Nothing may be classified here.
+    Unbounded,
+}
+
+fn cost_of_node(node: &RbcExprNode) -> Cost {
+    match node {
+        RbcExprNode::Literal { .. } => Cost::Bounded,
+        RbcExprNode::Coordinate { .. } => Cost::Bounded,
+        RbcExprNode::Unary { .. } => Cost::Bounded,
+        RbcExprNode::Binary { .. } => Cost::Bounded,
+        RbcExprNode::Conditional { .. } => Cost::Bounded,
+        RbcExprNode::Builtin { .. } => Cost::Bounded,
+        RbcExprNode::Array { .. } => Cost::Bounded,
+        RbcExprNode::Record { .. } => Cost::Bounded,
+        RbcExprNode::Field { .. } => Cost::Bounded,
+        RbcExprNode::Range { .. } => Cost::Bounded,
+        // The only iteration in the language, and its trip count is the
+        // domain's extent, which the artifact carries as a constant.
+        RbcExprNode::Comprehension { .. } => Cost::BoundedByDomain,
+        RbcExprNode::Index { .. } => Cost::Bounded,
+        RbcExprNode::ArrayUpdate { .. } => Cost::Bounded,
+        // A call names a function whose body this artifact does not carry.
+        RbcExprNode::Call { .. } => Cost::Opaque,
+        RbcExprNode::Unsupported { .. } => Cost::Opaque,
+    }
+}
+
+fn cost_of_body(body: &RbcFunctionBody) -> Cost {
+    match body {
+        // The body exists and is not here, so nothing in the artifact can
+        // recurse: a call is a leaf as far as this IR is concerned.
+        RbcFunctionBody::ElidedModelica => Cost::Opaque,
+        RbcFunctionBody::External { .. } => Cost::Opaque,
+    }
+}
+
+#[test]
+fn no_expression_node_can_iterate_without_a_bound() {
+    // The enforcement is the exhaustive `match` in `cost_of_node`: a new node
+    // kind fails to compile until it is classified, so this claim cannot rot
+    // the way a doc comment would. What this test adds is that the
+    // classification is actually applied to real nodes and that nothing in a
+    // built artifact lands in the one category that would break totality.
+    let model = decay_model();
+    assert!(!model.expressions.is_empty(), "the fixture must have nodes");
+    for expression in &model.expressions {
+        assert_ne!(
+            cost_of_node(&expression.node),
+            Cost::Unbounded,
+            "expression {} would make the IR Turing complete; every static \
+             analysis here assumes an artifact is total",
+            expression.id.0
+        );
+    }
+    for function in &model.functions {
+        assert_ne!(cost_of_body(&function.body), Cost::Unbounded);
+    }
+}
+
+#[test]
+fn the_expression_arena_cannot_hold_a_cycle() {
+    // Not "does not", *cannot*: operands must be strictly earlier, so a cycle
+    // is unrepresentable rather than something a checker has to find. This is
+    // the structural reason evaluation is one forward pass.
+    let mut model = decay_model();
+    let last = model.expressions.len() - 1;
+    model.expressions[last].node = RbcExprNode::Binary {
+        op: RbcBinaryOp::Add,
+        lhs: ExprId(last as u32),           // itself
+        rhs: ExprId(0),
+    };
+    let errors = validate(&model, &ValidateOptions::default()).unwrap_err();
+    assert!(
+        errors.iter().any(|error| matches!(
+            error,
+            ValidationError::NonTopologicalOperand { .. }
+        )),
+        "a self-referencing operand must be rejected, got {errors:?}"
+    );
+
+    let mut forward = decay_model();
+    forward.expressions[0].node = RbcExprNode::Unary {
+        op: RbcUnaryOp::Negate,
+        operand: ExprId(forward.expressions.len() as u32 - 1),
+    };
+    assert!(
+        validate(&forward, &ValidateOptions::default()).is_err(),
+        "a forward operand reference must be rejected too"
+    );
+}
+
+#[test]
+fn a_function_body_is_never_carried_so_nothing_can_recurse() {
+    // If a Modelica body were ever inlined into the artifact, recursion would
+    // become expressible and this whole argument would need redoing. The
+    // exhaustive match in `cost_of_body` is the guard; this pins the reason.
+    let variants = [
+        RbcFunctionBody::ElidedModelica,
+        RbcFunctionBody::External { language: "C".into(), symbol: "f".into() },
+    ];
+    assert_eq!(variants.len(), 2,
+               "a third body kind means re-deriving the totality argument");
+}
+
+// ── Building ─────────────────────────────────────────────────────────────────
+
+#[test]
+fn a_model_can_be_built_from_nothing_and_is_valid() {
+    // The format calls itself an interchange format. Until `build` there was
+    // no way for a Rust consumer to produce an artifact except to write out
+    // every field of `RbcModel`, which meant in practice that only the Rumoca
+    // compiler could write one.
+    let mut builder = Builder::new("Built");
+    let x = builder.state("x", 1.0);
+    let k = builder.parameter("k", 2.0);
+    let scaled = {
+        let left = builder.parameter_ref(k);
+        let right = builder.state_ref(x);
+        builder.binary(RbcBinaryOp::Multiply, left, right)
+    };
+    let rhs = builder.negate_of(scaled);
+    builder.derivative_equation(x, rhs);
+    let model = builder.finish();
+
+    assert!(
+        validate(&model, &ValidateOptions::default()).is_ok(),
+        "a built model must validate: {:?}",
+        validate(&model, &ValidateOptions::default())
+    );
+    assert_eq!(model.variables.len(), 2);
+    assert_eq!(model.equations.len(), 1);
+    assert_eq!(
+        model.summary.equations, 1,
+        "finish() recomputes the summary the validator checks"
+    );
+}
+
+#[test]
+fn the_builder_derives_what_an_equation_reads() {
+    // The schema carries `reads` so that no consumer has to re-derive it by
+    // walking expressions, which means a producer that omits it leaves every
+    // dependency analysis with a hole.
+    let mut builder = Builder::new("Reads");
+    let x = builder.state("x", 0.0);
+    let k = builder.parameter("k", 1.0);
+    let scaled = {
+        let left = builder.parameter_ref(k);
+        let right = builder.state_ref(x);
+        builder.binary(RbcBinaryOp::Multiply, left, right)
+    };
+    builder.derivative_equation(x, scaled);
+    let model = builder.finish();
+
+    let equation = &model.equations[0];
+    assert_eq!(equation.reads, vec![x, k], "both values are read");
+    assert_eq!(
+        equation.reads_derivative,
+        vec![x],
+        "and the derivative is recorded apart from the value"
+    );
+}
+
+#[test]
+#[should_panic(expected = "not strictly earlier")]
+fn the_builder_refuses_a_forward_operand() {
+    // The arena's topological order is what makes a cycle unrepresentable.
+    // Validation catches a violation, but much later and by node id; this
+    // catches it at the call that made the mistake.
+    let mut builder = Builder::new("Forward");
+    builder.expr(RbcExprNode::Unary {
+        op: RbcUnaryOp::Negate,
+        operand: ExprId(99),
+    });
+}
+
+#[test]
+fn everything_the_builder_adds_is_marked_generated() {
+    // An entity a tool produced must be distinguishable from one a modeller
+    // wrote. A pass that leaves `Source` provenance on its own additions is
+    // indistinguishable from a compiler bug.
+    let mut builder = Builder::new("Marked");
+    let x = builder.state("x", 0.0);
+    let zero = builder.real(0.0);
+    builder.derivative_equation(x, zero);
+    let model = builder.finish();
+
+    for equation in &model.equations {
+        assert!(
+            matches!(equation.provenance.origin, RbcOrigin::Generated { .. }),
+            "an equation the builder added claims to come from source"
+        );
+    }
+    for expression in &model.expressions {
+        assert!(matches!(
+            expression.provenance.origin,
+            RbcOrigin::Generated { .. }
+        ));
+    }
+}
+
+#[test]
+fn operands_lists_every_child_of_every_node_kind() {
+    // `operands` is how the builder checks the topological rule and how a
+    // rewrite finds a path, so a node kind missing from it is walked as a leaf
+    // and both silently do the wrong thing. The exhaustive `match` inside is
+    // the guard; this pins the shapes that carry children.
+    let mut builder = Builder::new("Operands");
+    let a = builder.real(1.0);
+    let b = builder.real(2.0);
+    let sum = builder.binary(RbcBinaryOp::Add, a, b);
+    let negated = builder.negate_of(sum);
+    let model = builder.finish();
+
+    let node = &model.expressions[sum.0 as usize].node;
+    assert_eq!(crate::build::operands(node), vec![a, b]);
+    let node = &model.expressions[negated.0 as usize].node;
+    assert_eq!(crate::build::operands(node), vec![sum]);
+    let node = &model.expressions[a.0 as usize].node;
+    assert!(crate::build::operands(node).is_empty(), "a literal is a leaf");
+}
+
+#[test]
+fn a_pass_can_continue_from_an_artifact_it_did_not_build() {
+    // The instrumentation case: a pass receives a compiled model and adds to
+    // it. `Builder::new` is for a producer starting from nothing;
+    // `from_model` is for everything that arrives already built, which is the
+    // common one and the reason the entry point exists.
+    let original = decay_model();
+    let variables_before = original.variables.len();
+    let equations_before = original.equations.len();
+
+    let mut builder = Builder::from_model(original);
+    let observed = builder.state("integral_of_x", 0.0);
+    let x = VariableId(0);
+    let value = builder.state_ref(x);
+    builder.derivative_equation(observed, value);
+    builder.trace_point(observed, "integral of x", "test");
+    let model = builder.finish();
+
+    assert_eq!(model.variables.len(), variables_before + 1);
+    assert_eq!(model.equations.len(), equations_before + 1);
+    assert!(
+        validate(&model, &ValidateOptions::default()).is_ok(),
+        "the instrumented model must still validate: {:?}",
+        validate(&model, &ValidateOptions::default())
+    );
+    assert_eq!(
+        model.trace_points.len(),
+        1,
+        "and carry the observation the pass asked for"
+    );
 }

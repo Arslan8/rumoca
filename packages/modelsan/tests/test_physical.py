@@ -30,9 +30,17 @@ FAILURES: list[str] = []
 
 
 def check(condition: bool, label: str) -> None:
+    """Record and *assert*.
+
+    This module collected failures into a list for its `main()` and never
+    asserted, so under pytest every test in it passed whatever it found. The
+    list is kept for the standalone runner; the assertion is what makes the
+    suite mean something.
+    """
     print(f"{'PASS' if condition else 'FAIL'}  {label}")
     if not condition:
         FAILURES.append(label)
+    assert condition, label
 
 
 class FakeVar:
@@ -59,6 +67,36 @@ class Neg:
     """`-x` as the DAE represents it: a unary operation, not a literal."""
 
     def __init__(self, inner): self.op, self.operand = "negate", inner
+
+
+class Bin:
+    def __init__(self, op, lhs, rhs): self.op, self.lhs, self.rhs = op, lhs, rhs
+
+
+class Neg2:
+    """A unary node with an explicit operator, for `not`."""
+
+    def __init__(self, op, inner): self.op, self.operand = op, inner
+
+
+class Cond:
+    """`if c1 then v1 ... else fallback`, as the DAE represents it."""
+
+    def __init__(self, branches, fallback):
+        self.branches, self.fallback = branches, fallback
+
+
+class Ref:
+    """A reference to a variable, as the DAE spells it.
+
+    ``kind`` follows the variable's variability, so `is_derivative` and
+    `is_previous` — not the kind string — say whether this names a value or a
+    trajectory.
+    """
+
+    def __init__(self, variable, derivative=False, previous=False):
+        self.variable = variable
+        self.is_derivative, self.is_previous = derivative, previous
 
 
 class FakeModel:
@@ -140,10 +178,78 @@ def test_negative_declarations_are_read():
     check(constant_value(Neg(Lit(2.0))) == -2.0, "a negated literal folds")
     check(constant_value(None) is None, "an absent expression is not a value")
 
-    class Ref:
+    class Opaque:
         op = None
-    check(constant_value(Ref()) is None,
+    check(constant_value(Opaque()) is None,
           "a non-constant expression is undecided, not assumed")
+
+
+def test_parameter_chains_are_followed():
+    print("\n== a value written in two steps is still a value ==")
+    # `parameter Real scale = 2.5; parameter SI.Resistance R = -scale * 5;`
+    # Rumoca folds this chain only when the result is an exact integer, so
+    # reading bindings literally made the verdict depend on whether the
+    # arithmetic happened to land on a whole number: `-2 * 5` was reported as
+    # a violation and the identical `-2.5 * 5` only as an unbounded
+    # declaration. Following the chain decides on the model instead.
+    scale = FakeVar(1, "scale", binding=Lit(2.5))
+    check(constant_value(Neg(Bin("multiply", Ref(scale), Lit(5)))) == -12.5,
+          "a chain through a parameter folds")
+
+    check(constant_value(Bin("power", Lit(3.0), Lit(2.0))) == 9.0,
+          "a power over constants folds")
+
+    # A state's trajectory is not its declaration, whatever it starts at.
+    state = FakeVar(2, "x", parameter=False, binding=Lit(1.0))
+    check(constant_value(Ref(state)) is None, "a non-parameter is not a value")
+    check(constant_value(Ref(scale, derivative=True)) is None,
+          "der(p) names a trajectory, not the declaration")
+    check(constant_value(Ref(scale, previous=True)) is None,
+          "pre(p) names a trajectory, not the declaration")
+
+    # `start` is a solver's guess; treating one as fixed partway down a chain
+    # would report a violation the declaration never commits to.
+    guessed = FakeVar(3, "g")
+    guessed.start = Lit(-4.0)
+    check(constant_value(Ref(guessed)) is None,
+          "a start part-way down a chain is not a fixed value")
+
+    # A self-referential binding must terminate rather than recurse.
+    loop = FakeVar(4, "loop")
+    loop.binding = Bin("add", Ref(loop), Lit(1.0))
+    check(constant_value(Ref(loop)) is None, "a cyclic binding is not a value")
+
+
+def test_decidable_conditionals_are_values():
+    print("\n== a branch the declaration decides is a value ==")
+    # MSL writes derived parameters as `if PRef <= 0 then 0 else <expr>`
+    # (`DCSE_Start` does, for three of them). Rumoca resolves the branch itself
+    # when the arm is an exact integer, so skipping conditionals here made the
+    # verdict depend on which arm the declaration happened to land on.
+    p_ref = FakeVar(1, "PRef", binding=Lit(0.0))
+    taken = Cond([(Bin("less_equal", Ref(p_ref), Lit(0)), Lit(0.0))], Lit(-5.0))
+    check(constant_value(taken) == 0.0, "the selected arm is the value")
+
+    p_ref.binding = Lit(10.0)
+    check(constant_value(taken) == -5.0, "a false condition falls through")
+
+    # A condition the declaration does not decide leaves the whole thing open;
+    # guessing an arm would report a violation the model never commits to.
+    free = FakeVar(2, "x", parameter=False)
+    check(constant_value(Cond([(Bin("less", Ref(free), Lit(1)), Lit(-1.0))],
+                              Lit(2.0))) is None,
+          "an undecided condition is not a value")
+
+    # Boolean parameters and negation decide arms too.
+    flag = FakeVar(3, "useX", binding=Lit(True))
+    check(constant_value(Cond([(Ref(flag), Lit(7.0))], Lit(0.0))) == 7.0,
+          "a Boolean parameter decides its arm")
+    check(constant_value(Cond([(Neg2("not", Ref(flag)), Lit(7.0))], Lit(0.0))) == 0.0,
+          "negation decides its arm")
+
+    # A comparison is not a number: `a < b` must never read back as 0.0.
+    check(constant_value(Bin("less", Lit(1.0), Lit(2.0))) is None,
+          "a comparison is not a value")
 
 
 # ── the model's own bound is respected ───────────────────────────────────────
@@ -184,11 +290,21 @@ def test_cross_domain_end_to_end():
         ("fluid ok", [FakeVar(0, "p.rho", "Density", "kg/m3", binding=Lit(998.0))], 0),
         ("fluid bad", [FakeVar(0, "p.rho", "Density", "kg/m3", binding=Neg(Lit(998.0)))], 1),
     ]
+    # None of these doubles carries a declaring class, so no component
+    # establishes the rule's premise: a bad value is *reported*, and reported
+    # as a question rather than as a violation. Asserting on
+    # `physical-invariant-violated` here would be asserting that the analyzer
+    # knows an intent nobody wrote down.
     for label, variables, expected in cases:
         model = FakeModel(variables)
         findings = attach(san.analyze(model, AnalysisContext(model)))
-        violations = [f for f in findings if f.kind == "physical-invariant-violated"]
-        check(len(violations) == expected, f"{label}: {len(violations)} violation(s)")
+        reported = [f for f in findings
+                    if f.kind in ("physical-invariant-violated",
+                                  "physical-intent-question")
+                    and f.evidence.get("observed") is not None]
+        check(len(reported) == expected, f"{label}: {len(reported)} reported")
+        check(all(f.kind == "physical-intent-question" for f in reported),
+              f"{label}: uncatalogued, so asked rather than asserted")
 
 
 def test_provenance_is_preserved():
@@ -221,3 +337,106 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# ── the premise matrix: two paths, three states ──────────────────────────────
+#
+# The predicate and the authority for applying it are separate facts, and both
+# paths through the sanitizer have to ask the second one. The observed-value
+# path already did; the declaration path did not, and reported an unestablished
+# premise as a medium-severity domain defect.
+
+
+def _premise_case(variable, catalog=None, assumptions=None):
+    from modelsan.semantics import SemanticBinder
+
+    model = FakeModel([variable])
+    binder = SemanticBinder(catalog=catalog) if catalog else SemanticBinder()
+    context = AnalysisContext(model)
+    if assumptions is not None:
+        context.assumptions = assumptions
+    found = PhysicalSan(binder=binder).analyze(model, context)
+    return [f for f in found if variable.name in str(f.evidence)]
+
+
+def _passive_catalog(klass, member):
+    from modelsan.semantics import role as roles
+    from modelsan.semantics.catalog import ClassCatalog, ClassSemantics
+
+    return ClassCatalog().register(ClassSemantics(
+        klass=klass, members={member: roles.PASSIVE_RESISTANCE},
+        note="a passive resistor, for the purposes of this test"))
+
+
+def _signed_catalog(klass, member):
+    from modelsan.semantics import role as roles
+    from modelsan.semantics.catalog import ClassCatalog, ClassSemantics
+
+    return ClassCatalog().register(ClassSemantics(
+        klass=klass, members={member: roles.UNRESTRICTED_RESISTANCE},
+        note="documented as permitting either sign"))
+
+
+def test_the_declaration_path_asks_when_the_premise_is_unknown():
+    print("\n-- unenforced declaration, premise UNKNOWN --")
+    variable = FakeVar(1, "mystery.R", quantity="Resistance", unit="Ohm",
+                       binding=Lit(1.0))
+    found = _premise_case(variable)
+    kinds = {f.kind for f in found}
+    check(kinds == {"physical-intent-question"},
+          f"an unbounded uncatalogued declaration asks (got {sorted(kinds)})")
+    check(found[0].severity.value == "low", "at low severity")
+    check(found[0].evidence.get("observation") == "permissive-declaration",
+          "about the declaration rather than a value")
+
+
+def test_the_declaration_path_enforces_when_the_premise_is_established():
+    print("\n-- unenforced declaration, premise ESTABLISHED --")
+    variable = FakeVar(1, "shunt.R", quantity="Resistance", unit="Ohm",
+                       binding=Lit(1.0))
+    variable.declaring_class = "Vendor.PassiveShunt"
+    found = _premise_case(variable, _passive_catalog("Vendor.PassiveShunt", "R"))
+    kinds = {f.kind for f in found}
+    check("physical-domain-unenforced" in kinds,
+          f"a known passive resistor keeps the domain claim (got {sorted(kinds)})")
+    claim = next(f for f in found if f.kind == "physical-domain-unenforced")
+    check(claim.evidence.get("premise_state") == "established",
+          f"premise_state=established (got {claim.evidence.get('premise_state')})")
+
+
+def test_the_declaration_path_stands_down_when_the_premise_is_refuted():
+    print("\n-- unenforced declaration, premise REFUTED --")
+    variable = FakeVar(1, "nic.R", quantity="Resistance", unit="Ohm",
+                       binding=Lit(1.0))
+    variable.declaring_class = "Vendor.SignedResistor"
+    found = _premise_case(variable, _signed_catalog("Vendor.SignedResistor", "R"))
+    kinds = {f.kind for f in found}
+    check("physical-domain-unenforced" not in kinds,
+          f"no domain claim against a signed component (got {sorted(kinds)})")
+    check("physical-intent-question" not in kinds,
+          "and nothing to ask: the component already answered")
+
+
+def test_the_observed_value_path_covers_the_same_three_states():
+    print("\n-- observed value, all three states --")
+    unknown = FakeVar(1, "mystery.R", quantity="Resistance", unit="Ohm",
+                      binding=Lit(-1.0))
+    kinds = {f.kind for f in _premise_case(unknown)}
+    check(kinds == {"physical-intent-question"},
+          f"UNKNOWN asks (got {sorted(kinds)})")
+
+    established = FakeVar(1, "shunt.R", quantity="Resistance", unit="Ohm",
+                          binding=Lit(-1.0))
+    established.declaring_class = "Vendor.PassiveShunt"
+    kinds = {f.kind for f in _premise_case(
+        established, _passive_catalog("Vendor.PassiveShunt", "R"))}
+    check("physical-invariant-violated" in kinds,
+          f"ESTABLISHED enforces (got {sorted(kinds)})")
+
+    refuted = FakeVar(1, "nic.R", quantity="Resistance", unit="Ohm",
+                      binding=Lit(-1.0))
+    refuted.declaring_class = "Vendor.SignedResistor"
+    kinds = {f.kind for f in _premise_case(
+        refuted, _signed_catalog("Vendor.SignedResistor", "R"))}
+    check("physical-invariant-violated" not in kinds,
+          f"REFUTED does not (got {sorted(kinds)})")

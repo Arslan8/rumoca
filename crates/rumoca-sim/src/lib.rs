@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 /// (and library users) can switch it on without an environment variable. See
 /// [`rumoca_eval_solve::nan_trace`].
 pub use rumoca_eval_solve::nan_trace;
+pub mod execution;
 use rumoca_ir_dae as dae;
 pub use rumoca_phase_solve::{
     deserialize_solve_model,

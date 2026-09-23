@@ -1,0 +1,90 @@
+# FINDING-04741: Zero medium specific heat capacity enters an unguarded division
+
+| Field | Value |
+|---|---|
+| Verdict | confirmed |
+| Scope / group | fluid-medium-cp |
+| Model | Modelica.Thermal.FluidHeatFlow.Examples.WaterPump |
+| Target | volumeFlowSensor.medium.cp |
+| Student classification | divisor-reachable-zero |
+| Original report | [FINDING-waterpump-volumeflowsensor-medium-cp-divzero-2.md](../../v2/bugs/FINDING-waterpump-volumeflowsensor-medium-cp-divzero-2.md) — reviewed as `FINDING-04741-waterpump-volumeflowsensor-medium-cp.md`, which a later run renamed |
+| Original SHA-256 | e5568a6b1e849f487289ff7452312d80822313d42391e697fc4a1e2a62076793 |
+
+## Verification and root cause
+
+The Medium record gives cp no strictly-positive bound or assertion. FluidHeatFlow.BaseClasses.TwoPort evaluates T_a=flowPort_a.h/medium.cp and T_b=flowPort_b.h/medium.cp. Therefore zero is admitted by the material record and makes the common consumer undefined. The report instances share this declaration-level defect; nominal models blocked in the current Rumoca runtime are not falsely described as independently simulated.
+
+## Source evidence
+
+Compiler/source-resolved declaration: `Thermal/FluidHeatFlow/Media/Medium.mo:5`. Role: `parameter`; binding: `4177`; effective min: `None`; effective max: `None`. 
+
+[Thermal/FluidHeatFlow/Media/Medium.mo — source snapshot](../evidence/sources/9758e96ec7e20ef4-Medium.mo)
+
+```modelica
+3:   extends Modelica.Icons.Record;
+4:   parameter SI.Density rho = 1 "Density";
+5:   parameter SI.SpecificHeatCapacity cp = 1
+6:     "Specific heat capacity at constant pressure";
+7:   parameter SI.SpecificHeatCapacity cv = 1
+8:     "Specific heat capacity at constant volume";
+```
+
+[Thermal/FluidHeatFlow/Media/Medium.mo — source snapshot](../evidence/sources/9758e96ec7e20ef4-Medium.mo)
+
+```modelica
+2: record Medium "Record containing media properties"
+3:   extends Modelica.Icons.Record;
+4:   parameter SI.Density rho = 1 "Density";
+5:   parameter SI.SpecificHeatCapacity cp = 1
+6:     "Specific heat capacity at constant pressure";
+7:   parameter SI.SpecificHeatCapacity cv = 1
+8:     "Specific heat capacity at constant volume";
+9:   parameter SI.ThermalConductivity lambda = 1
+10:     "Thermal conductivity";
+11:   parameter SI.KinematicViscosity nu = 1
+12:     "Kinematic viscosity";
+```
+
+[Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo — source snapshot](../evidence/sources/04f0a49d716ce1bd-TwoPort.mo)
+
+```modelica
+29:     annotation (Placement(transformation(extent={{-110,-10},{-90,10}})));
+30:   FluidHeatFlow.Interfaces.FlowPort_b flowPort_b(final medium=medium)
+31:     annotation (Placement(transformation(extent={{90,-10},{110,10}})));
+32: equation
+33:   dp=flowPort_a.p - flowPort_b.p;
+34:   V_flow=flowPort_a.m_flow/medium.rho;
+35:   T_a=flowPort_a.h/medium.cp;
+36:   T_b=flowPort_b.h/medium.cp;
+37:   dT=if noEvent(V_flow>=0) then T-T_a else T_b-T;
+38:   h = medium.cp*T;
+39:   T_q = T  - noEvent(sign(V_flow))*(1 - tapT)*dT;
+40:   // mass balance
+41:   flowPort_a.m_flow + flowPort_b.m_flow = 0;
+42:   // energy balance
+```
+
+
+## Execution evidence
+
+[Rumoca commands, return codes, integrity hashes, bounded output and metadata](../evidence/73c04f9c1ce524a6.json). Baseline: **clean**.
+
+| Probe | Outcome |
+|---|---|
+| `volumeFlowSensor.medium.cp=0` | reported-failure |
+
+Diagnostic: solve-IR evaluation failed: algebraic projection did not converge at event boundary: worst scaled residual row=46 target=volumeFlowSensor.T_b value=-inf ratio=inf norm=inf row_scale=3.000000e2 scaled_tolerance=3.000000e-8
+
+## Proposed fix
+
+Require and validate medium.cp>0 at the medium/TwoPort contract, and guard evaluation so an actionable material-domain error occurs before division. Prefer a reusable medium-property validation function or assertion; do not clamp a nonphysical zero to epsilon.
+
+## Fix validation
+
+Test the default medium, zero and negative cp, and a small positive value in a minimal TwoPort descendant. Both flow directions must retain finite temperature/volume-flow calculations.
+
+## Scope and limitations
+
+A source-level verdict addresses the reported declaration/claim, not every possible connected system. Tests cover 0–0.5 seconds and are not a proof of long-run stability. Shared instances are not distinct root causes. A missing bound, timeout, compiler error or failed nominal run alone never counts as a verified bug or a false positive. Fixes are proposals; no library/compiler implementation was changed.
+
+[Group and related reports](../groups/fluid-medium-cp.md) · [Index](../README.md)

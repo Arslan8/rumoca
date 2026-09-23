@@ -1,0 +1,35 @@
+# FINDING-01473: `dcpm2.core.coreParameters.GcRef` in `DCPM_Drive`
+
+| Field | Value |
+|---|---|
+| Verdict | false-positive |
+| Review group | `physical-zero-is-a-supported-limit` |
+| Original tier | Candidate |
+| Sanitizer result | `physical-zero-is-a-supported-limit` |
+| Model | Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Drive |
+| Target | `dcpm2.core.coreParameters.GcRef` |
+| Declaration/site | `target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Losses/CoreParameters.mo:18` |
+| Original report | [FINDING-dcpm-drive-dcpm2-core-coreparameters-gcref-zerolimit.md](../../bugs/FINDING-dcpm-drive-dcpm2-core-coreparameters-gcref-zerolimit.md) |
+| Original SHA-256 | `d5cf9c474168b60328f47a5391655419b7c9a62e5b99003ddd64b9d751379687` |
+
+## Why this is not a verified bug
+
+The v2 result explicitly records that zero is a supported component limit. It says the positivity rule does not apply and does not claim that the model is defective.
+
+## Regression action
+
+Keep this as a regression proving the detector suppresses or labels the non-defect correctly.
+
+## Evidence basis
+
+The v2 report's own verdict/proof explicitly declines a defect claim.
+
+## Original claim
+
+The positivity rule does **not** apply: this component documents zero as a meaningful limit, so a missing-bound claim would contradict its contract. It does **not** claim that anything is wrong — this records a rule that was considered and correctly declined, with the contract that declined it.
+
+## Scope
+
+Confirmed means independently reproduced execution evidence survived the semantic controls. Candidate means useful static/source evidence exists but a false positive is still possible. Advisory means the analyzer explicitly asks about unknown intent and makes no defect claim. False-positive means the stated defect claim is refuted; it does not certify every connected topology. Unresolved entries are deliberately not called real or fake.
+
+[v2 verification index](../README.md)

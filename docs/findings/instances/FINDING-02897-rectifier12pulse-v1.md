@@ -1,0 +1,48 @@
+# FINDING-02897: `transformerData2.V1` in `Rectifier12pulse`
+
+| | |
+|---|---|
+| **Model** | `Modelica.Electrical.Machines.Examples.Transformers.Rectifier12pulse` |
+| **Reached as** | `transformerData2.V1` |
+| **Declaration** | `TransformerData.mo:5` |
+| **Parameter** | `V1` |
+| **Claim** | a settable parameter reaches a denominator, nothing excludes zero |
+| **Kind** | `divisor-reachable-zero` |
+| **Severity** | medium |
+| **Sanitizer** | `divisor` |
+| **Fix site** | [SITE-0146](../../site-reports/SITE-0146-v1-divisor-reachable-zero.md) |
+| **Status** | **candidate — not execution-confirmed** |
+
+## Evidence
+
+| key | value |
+|---|---|
+| `parameter` | transformerData2.V1 |
+| `shape` | propagated |
+| `path` | transformerData2.V1 -> transformerData2.V1ph |
+| `declared_min` | None |
+| `divisor_sites` | 6 |
+| `note` | reaches a denominator and nothing excludes zero |
+
+
+## What this is
+
+One occurrence. The declaration at `TransformerData.mo:5` is reached by this model through
+`transformerData2.V1`, and the analysis reached it statically — no value has been observed
+breaking anything here.
+
+The fix is at the declaration, not in this model. Other models reaching the same
+declaration are separate files; the fix site groups them.
+
+| Tier | Evidence | Where |
+|---|---|---|
+| confirmed | fails in two independent tools | [`INSTANCES.md`](../../verified%20bugs/INSTANCES.md) |
+| **candidate** | **static analysis reached it** | **here** |
+| latent | a declaration permits it | [`declaration-sites/`](../../declaration-sites/README.md) |
+
+## Reproducing
+
+```bash
+python3 tools/sweep/static_eval.py --list tools/sweep/ALL.list \
+  --out results.jsonl --keep-parameter-chains
+```

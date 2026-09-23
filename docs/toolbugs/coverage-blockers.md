@@ -11,7 +11,7 @@ It is recorded here, in toolbugs, because none of it is a defect in any model.
 |---|---|---|
 | `function value type` — MLS §12.9 **external objects** (`ExternalCombiTimeTable`) | 86 | Large. Needs C interop at runtime. |
 | `Medium.BaseProperties` cannot instantiate partial class | 30 | Large. Fluid media. |
-| `ED008`/`EF023` unresolved `v`, `v.re` | ~30 | [BUG-004](BUG-004-record-array-destructured-without-subscript.md). Contained but needs a `Reference` mutation API. |
+| `ED008`/`EF023` unresolved `v`, `v.re` | ~30 | [BUG-004](../verified%20bugs/BUG-004-record-array-destructured-without-subscript.md). Contained but needs a `Reference` mutation API. |
 | `impure call context` | 12 | Unassessed |
 | `EF025` missing function-selection identity | 8 | Unassessed |
 | `ED001` unbalanced model | 55 | Unassessed; OMC accepts many of these |

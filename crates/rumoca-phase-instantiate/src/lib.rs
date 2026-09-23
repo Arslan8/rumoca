@@ -205,6 +205,22 @@ pub struct InstantiateOptions {
     /// expansion and exists so differential tests can prove the two paths
     /// produce identical overlays.
     pub compact_component_families: bool,
+    /// Replace a parameter's declaration binding with the constant it evaluates
+    /// to, when it evaluates to one (`parameter Real d = k * 10` with `k = 2`
+    /// becomes `d = 20`).
+    ///
+    /// Enabled by default, because it is what makes a derived parameter usable
+    /// as a value rather than as an expression. Turning it off keeps the
+    /// binding as written, so a consumer can see *which* parameters a derived
+    /// one is derived from — a dependency an analysis cannot recover once the
+    /// arithmetic has been carried out.
+    ///
+    /// This never disables evaluation, only the rewrite. MLS §18.3 structural
+    /// parameters — array dimensions, for-loop ranges, if-equation conditions —
+    /// must be known at translation time and are still resolved, as are
+    /// discrete-typed bindings, so the shape of the flattened model is
+    /// unchanged either way.
+    pub fold_parameter_declaration_bindings: bool,
 }
 
 impl Default for InstantiateOptions {
@@ -213,6 +229,7 @@ impl Default for InstantiateOptions {
             depth_limit: DEFAULT_INSTANTIATION_DEPTH_LIMIT,
             root_modifications: Vec::new(),
             compact_component_families: true,
+            fold_parameter_declaration_bindings: true,
         }
     }
 }
@@ -1384,6 +1401,10 @@ fn instantiate_component(
     let (flow, stream) = component_flow_stream(comp, ctx);
     validate_final_type_attribute_overrides(tree, class_def, comp, ctx.mod_env())?;
     merge_type_hierarchy_string_attributes(tree, class_def, &mut attrs);
+    // MLS §4.8: a type's attribute modifications are part of the variable's
+    // type. `type Mass = Real(min=0)` bounds every `SI.Mass`, and only the
+    // string attributes were being inherited.
+    merge_type_hierarchy_numeric_attributes(tree, class_def, &mut attrs);
     let (dims, dims_expr) = resolve_component_shape(
         tree,
         comp,
@@ -1577,7 +1598,11 @@ fn prepare_component_binding_info(
     let start_from_declaration_binding =
         !binding_from_modification && binding.is_some() && attrs.start == binding;
     if !binding_from_modification
-        && declaration_binding_allows_structural_resolution(comp, is_discrete_type)
+        && declaration_binding_allows_structural_resolution(
+            comp,
+            is_discrete_type,
+            ctx.options.fold_parameter_declaration_bindings,
+        )
         && let Some(declaration_binding) = binding.as_ref()
     {
         let resolved_binding = mod_env::resolve_declaration_binding_expr(
@@ -1604,12 +1629,20 @@ fn prepare_component_binding_info(
 fn declaration_binding_allows_structural_resolution(
     comp: &ast::Component,
     is_discrete_type: bool,
+    fold_parameters: bool,
 ) -> bool {
-    matches!(
-        comp.variability,
-        rumoca_core::Variability::Parameter(_) | rumoca_core::Variability::Constant(_)
-    ) || comp.is_structural
-        || is_discrete_type
+    // A structural parameter (MLS §18.3) and a discrete-typed binding must be
+    // resolved whatever the caller asked for: the first decides array extents
+    // and branch selection, the second the value a `when` settles on, and both
+    // change the shape of the model rather than only a number inside it.
+    if comp.is_structural || is_discrete_type {
+        return true;
+    }
+    fold_parameters
+        && matches!(
+            comp.variability,
+            rumoca_core::Variability::Parameter(_) | rumoca_core::Variability::Constant(_)
+        )
 }
 
 struct NestedComponentRequest<'a> {

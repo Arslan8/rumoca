@@ -1,0 +1,109 @@
+{
+  "model": "SwitchedRLC",
+  "source": "examples/models/SwitchedRLC.mo",
+  "variables": {
+    "R": {
+      "name": "R",
+      "role": "parameter",
+      "declaring_class": "SwitchedRLC",
+      "source": "examples/models/SwitchedRLC.mo",
+      "line": 9,
+      "binding": "100",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 2,
+        "name": "R",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 2,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 325,
+            "end": 337,
+            "line": 9,
+            "column": 13
+          }
+        },
+        "unit": "Ohm",
+        "declaring_class": "SwitchedRLC",
+        "binding": 4,
+        "start": 5,
+        "tunable": true,
+        "from_source": true
+      }
+    }
+  },
+  "trials": {
+    "R=0": {
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile-bitcode",
+        "/data/mrumoca/rumoca/target/bug-review-20260915/51a47159af620668.rbc",
+        "--simulate",
+        "--check",
+        "--t-end",
+        "0.5",
+        "--param",
+        "R=0"
+      ],
+      "cwd": "/data/mrumoca/rumoca",
+      "status": "completed",
+      "returncode": 2,
+      "seconds": 0.01,
+      "stdout": "[\n  {\n    \"kind\": \"simulation-failure\",\n    \"detail\": \"solve-IR evaluation failed: algebraic projection did not converge at event boundary: worst scaled residual row=1 target=i_R value=NaN ratio=NaN norm=inf row_scale=1.000000e0 scaled_tolerance=1.000000e-10\",\n    \"parameters\": [\n      {\n        \"name\": \"R\",\n        \"value\": 0.0\n      }\n    ]\n  }\n]\n",
+      "stderr": "reading /data/mrumoca/rumoca/target/bug-review-20260915/51a47159af620668.rbc (bitcode v1, cbor)\nSimulating SwitchedRLC to t=0.5 with property checks...\n",
+      "outcome": "reported-failure"
+    }
+  },
+  "compile": {
+    "command": [
+      "/data/mrumoca/rumoca/target/debug/rumoca",
+      "compile",
+      "examples/models/SwitchedRLC.mo",
+      "--model",
+      "SwitchedRLC",
+      "--emit-bitcode",
+      "/data/mrumoca/rumoca/target/bug-review-20260915/51a47159af620668.rbc",
+      "--source-root",
+      "target/msl/ModelicaStandardLibrary-4.1.0",
+      "--source-root",
+      "target/corpus/ModelicaStandardLibrary-4.1.0",
+      "--source-root",
+      "target/cmm/CMM-a642c381"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 0.057,
+    "stdout": "",
+    "stderr": "wrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/bug-review-20260915/51a47159af620668.rbc\n",
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 96,
+    "stderr_sha256": "ead1d1583dcc179eaa00ac15faaf02a7faa81b6009a519a3efdb840290df2540"
+  },
+  "baseline": {
+    "command": [
+      "/data/mrumoca/rumoca/target/debug/rumoca",
+      "compile-bitcode",
+      "/data/mrumoca/rumoca/target/bug-review-20260915/51a47159af620668.rbc",
+      "--simulate",
+      "--check",
+      "--t-end",
+      "0.5"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 0.012,
+    "stdout": "[]\n",
+    "stderr": "reading /data/mrumoca/rumoca/target/bug-review-20260915/51a47159af620668.rbc (bitcode v1, cbor)\nSimulating SwitchedRLC to t=0.5 with property checks...\nSimulation complete: 501 time points, 5 variables\n",
+    "outcome": "clean"
+  }
+}

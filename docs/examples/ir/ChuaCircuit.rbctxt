@@ -1,0 +1,514 @@
+; rumoca bitcode, textual form
+rbc 1
+producer "rumoca 0.10.0"
+model "Modelica.Electrical.Analog.Examples.ChuaCircuit"
+
+; sources
+!0 source "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/ChuaCircuit.mo"
+!1 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Interfaces/TwoPin.mo"
+!2 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Interfaces/PositivePin.mo"
+!3 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Interfaces/NegativePin.mo"
+!4 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Inductor.mo"
+!5 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Interfaces/OnePort.mo"
+!6 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Interfaces/ConditionalHeatPort.mo"
+!7 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Resistor.mo"
+!8 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Conductor.mo"
+!9 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo"
+!10 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Interfaces/Pin.mo"
+!11 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/Utilities/NonlinearResistor.mo"
+!12 source "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Ground.mo"
+
+; types
+$0 type real
+$1 type real
+$2 type real
+$3 type real
+$4 type boolean
+$5 type real
+$6 type real
+$7 type real
+$8 type real
+$9 type real
+$10 type real
+$11 type integer
+$12 type string
+
+; components
+#0 comp "C1"
+#1 comp "C2"
+#2 comp "G"
+#3 comp "Gnd"
+#4 comp "L"
+#5 comp "Nr"
+#6 comp "Ro"
+
+; variables
+%0 var "L.i" $0 state local scalars 1 comp #4 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Basic.Inductor" desc "Current flowing from pin p to pin n" fixed true from_source start ^0 @src 5 161 173 5 3
+%1 var "L.v" $1 algebraic local scalars 1 comp #4 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Basic.Inductor" desc "Voltage drop of the two pins (= p.v - n.v)" from_source start ^1 @src 1 106 118 3 3
+%2 var "L.p.v" $2 algebraic local scalars 1 comp #4 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Potential at the pin" from_source start ^2 connector potential connected @src 2 112 134 3 3
+%3 var "L.p.i" $0 algebraic local scalars 1 comp #4 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Current flowing into the pin" from_source start ^3 connector flow connected @src 2 477 489 9 8
+%4 var "L.n.v" $2 algebraic local scalars 1 comp #4 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Potential at the pin" from_source start ^4 connector potential connected @src 3 112 134 3 3
+%5 var "L.n.i" $0 algebraic local scalars 1 comp #4 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Current flowing into the pin" from_source start ^5 connector flow connected @src 3 477 489 9 8
+%6 var "L.L" $3 parameter parameter scalars 1 comp #4 unit "H" quantity "Inductance" class "Modelica.Electrical.Analog.Basic.Inductor" desc "Inductance" tunable from_source start ^7 binding ^6 @src 4 145 160 4 13
+%7 var "Ro.i" $0 algebraic local scalars 1 comp #6 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Current flowing from pin p to pin n" from_source start ^8 @src 5 161 173 5 3
+%8 var "Ro.v" $1 algebraic local scalars 1 comp #6 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Voltage drop of the two pins (= p.v - n.v)" from_source start ^9 @src 1 106 118 3 3
+%9 var "Ro.p.v" $2 algebraic local scalars 1 comp #6 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Potential at the pin" from_source start ^10 connector potential connected @src 2 112 134 3 3
+%10 var "Ro.p.i" $0 algebraic local scalars 1 comp #6 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Current flowing into the pin" from_source start ^11 connector flow connected @src 2 477 489 9 8
+%11 var "Ro.n.v" $2 algebraic local scalars 1 comp #6 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Potential at the pin" from_source start ^12 connector potential connected @src 3 112 134 3 3
+%12 var "Ro.n.i" $0 algebraic local scalars 1 comp #6 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Current flowing into the pin" from_source start ^13 connector flow connected @src 3 477 489 9 8
+%13 var "Ro.useHeatPort" $4 parameter parameter scalars 1 comp #6 class "Modelica.Electrical.Analog.Basic.Resistor" desc "= true, if heatPort is enabled" from_source start ^15 binding ^14 @src 6 203 222 5 13
+%14 var "Ro.T" $5 parameter parameter scalars 1 comp #6 unit "K" quantity "ThermodynamicTemperature" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Fixed device temperature if useHeatPort = false" tunable from_source start ^76 binding ^75 @src 6 346 362 7 13
+%15 var "Ro.LossPower" $6 algebraic local scalars 1 comp #6 unit "W" quantity "Power" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Loss power leaving component via heatPort" from_source start ^16 @src 6 753 771 13 3
+%16 var "Ro.T_heatPort" $5 algebraic local scalars 1 comp #6 unit "K" quantity "ThermodynamicTemperature" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Temperature of heatPort" from_source start ^17 @src 6 819 844 14 3
+%17 var "Ro.R" $7 parameter parameter scalars 1 comp #6 unit "Ohm" quantity "Resistance" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Resistance at temperature T_ref" tunable from_source start ^19 binding ^18 @src 7 103 118 3 13
+%18 var "Ro.T_ref" $5 parameter parameter scalars 1 comp #6 unit "K" quantity "ThermodynamicTemperature" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Reference temperature" tunable from_source start ^21 binding ^20 @src 7 179 199 5 13
+%19 var "Ro.alpha" $8 parameter parameter scalars 1 comp #6 unit "1/K" quantity "LinearTemperatureCoefficient" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Temperature coefficient of resistance (R_actual = R*(1 + alpha*(T_heatPort - T_ref))" tunable from_source start ^23 binding ^22 @src 7 244 281 6 13
+%20 var "Ro.R_actual" $7 algebraic local scalars 1 comp #6 unit "Ohm" quantity "Resistance" class "Modelica.Electrical.Analog.Basic.Resistor" desc "Actual resistance = R*(1 + alpha*(T_heatPort - T_ref))" from_source start ^24 @src 7 514 536 11 3
+%21 var "G.i" $0 algebraic local scalars 1 comp #2 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Current flowing from pin p to pin n" from_source start ^25 @src 5 161 173 5 3
+%22 var "G.v" $1 algebraic local scalars 1 comp #2 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Voltage drop of the two pins (= p.v - n.v)" from_source start ^26 @src 1 106 118 3 3
+%23 var "G.p.v" $2 algebraic local scalars 1 comp #2 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Potential at the pin" from_source start ^27 connector potential connected @src 2 112 134 3 3
+%24 var "G.p.i" $0 algebraic local scalars 1 comp #2 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Current flowing into the pin" from_source start ^28 connector flow connected @src 2 477 489 9 8
+%25 var "G.n.v" $2 algebraic local scalars 1 comp #2 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Potential at the pin" from_source start ^29 connector potential connected @src 3 112 134 3 3
+%26 var "G.n.i" $0 algebraic local scalars 1 comp #2 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Current flowing into the pin" from_source start ^30 connector flow connected @src 3 477 489 9 8
+%27 var "G.useHeatPort" $4 parameter parameter scalars 1 comp #2 class "Modelica.Electrical.Analog.Basic.Conductor" desc "= true, if heatPort is enabled" from_source start ^32 binding ^31 @src 6 203 222 5 13
+%28 var "G.T" $5 parameter parameter scalars 1 comp #2 unit "K" quantity "ThermodynamicTemperature" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Fixed device temperature if useHeatPort = false" tunable from_source start ^78 binding ^77 @src 6 346 362 7 13
+%29 var "G.LossPower" $6 algebraic local scalars 1 comp #2 unit "W" quantity "Power" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Loss power leaving component via heatPort" from_source start ^33 @src 6 753 771 13 3
+%30 var "G.T_heatPort" $5 algebraic local scalars 1 comp #2 unit "K" quantity "ThermodynamicTemperature" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Temperature of heatPort" from_source start ^34 @src 6 819 844 14 3
+%31 var "G.G" $9 parameter parameter scalars 1 comp #2 unit "S" quantity "Conductance" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Conductance at temperature T_ref" tunable from_source start ^36 binding ^35 @src 8 105 121 3 13
+%32 var "G.T_ref" $5 parameter parameter scalars 1 comp #2 unit "K" quantity "ThermodynamicTemperature" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Reference temperature" tunable from_source start ^38 binding ^37 @src 8 183 203 5 13
+%33 var "G.alpha" $8 parameter parameter scalars 1 comp #2 unit "1/K" quantity "LinearTemperatureCoefficient" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Temperature coefficient of conductance (G_actual = G_ref/(1 + alpha*(T_heatPort - T_ref))" tunable from_source start ^40 binding ^39 @src 8 248 285 6 13
+%34 var "G.G_actual" $9 algebraic local scalars 1 comp #2 unit "S" quantity "Conductance" class "Modelica.Electrical.Analog.Basic.Conductor" desc "Actual conductance = G_ref/(1 + alpha*(T_heatPort - T_ref))" from_source start ^41 @src 8 522 545 10 3
+%35 var "C1.i" $0 algebraic local scalars 1 comp #0 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Basic.Capacitor" desc "Current flowing from pin p to pin n" from_source start ^42 @src 5 161 173 5 3
+%36 var "C1.v" $1 state local scalars 1 comp #0 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Basic.Capacitor" desc "Voltage drop of the two pins (= p.v - n.v)" fixed true from_source start ^43 @src 1 106 118 3 3
+%37 var "C1.p.v" $2 algebraic local scalars 1 comp #0 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Potential at the pin" from_source start ^44 connector potential connected @src 2 112 134 3 3
+%38 var "C1.p.i" $0 algebraic local scalars 1 comp #0 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Current flowing into the pin" from_source start ^45 connector flow connected @src 2 477 489 9 8
+%39 var "C1.n.v" $2 algebraic local scalars 1 comp #0 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Potential at the pin" from_source start ^46 connector potential connected @src 3 112 134 3 3
+%40 var "C1.n.i" $0 algebraic local scalars 1 comp #0 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Current flowing into the pin" from_source start ^47 connector flow connected @src 3 477 489 9 8
+%41 var "C1.C" $10 parameter parameter scalars 1 comp #0 unit "F" quantity "Capacitance" class "Modelica.Electrical.Analog.Basic.Capacitor" desc "Capacitance" tunable from_source start ^49 binding ^48 @src 9 147 163 4 13
+%42 var "C2.i" $0 algebraic local scalars 1 comp #1 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Basic.Capacitor" desc "Current flowing from pin p to pin n" from_source start ^50 @src 5 161 173 5 3
+%43 var "C2.v" $1 state local scalars 1 comp #1 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Basic.Capacitor" desc "Voltage drop of the two pins (= p.v - n.v)" fixed true from_source start ^51 @src 1 106 118 3 3
+%44 var "C2.p.v" $2 algebraic local scalars 1 comp #1 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Potential at the pin" from_source start ^52 connector potential connected @src 2 112 134 3 3
+%45 var "C2.p.i" $0 algebraic local scalars 1 comp #1 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Current flowing into the pin" from_source start ^53 connector flow connected @src 2 477 489 9 8
+%46 var "C2.n.v" $2 algebraic local scalars 1 comp #1 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Potential at the pin" from_source start ^54 connector potential connected @src 3 112 134 3 3
+%47 var "C2.n.i" $0 algebraic local scalars 1 comp #1 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Current flowing into the pin" from_source start ^55 connector flow connected @src 3 477 489 9 8
+%48 var "C2.C" $10 parameter parameter scalars 1 comp #1 unit "F" quantity "Capacitance" class "Modelica.Electrical.Analog.Basic.Capacitor" desc "Capacitance" tunable from_source start ^57 binding ^56 @src 9 147 163 4 13
+%49 var "Nr.i" $0 algebraic local scalars 1 comp #5 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor" desc "Current flowing from pin p to pin n" from_source start ^58 @src 5 161 173 5 3
+%50 var "Nr.v" $1 algebraic local scalars 1 comp #5 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor" desc "Voltage drop of the two pins (= p.v - n.v)" from_source start ^59 @src 1 106 118 3 3
+%51 var "Nr.p.v" $2 algebraic local scalars 1 comp #5 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Potential at the pin" from_source start ^60 connector potential connected @src 2 112 134 3 3
+%52 var "Nr.p.i" $0 algebraic local scalars 1 comp #5 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.PositivePin" desc "Current flowing into the pin" from_source start ^61 connector flow connected @src 2 477 489 9 8
+%53 var "Nr.n.v" $2 algebraic local scalars 1 comp #5 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Potential at the pin" from_source start ^62 connector potential connected @src 3 112 134 3 3
+%54 var "Nr.n.i" $0 algebraic local scalars 1 comp #5 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.NegativePin" desc "Current flowing into the pin" from_source start ^63 connector flow connected @src 3 477 489 9 8
+%55 var "Nr.Ga" $9 parameter parameter scalars 1 comp #5 unit "S" quantity "Conductance" class "Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor" desc "Conductance in inner voltage range" tunable from_source min ^67 binding ^65 @src 11 139 156 5 13
+%56 var "Nr.Gb" $9 parameter parameter scalars 1 comp #5 unit "S" quantity "Conductance" class "Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor" desc "Conductance in outer voltage range" tunable from_source min ^71 binding ^69 @src 11 207 224 6 13
+%57 var "Nr.Ve" $1 parameter parameter scalars 1 comp #5 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Examples.Utilities.NonlinearResistor" desc "Inner voltage range limit" tunable from_source binding ^72 @src 11 275 288 7 13
+%58 var "Gnd.p.v" $2 algebraic local scalars 1 comp #3 unit "V" quantity "ElectricPotential" class "Modelica.Electrical.Analog.Interfaces.Pin" desc "Potential at the pin" from_source start ^73 connector potential connected @src 10 95 117 3 3
+%59 var "Gnd.p.i" $0 algebraic local scalars 1 comp #3 unit "A" quantity "ElectricCurrent" class "Modelica.Electrical.Analog.Interfaces.Pin" desc "Current flowing into the pin" from_source start ^74 connector flow connected @src 10 460 472 9 8
+
+; expressions
+^0 expr $11 lit integer 0 @src 0 184 185 5 61
+^1 expr $0 lit real 0.0 @gen default_start 1 106 118 3 3
+^2 expr $0 lit real 0.0 @gen default_start 2 112 134 3 3
+^3 expr $0 lit real 0.0 @gen default_start 2 477 489 9 8
+^4 expr $0 lit real 0.0 @gen default_start 3 112 134 3 3
+^5 expr $0 lit real 0.0 @gen default_start 3 477 489 9 8
+^6 expr $11 lit integer 18 @src 0 172 174 5 49
+^7 expr $11 lit integer 1 @src 4 167 168 4 35
+^8 expr $0 lit real 0.0 @gen default_start 5 161 173 5 3
+^9 expr $0 lit real 0.0 @gen default_start 1 106 118 3 3
+^10 expr $0 lit real 0.0 @gen default_start 2 112 134 3 3
+^11 expr $0 lit real 0.0 @gen default_start 2 477 489 9 8
+^12 expr $0 lit real 0.0 @gen default_start 3 112 134 3 3
+^13 expr $0 lit real 0.0 @gen default_start 3 477 489 9 8
+^14 expr $4 lit boolean false @src 6 225 230 5 35
+^15 expr $4 lit boolean false @src 6 225 230 5 35
+^16 expr $0 lit real 0.0 @gen default_start 6 753 771 13 3
+^17 expr $0 lit real 0.0 @gen default_start 6 819 844 14 3
+^18 expr $0 lit real 0.0125 @src 0 373 380 9 50
+^19 expr $11 lit integer 1 @src 7 125 126 3 35
+^20 expr $0 lit real 300.15 @src 7 200 206 5 34
+^21 expr $0 lit real 300.15 @src 7 200 206 5 34
+^22 expr $11 lit integer 0 @src 7 282 283 6 51
+^23 expr $11 lit integer 0 @src 7 282 283 6 51
+^24 expr $0 lit real 0.0 @gen default_start 7 514 536 11 3
+^25 expr $0 lit real 0.0 @gen default_start 5 161 173 5 3
+^26 expr $0 lit real 0.0 @gen default_start 1 106 118 3 3
+^27 expr $0 lit real 0.0 @gen default_start 2 112 134 3 3
+^28 expr $0 lit real 0.0 @gen default_start 2 477 489 9 8
+^29 expr $0 lit real 0.0 @gen default_start 3 112 134 3 3
+^30 expr $0 lit real 0.0 @gen default_start 3 477 489 9 8
+^31 expr $4 lit boolean false @src 6 225 230 5 35
+^32 expr $4 lit boolean false @src 6 225 230 5 35
+^33 expr $0 lit real 0.0 @gen default_start 6 753 771 13 3
+^34 expr $0 lit real 0.0 @gen default_start 6 819 844 14 3
+^35 expr $0 lit real 0.565 @src 0 556 561 13 50
+^36 expr $11 lit integer 1 @src 8 128 129 3 36
+^37 expr $0 lit real 300.15 @src 8 204 210 5 34
+^38 expr $0 lit real 300.15 @src 8 204 210 5 34
+^39 expr $11 lit integer 0 @src 8 286 287 6 51
+^40 expr $11 lit integer 0 @src 8 286 287 6 51
+^41 expr $0 lit real 0.0 @gen default_start 8 522 545 10 3
+^42 expr $0 lit real 0.0 @gen default_start 5 161 173 5 3
+^43 expr $11 lit integer 4 @src 0 705 706 15 63
+^44 expr $0 lit real 0.0 @gen default_start 2 112 134 3 3
+^45 expr $0 lit real 0.0 @gen default_start 2 477 489 9 8
+^46 expr $0 lit real 0.0 @gen default_start 3 112 134 3 3
+^47 expr $0 lit real 0.0 @gen default_start 3 477 489 9 8
+^48 expr $11 lit integer 10 @src 0 693 695 15 51
+^49 expr $11 lit integer 1 @src 9 170 171 4 36
+^50 expr $0 lit real 0.0 @gen default_start 5 161 173 5 3
+^51 expr $11 lit integer 0 @src 0 906 907 19 64
+^52 expr $0 lit real 0.0 @gen default_start 2 112 134 3 3
+^53 expr $0 lit real 0.0 @gen default_start 2 477 489 9 8
+^54 expr $0 lit real 0.0 @gen default_start 3 112 134 3 3
+^55 expr $0 lit real 0.0 @gen default_start 3 477 489 9 8
+^56 expr $11 lit integer 100 @src 0 893 896 19 51
+^57 expr $11 lit integer 1 @src 9 170 171 4 36
+^58 expr $0 lit real 0.0 @gen default_start 5 161 173 5 3
+^59 expr $0 lit real 0.0 @gen default_start 1 106 118 3 3
+^60 expr $0 lit real 0.0 @gen default_start 2 112 134 3 3
+^61 expr $0 lit real 0.0 @gen default_start 2 477 489 9 8
+^62 expr $0 lit real 0.0 @gen default_start 3 112 134 3 3
+^63 expr $0 lit real 0.0 @gen default_start 3 477 489 9 8
+^64 expr $0 lit real 0.757576 @src 0 1133 1141 24 19
+^65 expr $0 un negate ^64 @src 0 1132 1141 24 18
+^66 expr $11 lit integer 1 @src 0 1127 1128 24 13
+^67 expr $11 un negate ^66 @src 0 1126 1128 24 12
+^68 expr $0 lit real 0.409091 @src 0 1161 1169 25 19
+^69 expr $0 un negate ^68 @src 0 1160 1169 25 18
+^70 expr $11 lit integer 1 @src 0 1155 1156 25 13
+^71 expr $11 un negate ^70 @src 0 1154 1156 25 12
+^72 expr $11 lit integer 1 @src 0 1178 1179 26 8
+^73 expr $0 lit real 0.0 @gen default_start 10 95 117 3 3
+^74 expr $0 lit real 0.0 @gen default_start 10 460 472 9 8
+^75 expr $5 coord param %18 @src 7 504 509 10 71
+^76 expr $5 coord param %18 @src 7 504 509 10 71
+^77 expr $5 coord param %32 @src 8 512 517 9 71
+^78 expr $5 coord param %32 @src 8 512 517 9 71
+^79 expr $11 lit integer 0 @src 5 224 225 7 3
+^80 expr $0 coord alg %3 @src 5 228 231 7 7
+^81 expr $0 coord alg %5 @src 5 234 237 7 13
+^82 expr $0 bin add ^80 ^81 @src 5 228 237 7 7
+^83 expr $0 bin sub ^79 ^82 @src 5 224 225 7 3
+^84 expr $0 coord state %0 @src 5 241 242 8 3
+^85 expr $0 coord alg %3 @src 5 245 248 8 7
+^86 expr $0 bin sub ^84 ^85 @src 5 241 242 8 3
+^87 expr $1 coord alg %1 @src 1 407 408 10 3
+^88 expr $2 coord alg %2 @src 1 411 414 10 7
+^89 expr $2 coord alg %4 @src 1 417 420 10 13
+^90 expr $0 bin sub ^88 ^89 @src 1 411 420 10 7
+^91 expr $0 bin sub ^87 ^90 @src 1 407 408 10 3
+^92 expr $3 coord param %6 @src 4 196 197 7 3
+^93 expr $0 coord der %0 @src 4 198 204 7 5
+^94 expr $0 bin mul ^92 ^93 @src 4 196 204 7 3
+^95 expr $1 coord alg %1 @src 4 207 208 7 14
+^96 expr $0 bin sub ^94 ^95 @src 4 196 204 7 3
+^97 expr $11 lit integer 0 @src 5 224 225 7 3
+^98 expr $0 coord alg %10 @src 5 228 231 7 7
+^99 expr $0 coord alg %12 @src 5 234 237 7 13
+^100 expr $0 bin add ^98 ^99 @src 5 228 237 7 7
+^101 expr $0 bin sub ^97 ^100 @src 5 224 225 7 3
+^102 expr $0 coord alg %7 @src 5 241 242 8 3
+^103 expr $0 coord alg %10 @src 5 245 248 8 7
+^104 expr $0 bin sub ^102 ^103 @src 5 241 242 8 3
+^105 expr $1 coord alg %8 @src 1 407 408 10 3
+^106 expr $2 coord alg %9 @src 1 411 414 10 7
+^107 expr $2 coord alg %11 @src 1 417 420 10 13
+^108 expr $0 bin sub ^106 ^107 @src 1 411 420 10 7
+^109 expr $0 bin sub ^105 ^108 @src 1 407 408 10 3
+^110 expr $5 coord alg %16 @src 6 912 922 17 6
+^111 expr $5 coord param %14 @src 6 925 926 17 19
+^112 expr $0 bin sub ^110 ^111 @src 6 912 922 17 6
+^113 expr $7 coord alg %20 @src 7 724 732 17 3
+^114 expr $7 coord param %17 @src 7 735 736 17 14
+^115 expr $11 lit integer 1 @src 7 738 739 17 17
+^116 expr $8 coord param %19 @src 7 742 747 17 21
+^117 expr $5 coord alg %16 @src 7 749 759 17 28
+^118 expr $5 coord param %18 @src 7 762 767 17 41
+^119 expr $0 bin sub ^117 ^118 @src 7 749 767 17 28
+^120 expr $0 bin mul ^116 ^119 @src 7 742 767 17 21
+^121 expr $0 bin add ^115 ^120 @src 7 738 767 17 17
+^122 expr $0 bin mul ^114 ^121 @src 7 735 767 17 14
+^123 expr $0 bin sub ^113 ^122 @src 7 724 732 17 3
+^124 expr $1 coord alg %8 @src 7 773 774 18 3
+^125 expr $7 coord alg %20 @src 7 777 785 18 7
+^126 expr $0 coord alg %7 @src 7 786 787 18 16
+^127 expr $0 bin mul ^125 ^126 @src 7 777 787 18 7
+^128 expr $0 bin sub ^124 ^127 @src 7 773 774 18 3
+^129 expr $6 coord alg %15 @src 7 791 800 19 3
+^130 expr $1 coord alg %8 @src 7 803 804 19 15
+^131 expr $0 coord alg %7 @src 7 805 806 19 17
+^132 expr $0 bin mul ^130 ^131 @src 7 803 806 19 15
+^133 expr $0 bin sub ^129 ^132 @src 7 791 800 19 3
+^134 expr $11 lit integer 0 @src 5 224 225 7 3
+^135 expr $0 coord alg %24 @src 5 228 231 7 7
+^136 expr $0 coord alg %26 @src 5 234 237 7 13
+^137 expr $0 bin add ^135 ^136 @src 5 228 237 7 7
+^138 expr $0 bin sub ^134 ^137 @src 5 224 225 7 3
+^139 expr $0 coord alg %21 @src 5 241 242 8 3
+^140 expr $0 coord alg %24 @src 5 245 248 8 7
+^141 expr $0 bin sub ^139 ^140 @src 5 241 242 8 3
+^142 expr $1 coord alg %22 @src 1 407 408 10 3
+^143 expr $2 coord alg %23 @src 1 411 414 10 7
+^144 expr $2 coord alg %25 @src 1 417 420 10 13
+^145 expr $0 bin sub ^143 ^144 @src 1 411 420 10 7
+^146 expr $0 bin sub ^142 ^145 @src 1 407 408 10 3
+^147 expr $5 coord alg %30 @src 6 912 922 17 6
+^148 expr $5 coord param %28 @src 6 925 926 17 19
+^149 expr $0 bin sub ^147 ^148 @src 6 912 922 17 6
+^150 expr $9 coord alg %34 @src 8 738 746 16 3
+^151 expr $9 coord param %31 @src 8 749 750 16 14
+^152 expr $11 lit integer 1 @src 8 752 753 16 17
+^153 expr $8 coord param %33 @src 8 756 761 16 21
+^154 expr $5 coord alg %30 @src 8 763 773 16 28
+^155 expr $5 coord param %32 @src 8 776 781 16 41
+^156 expr $0 bin sub ^154 ^155 @src 8 763 781 16 28
+^157 expr $0 bin mul ^153 ^156 @src 8 756 781 16 21
+^158 expr $0 bin add ^152 ^157 @src 8 752 781 16 17
+^159 expr $0 bin div ^151 ^158 @src 8 749 781 16 14
+^160 expr $0 bin sub ^150 ^159 @src 8 738 746 16 3
+^161 expr $0 coord alg %21 @src 8 787 788 17 3
+^162 expr $9 coord alg %34 @src 8 791 799 17 7
+^163 expr $1 coord alg %22 @src 8 800 801 17 16
+^164 expr $0 bin mul ^162 ^163 @src 8 791 801 17 7
+^165 expr $0 bin sub ^161 ^164 @src 8 787 788 17 3
+^166 expr $6 coord alg %29 @src 8 805 814 18 3
+^167 expr $1 coord alg %22 @src 8 817 818 18 15
+^168 expr $0 coord alg %21 @src 8 819 820 18 17
+^169 expr $0 bin mul ^167 ^168 @src 8 817 820 18 15
+^170 expr $0 bin sub ^166 ^169 @src 8 805 814 18 3
+^171 expr $11 lit integer 0 @src 5 224 225 7 3
+^172 expr $0 coord alg %38 @src 5 228 231 7 7
+^173 expr $0 coord alg %40 @src 5 234 237 7 13
+^174 expr $0 bin add ^172 ^173 @src 5 228 237 7 7
+^175 expr $0 bin sub ^171 ^174 @src 5 224 225 7 3
+^176 expr $0 coord alg %35 @src 5 241 242 8 3
+^177 expr $0 coord alg %38 @src 5 245 248 8 7
+^178 expr $0 bin sub ^176 ^177 @src 5 241 242 8 3
+^179 expr $1 coord state %36 @src 1 407 408 10 3
+^180 expr $2 coord alg %37 @src 1 411 414 10 7
+^181 expr $2 coord alg %39 @src 1 417 420 10 13
+^182 expr $0 bin sub ^180 ^181 @src 1 411 420 10 7
+^183 expr $0 bin sub ^179 ^182 @src 1 407 408 10 3
+^184 expr $0 coord alg %35 @src 9 200 201 7 3
+^185 expr $10 coord param %41 @src 9 204 205 7 7
+^186 expr $1 coord der %36 @src 9 206 212 7 9
+^187 expr $0 bin mul ^185 ^186 @src 9 204 212 7 7
+^188 expr $0 bin sub ^184 ^187 @src 9 200 201 7 3
+^189 expr $11 lit integer 0 @src 5 224 225 7 3
+^190 expr $0 coord alg %45 @src 5 228 231 7 7
+^191 expr $0 coord alg %47 @src 5 234 237 7 13
+^192 expr $0 bin add ^190 ^191 @src 5 228 237 7 7
+^193 expr $0 bin sub ^189 ^192 @src 5 224 225 7 3
+^194 expr $0 coord alg %42 @src 5 241 242 8 3
+^195 expr $0 coord alg %45 @src 5 245 248 8 7
+^196 expr $0 bin sub ^194 ^195 @src 5 241 242 8 3
+^197 expr $1 coord state %43 @src 1 407 408 10 3
+^198 expr $2 coord alg %44 @src 1 411 414 10 7
+^199 expr $2 coord alg %46 @src 1 417 420 10 13
+^200 expr $0 bin sub ^198 ^199 @src 1 411 420 10 7
+^201 expr $0 bin sub ^197 ^200 @src 1 407 408 10 3
+^202 expr $0 coord alg %42 @src 9 200 201 7 3
+^203 expr $10 coord param %48 @src 9 204 205 7 7
+^204 expr $1 coord der %43 @src 9 206 212 7 9
+^205 expr $0 bin mul ^203 ^204 @src 9 204 212 7 7
+^206 expr $0 bin sub ^202 ^205 @src 9 200 201 7 3
+^207 expr $11 lit integer 0 @src 5 224 225 7 3
+^208 expr $0 coord alg %52 @src 5 228 231 7 7
+^209 expr $0 coord alg %54 @src 5 234 237 7 13
+^210 expr $0 bin add ^208 ^209 @src 5 228 237 7 7
+^211 expr $0 bin sub ^207 ^210 @src 5 224 225 7 3
+^212 expr $0 coord alg %49 @src 5 241 242 8 3
+^213 expr $0 coord alg %52 @src 5 245 248 8 7
+^214 expr $0 bin sub ^212 ^213 @src 5 241 242 8 3
+^215 expr $1 coord alg %50 @src 1 407 408 10 3
+^216 expr $2 coord alg %51 @src 1 411 414 10 7
+^217 expr $2 coord alg %53 @src 1 417 420 10 13
+^218 expr $0 bin sub ^216 ^217 @src 1 411 420 10 7
+^219 expr $0 bin sub ^215 ^218 @src 1 407 408 10 3
+^220 expr $0 coord alg %49 @src 11 329 330 9 3
+^221 expr $1 coord alg %50 @src 11 337 338 9 11
+^222 expr $1 coord param %57 @src 11 342 344 9 16
+^223 expr $0 un negate ^222 @src 11 341 344 9 15
+^224 expr $4 bin lt ^221 ^223 @src 11 337 344 9 11
+^225 expr $9 coord param %56 @src 11 351 353 9 25
+^226 expr $1 coord alg %50 @src 11 355 356 9 29
+^227 expr $1 coord param %57 @src 11 359 361 9 33
+^228 expr $0 bin add ^226 ^227 @src 11 355 361 9 29
+^229 expr $0 bin mul ^225 ^228 @src 11 351 361 9 25
+^230 expr $9 coord param %55 @src 11 365 367 9 39
+^231 expr $1 coord param %57 @src 11 368 370 9 42
+^232 expr $0 bin mul ^230 ^231 @src 11 365 370 9 39
+^233 expr $0 bin sub ^229 ^232 @src 11 351 370 9 25
+^234 expr $1 coord alg %50 @src 11 380 381 9 54
+^235 expr $1 coord param %57 @src 11 384 386 9 58
+^236 expr $4 bin gt ^234 ^235 @src 11 380 386 9 54
+^237 expr $9 coord param %56 @src 11 393 395 9 67
+^238 expr $1 coord alg %50 @src 11 397 398 9 71
+^239 expr $1 coord param %57 @src 11 401 403 9 75
+^240 expr $0 bin sub ^238 ^239 @src 11 397 403 9 71
+^241 expr $0 bin mul ^237 ^240 @src 11 393 403 9 67
+^242 expr $9 coord param %55 @src 11 412 414 10 8
+^243 expr $1 coord param %57 @src 11 415 417 10 11
+^244 expr $0 bin mul ^242 ^243 @src 11 412 417 10 8
+^245 expr $0 bin add ^241 ^244 @src 11 393 417 9 67
+^246 expr $9 coord param %55 @src 11 423 425 10 19
+^247 expr $1 coord alg %50 @src 11 426 427 10 22
+^248 expr $0 bin mul ^246 ^247 @src 11 423 427 10 19
+^249 expr $0 cond 1 ^236 ^245 else ^248 @src 11 329 427 9 3
+^250 expr $0 cond 1 ^224 ^233 else ^249 @src 11 329 427 9 3
+^251 expr $0 bin sub ^220 ^250 @src 11 329 330 9 3
+^252 expr $2 coord alg %58 @src 12 222 225 9 3
+^253 expr $11 lit integer 0 @src 12 228 229 9 9
+^254 expr $0 bin sub ^252 ^253 @src 12 222 225 9 3
+^255 expr $0 coord alg %5 @src 0 1451 1452 33 11
+^256 expr $0 coord alg %10 @src 0 1451 1452 33 11
+^257 expr $0 bin add ^255 ^256 @gen flow_balance_equation 0 1451 1452 33 11
+^258 expr $0 coord alg %45 @src 0 1518 1520 34 11
+^259 expr $0 coord alg %24 @src 0 1518 1520 34 11
+^260 expr $0 bin add ^258 ^259 @src 0 1518 1520 34 11
+^261 expr $0 coord alg %3 @src 0 1518 1520 34 11
+^262 expr $0 bin add ^260 ^261 @gen flow_balance_equation 0 1518 1520 34 11
+^263 expr $0 coord alg %26 @src 0 1723 1724 38 11
+^264 expr $0 coord alg %52 @src 0 1723 1724 38 11
+^265 expr $0 bin add ^263 ^264 @src 0 1723 1724 38 11
+^266 expr $0 coord alg %38 @src 0 1723 1724 38 11
+^267 expr $0 bin add ^265 ^266 @gen flow_balance_equation 0 1723 1724 38 11
+^268 expr $0 coord alg %12 @src 0 1931 1933 42 11
+^269 expr $0 coord alg %59 @src 0 1931 1933 42 11
+^270 expr $0 bin add ^268 ^269 @src 0 1931 1933 42 11
+^271 expr $0 coord alg %47 @src 0 1931 1933 42 11
+^272 expr $0 bin add ^270 ^271 @src 0 1931 1933 42 11
+^273 expr $0 coord alg %40 @src 0 1931 1933 42 11
+^274 expr $0 bin add ^272 ^273 @src 0 1931 1933 42 11
+^275 expr $0 coord alg %54 @src 0 1931 1933 42 11
+^276 expr $0 bin add ^274 ^275 @gen flow_balance_equation 0 1931 1933 42 11
+^277 expr $2 coord alg %4 @src 0 1451 1452 33 11
+^278 expr $2 coord alg %9 @src 0 1451 1452 33 11
+^279 expr $0 bin sub ^277 ^278 @gen connection_equation 0 1451 1452 33 11
+^280 expr $2 coord alg %44 @src 0 1518 1520 34 11
+^281 expr $2 coord alg %23 @src 0 1518 1520 34 11
+^282 expr $0 bin sub ^280 ^281 @gen connection_equation 0 1518 1520 34 11
+^283 expr $2 coord alg %23 @src 0 1518 1520 34 11
+^284 expr $2 coord alg %2 @src 0 1518 1520 34 11
+^285 expr $0 bin sub ^283 ^284 @gen connection_equation 0 1518 1520 34 11
+^286 expr $2 coord alg %25 @src 0 1723 1724 38 11
+^287 expr $2 coord alg %51 @src 0 1723 1724 38 11
+^288 expr $0 bin sub ^286 ^287 @gen connection_equation 0 1723 1724 38 11
+^289 expr $2 coord alg %51 @src 0 1723 1724 38 11
+^290 expr $2 coord alg %37 @src 0 1723 1724 38 11
+^291 expr $0 bin sub ^289 ^290 @gen connection_equation 0 1723 1724 38 11
+^292 expr $2 coord alg %11 @src 0 1931 1933 42 11
+^293 expr $2 coord alg %58 @src 0 1931 1933 42 11
+^294 expr $0 bin sub ^292 ^293 @gen connection_equation 0 1931 1933 42 11
+^295 expr $2 coord alg %58 @src 0 1931 1933 42 11
+^296 expr $2 coord alg %46 @src 0 1931 1933 42 11
+^297 expr $0 bin sub ^295 ^296 @gen connection_equation 0 1931 1933 42 11
+^298 expr $2 coord alg %46 @src 0 1931 1933 42 11
+^299 expr $2 coord alg %39 @src 0 1931 1933 42 11
+^300 expr $0 bin sub ^298 ^299 @gen connection_equation 0 1931 1933 42 11
+^301 expr $2 coord alg %39 @src 0 1931 1933 42 11
+^302 expr $2 coord alg %53 @src 0 1931 1933 42 11
+^303 expr $0 bin sub ^301 ^302 @gen connection_equation 0 1931 1933 42 11
+^304 expr $11 lit integer 1 @src 7 619 620 15 11
+^305 expr $8 coord param %19 @src 7 623 628 15 15
+^306 expr $5 coord alg %16 @src 7 630 640 15 22
+^307 expr $5 coord param %18 @src 7 643 648 15 35
+^308 expr $0 bin sub ^306 ^307 @src 7 630 648 15 22
+^309 expr $0 bin mul ^305 ^308 @src 7 623 648 15 15
+^310 expr $0 bin add ^304 ^309 @src 7 619 648 15 11
+^311 expr $0 lit real 2.220446049250313e-16 @src 7 654 676 15 46
+^312 expr $4 bin ge ^310 ^311 @src 7 619 676 15 11
+^313 expr $12 lit string "Temperature outside scope of model!" @src 7 682 719 16 5
+^314 expr $11 lit integer 1 @src 8 633 634 14 11
+^315 expr $8 coord param %33 @src 8 637 642 14 15
+^316 expr $5 coord alg %30 @src 8 644 654 14 22
+^317 expr $5 coord param %32 @src 8 657 662 14 35
+^318 expr $0 bin sub ^316 ^317 @src 8 644 662 14 22
+^319 expr $0 bin mul ^315 ^318 @src 8 637 662 14 15
+^320 expr $0 bin add ^314 ^319 @src 8 633 662 14 11
+^321 expr $0 lit real 2.220446049250313e-16 @src 8 668 690 14 46
+^322 expr $4 bin ge ^320 ^321 @src 8 633 690 14 11
+^323 expr $12 lit string "Temperature outside scope of model!" @src 8 696 733 15 5
+
+; eq
+eq 0 ^83 reads %3 %5 @src 5 224 237 7 3
+eq 1 ^86 reads %0 %3 @src 5 241 248 8 3
+eq 2 ^91 reads %1 %2 %4 @src 1 407 420 10 3
+eq 3 ^96 reads %1 %6 dreads %0 @src 4 196 208 7 3
+eq 4 ^101 reads %10 %12 @src 5 224 237 7 3
+eq 5 ^104 reads %7 %10 @src 5 241 248 8 3
+eq 6 ^109 reads %8 %9 %11 @src 1 407 420 10 3
+eq 7 ^112 reads %14 %16 @src 6 912 926 17 6
+eq 8 ^123 reads %16 %17 %18 %19 %20 @src 7 724 767 17 3
+eq 9 ^128 reads %7 %8 %20 @src 7 773 787 18 3
+eq 10 ^133 reads %7 %8 %15 @src 7 791 806 19 3
+eq 11 ^138 reads %24 %26 @src 5 224 237 7 3
+eq 12 ^141 reads %21 %24 @src 5 241 248 8 3
+eq 13 ^146 reads %22 %23 %25 @src 1 407 420 10 3
+eq 14 ^149 reads %28 %30 @src 6 912 926 17 6
+eq 15 ^160 reads %30 %31 %32 %33 %34 @src 8 738 781 16 3
+eq 16 ^165 reads %21 %22 %34 @src 8 787 801 17 3
+eq 17 ^170 reads %21 %22 %29 @src 8 805 820 18 3
+eq 18 ^175 reads %38 %40 @src 5 224 237 7 3
+eq 19 ^178 reads %35 %38 @src 5 241 248 8 3
+eq 20 ^183 reads %36 %37 %39 @src 1 407 420 10 3
+eq 21 ^188 reads %35 %41 dreads %36 @src 9 200 212 7 3
+eq 22 ^193 reads %45 %47 @src 5 224 237 7 3
+eq 23 ^196 reads %42 %45 @src 5 241 248 8 3
+eq 24 ^201 reads %43 %44 %46 @src 1 407 420 10 3
+eq 25 ^206 reads %42 %48 dreads %43 @src 9 200 212 7 3
+eq 26 ^211 reads %52 %54 @src 5 224 237 7 3
+eq 27 ^214 reads %49 %52 @src 5 241 248 8 3
+eq 28 ^219 reads %50 %51 %53 @src 1 407 420 10 3
+eq 29 ^251 reads %49 %50 %55 %56 %57 @src 11 329 427 9 3
+eq 30 ^254 reads %58 @src 12 222 229 9 3
+eq 31 ^257 reads %5 %10 @gen flow_balance_equation 0 1451 1452 33 11
+eq 32 ^262 reads %3 %24 %45 @gen flow_balance_equation 0 1518 1520 34 11
+eq 33 ^267 reads %26 %38 %52 @gen flow_balance_equation 0 1723 1724 38 11
+eq 34 ^276 reads %12 %40 %47 %54 %59 @gen flow_balance_equation 0 1931 1933 42 11
+eq 35 ^279 reads %4 %9 @gen connection_equation 0 1451 1452 33 11
+eq 36 ^282 reads %23 %44 @gen connection_equation 0 1518 1520 34 11
+eq 37 ^285 reads %2 %23 @gen connection_equation 0 1518 1520 34 11
+eq 38 ^288 reads %25 %51 @gen connection_equation 0 1723 1724 38 11
+eq 39 ^291 reads %37 %51 @gen connection_equation 0 1723 1724 38 11
+eq 40 ^294 reads %11 %58 @gen connection_equation 0 1931 1933 42 11
+eq 41 ^297 reads %46 %58 @gen connection_equation 0 1931 1933 42 11
+eq 42 ^300 reads %39 %46 @gen connection_equation 0 1931 1933 42 11
+eq 43 ^303 reads %39 %53 @gen connection_equation 0 1931 1933 42 11
+
+; relations
+rel 0 ^224 @src 11 337 344 9 11
+rel 1 ^236 @src 11 380 386 9 54
+rel 2 ^312 @src 7 619 676 15 11
+rel 3 ^322 @src 8 633 690 14 11
+
+; conditions
+cond 0 rel 0 @src 11 337 344 9 11
+cond 1 rel 1 @src 11 380 386 9 54
+cond 2 rel 2 @src 7 619 676 15 11
+cond 3 not 2 @gen condition_lowering 7 611 720 15 3
+cond 4 always @gen condition_lowering 7 611 720 15 3
+cond 5 rel 3 @src 8 633 690 14 11
+cond 6 not 5 @gen condition_lowering 8 625 734 14 3
+cond 7 always @gen condition_lowering 8 625 734 14 3
+
+; roots
+root 0 rel 0 act 0 @src 11 337 344 9 11
+root 1 rel 1 act 1 @src 11 380 386 9 54
+root 2 rel 2 act 2 @gen condition_lowering 7 619 676 15 11
+root 3 rel 3 act 5 @gen condition_lowering 8 633 690 14 11
+
+; events
+event 0 trig 4 guard 3 assert ^313 @src 7 611 720 15 3
+event 1 trig 7 guard 6 assert ^323 @src 8 625 734 14 3
+
+; connections
+conn 0 %4 %9 potential "L.n" "Ro.p" eq 35 @gen connection_equation 0 1451 1452 33 11
+conn 1 %44 %23 potential "C2.p" "G.p" eq 36 @gen connection_equation 0 1518 1520 34 11
+conn 2 %23 %2 potential "G.p" "L.p" eq 37 @gen connection_equation 0 1518 1520 34 11
+conn 3 %25 %51 potential "G.n" "Nr.p" eq 38 @gen connection_equation 0 1723 1724 38 11
+conn 4 %51 %37 potential "Nr.p" "C1.p" eq 39 @gen connection_equation 0 1723 1724 38 11
+conn 5 %11 %58 potential "Ro.n" "Gnd.p" eq 40 @gen connection_equation 0 1931 1933 42 11
+conn 6 %58 %46 potential "Gnd.p" "C2.n" eq 41 @gen connection_equation 0 1931 1933 42 11
+conn 7 %46 %39 potential "C2.n" "C1.n" eq 42 @gen connection_equation 0 1931 1933 42 11
+conn 8 %39 %53 potential "C1.n" "Nr.n" eq 43 @gen connection_equation 0 1931 1933 42 11

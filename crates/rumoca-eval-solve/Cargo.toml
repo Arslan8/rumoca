@@ -13,8 +13,9 @@ rumoca-core = { workspace = true }
 rumoca-ir-solve = { workspace = true }
 tracing = { workspace = true }
 
-[dev-dependencies]
 serde_json = { workspace = true }
+
+[dev-dependencies]
 # SPEC_0039 / SOLVE-C17: pattern fixtures are a test-only surface. Declaring
 # the feature here and nowhere else keeps it out of every production build of
 # this crate.

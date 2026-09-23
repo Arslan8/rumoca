@@ -1,0 +1,2494 @@
+{
+  "method": "source-instantiated paired OpenModelica physical-witness execution",
+  "msl_version": "4.1.0",
+  "omc_version": "OpenModelica 1.27.0~dev.beta.2",
+  "candidate_report_count": 177,
+  "report_counts": {
+    "witness-admitted-with-warning": 10,
+    "witness-causes-omc-numerical-failure": 2,
+    "witness-executes-cleanly": 70,
+    "unresolved-baseline-fails": 5,
+    "refuted-illegal-witness": 90
+  },
+  "skipped": [],
+  "results": [
+    {
+      "case_key": "38608a7fd5bb1287",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.ControlCircuit",
+      "witness": "PIA.R1 = -1",
+      "wrapper": "model V2OMC_38608a7fd5bb1287\n  extends Modelica.Electrical.Analog.Examples.OpAmps.ControlCircuit(PIA.R1=-1);\nend V2OMC_38608a7fd5bb1287;",
+      "report_ids": [
+        "FINDING-00800"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac4. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\").",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/PI.mo:9:3-9:72:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac16. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\")."
+    },
+    {
+      "case_key": "dcb14edc8af1ff8e",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.ControlCircuit",
+      "witness": "firstOrder1A.R2 = -1",
+      "wrapper": "model V2OMC_dcb14edc8af1ff8e\n  extends Modelica.Electrical.Analog.Examples.OpAmps.ControlCircuit(firstOrder1A.R2=-1);\nend V2OMC_dcb14edc8af1ff8e;",
+      "report_ids": [
+        "FINDING-00805"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac4. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\").",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/FirstOrder.mo:9:3-9:70:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac28. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\")."
+    },
+    {
+      "case_key": "88f6540ed2439a60",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.ControlCircuit",
+      "witness": "firstOrder2A.R2 = -1",
+      "wrapper": "model V2OMC_88f6540ed2439a60\n  extends Modelica.Electrical.Analog.Examples.OpAmps.ControlCircuit(firstOrder2A.R2=-1);\nend V2OMC_88f6540ed2439a60;",
+      "report_ids": [
+        "FINDING-00812"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac4. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\").",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/FirstOrder.mo:9:3-9:70:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac40. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\")."
+    },
+    {
+      "case_key": "4c3e7a8dcaab51f4",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.Differentiator",
+      "witness": "der_.R = -1",
+      "wrapper": "model V2OMC_4c3e7a8dcaab51f4\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Differentiator(der_.R=-1);\nend V2OMC_4c3e7a8dcaab51f4;",
+      "report_ids": [
+        "FINDING-00842"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Der.mo:8:3-8:100:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "8dc344a745450e1b",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.HighPass",
+      "witness": "derivative.R1 = -1",
+      "wrapper": "model V2OMC_8dc344a745450e1b\n  extends Modelica.Electrical.Analog.Examples.OpAmps.HighPass(derivative.R1=-1);\nend V2OMC_8dc344a745450e1b;",
+      "report_ids": [
+        "FINDING-00858"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Derivative.mo:9:3-9:70:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "215792351acefb0a",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.Integrator",
+      "witness": "integrator.R = -1",
+      "wrapper": "model V2OMC_215792351acefb0a\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Integrator(integrator.R=-1);\nend V2OMC_215792351acefb0a;",
+      "report_ids": [
+        "FINDING-00876"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac0. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\").",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Integrator.mo:8:3-8:102:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac2. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\")."
+    },
+    {
+      "case_key": "d3ecbbf0da84a9c1",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator",
+      "witness": "C = 0",
+      "wrapper": "model V2OMC_d3ecbbf0da84a9c1\n  extends Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator(C=0);\nend V2OMC_d3ecbbf0da84a9c1;",
+      "report_ids": [
+        "FINDING-00925"
+      ],
+      "outcome": "witness-causes-omc-numerical-failure",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Simulation execution failed for model: V2OMC_d3ecbbf0da84a9c1\nLOG_ASSERT        | debug   | division by zero at time 0, (a=-0.0009999999999998899) / (b=0), where divisor b expression is: C * R\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization"
+    },
+    {
+      "case_key": "862c6a2959e53cbc",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator",
+      "witness": "L = -1",
+      "wrapper": "model V2OMC_862c6a2959e53cbc\n  extends Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator(L=-1);\nend V2OMC_862c6a2959e53cbc;",
+      "report_ids": [
+        "FINDING-00924"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/LCOscillator.mo:9:3-9:92:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "6985140b84a5b6e1",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator",
+      "witness": "R = -1",
+      "wrapper": "model V2OMC_6985140b84a5b6e1\n  extends Modelica.Electrical.Analog.Examples.OpAmps.LCOscillator(R=-1);\nend V2OMC_6985140b84a5b6e1;",
+      "report_ids": [
+        "FINDING-00926"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "6f3c12d08604b321",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.LowPass",
+      "witness": "firstOrder.R2 = -1",
+      "wrapper": "model V2OMC_6f3c12d08604b321\n  extends Modelica.Electrical.Analog.Examples.OpAmps.LowPass(firstOrder.R2=-1);\nend V2OMC_6f3c12d08604b321;",
+      "report_ids": [
+        "FINDING-00937"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac0. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\").",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/FirstOrder.mo:9:3-9:70:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\"Warning: There are nonlinear iteration variables with default zero start attribute found in NLSJac2. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\")."
+    },
+    {
+      "case_key": "f2e0a244f5c365b1",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.Multivibrator",
+      "witness": "R = -1",
+      "wrapper": "model V2OMC_f2e0a244f5c365b1\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Multivibrator(R=-1);\nend V2OMC_f2e0a244f5c365b1;",
+      "report_ids": [
+        "FINDING-00956"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully with 3 homotopy steps.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/Multivibrator.mo:10:3-10:114:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully with 3 homotopy steps.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "e314accee8cd1a05",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.Multivibrator",
+      "witness": "R1 = -1",
+      "wrapper": "model V2OMC_e314accee8cd1a05\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Multivibrator(R1=-1);\nend V2OMC_e314accee8cd1a05;",
+      "report_ids": [
+        "FINDING-00954"
+      ],
+      "outcome": "witness-admitted-with-warning",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully with 3 homotopy steps.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/Multivibrator.mo:10:3-10:114:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | warning | [/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Basic/Capacitor.mo:4:3-4:52:writable]\n|                 | |       | The following assertion has been violated at time 0.000000\nLOG_SUCCESS       | info    | The initialization finished successfully with 3 homotopy steps.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "b1af837395b7ee56",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.Multivibrator",
+      "witness": "R2 = -1",
+      "wrapper": "model V2OMC_b1af837395b7ee56\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Multivibrator(R2=-1);\nend V2OMC_b1af837395b7ee56;",
+      "report_ids": [
+        "FINDING-00955"
+      ],
+      "outcome": "witness-causes-omc-numerical-failure",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully with 3 homotopy steps.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Simulation execution failed for model: V2OMC_b1af837395b7ee56\nLOG_ASSERT        | warning | The following assertion has been violated at time 0.000000\nLOG_ASSERT        | debug   | Model error: Argument of log(1.0 + 2.0 * R1 / R2) was -1999 should be > 0\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization"
+    },
+    {
+      "case_key": "25dd59ba38f585c4",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Der",
+      "witness": "R = -1",
+      "wrapper": "model V2OMC_25dd59ba38f585c4\n  extends Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Der(R=-1);\nend V2OMC_25dd59ba38f585c4;",
+      "report_ids": [
+        "FINDING-00993"
+      ],
+      "outcome": "unresolved-baseline-fails",
+      "baseline": "failed",
+      "baseline_diagnostic": "messages = \"Failed to build model: Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Der\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Der.mo:6:3-6:39:writable] Error: Parameter f has neither value nor start value, and is fixed during initialization (fixed=true).",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_25dd59ba38f585c4\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Der.mo:6:3-6:39:writable] Error: Parameter f has neither value nor start value, and is fixed during initialization (fixed=true)."
+    },
+    {
+      "case_key": "7c2a1e420cfe1d43",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Derivative",
+      "witness": "R1 = -1",
+      "wrapper": "model V2OMC_7c2a1e420cfe1d43\n  extends Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Derivative(R1=-1);\nend V2OMC_7c2a1e420cfe1d43;",
+      "report_ids": [
+        "FINDING-00986"
+      ],
+      "outcome": "unresolved-baseline-fails",
+      "baseline": "failed",
+      "baseline_diagnostic": "messages = \"Failed to build model: Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Derivative\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Derivative.mo:8:3-8:38:writable] Error: Parameter T has neither value nor start value, and is fixed during initialization (fixed=true).",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_7c2a1e420cfe1d43\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Derivative.mo:8:3-8:38:writable] Error: Parameter T has neither value nor start value, and is fixed during initialization (fixed=true)."
+    },
+    {
+      "case_key": "8ebe4ce4784b3751",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.FirstOrder",
+      "witness": "R2 = -1",
+      "wrapper": "model V2OMC_8ebe4ce4784b3751\n  extends Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.FirstOrder(R2=-1);\nend V2OMC_8ebe4ce4784b3751;",
+      "report_ids": [
+        "FINDING-01003"
+      ],
+      "outcome": "unresolved-baseline-fails",
+      "baseline": "failed",
+      "baseline_diagnostic": "messages = \"Failed to build model: Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.FirstOrder\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/FirstOrder.mo:8:3-8:38:writable] Error: Parameter T has neither value nor start value, and is fixed during initialization (fixed=true).",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_8ebe4ce4784b3751\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/FirstOrder.mo:8:3-8:38:writable] Error: Parameter T has neither value nor start value, and is fixed during initialization (fixed=true)."
+    },
+    {
+      "case_key": "eafd0b64e353d137",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Integrator",
+      "witness": "R = -1",
+      "wrapper": "model V2OMC_eafd0b64e353d137\n  extends Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Integrator(R=-1);\nend V2OMC_eafd0b64e353d137;",
+      "report_ids": [
+        "FINDING-01012"
+      ],
+      "outcome": "unresolved-baseline-fails",
+      "baseline": "failed",
+      "baseline_diagnostic": "messages = \"Failed to build model: Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Integrator\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Integrator.mo:6:3-6:39:writable] Error: Parameter f has neither value nor start value, and is fixed during initialization (fixed=true).",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_eafd0b64e353d137\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/Integrator.mo:6:3-6:39:writable] Error: Parameter f has neither value nor start value, and is fixed during initialization (fixed=true)."
+    },
+    {
+      "case_key": "ababedb2f599bbf1",
+      "model": "Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.PI",
+      "witness": "R1 = -1",
+      "wrapper": "model V2OMC_ababedb2f599bbf1\n  extends Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.PI(R1=-1);\nend V2OMC_ababedb2f599bbf1;",
+      "report_ids": [
+        "FINDING-01020"
+      ],
+      "outcome": "unresolved-baseline-fails",
+      "baseline": "failed",
+      "baseline_diagnostic": "messages = \"Failed to build model: Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.PI\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/PI.mo:8:3-8:38:writable] Error: Parameter T has neither value nor start value, and is fixed during initialization (fixed=true).",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_ababedb2f599bbf1\",\n\"[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/OpAmps/OpAmpCircuits/PI.mo:8:3-8:38:writable] Error: Parameter T has neither value nor start value, and is fixed during initialization (fixed=true)."
+    },
+    {
+      "case_key": "df5990ab4866bbcc",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "cooling.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_df5990ab4866bbcc\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(cooling.flowPort_a.medium.rho=0);\nend V2OMC_df5990ab4866bbcc;",
+      "report_ids": [
+        "FINDING-01412"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_df5990ab4866bbcc\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "d77865f1fc963d8f",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "cooling.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_d77865f1fc963d8f\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(cooling.flowPort_b.medium.rho=0);\nend V2OMC_d77865f1fc963d8f;",
+      "report_ids": [
+        "FINDING-01413"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_d77865f1fc963d8f\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "6e1a7819bf56cc11",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "cooling.medium.rho = 0",
+      "wrapper": "model V2OMC_6e1a7819bf56cc11\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(cooling.medium.rho=0);\nend V2OMC_6e1a7819bf56cc11;",
+      "report_ids": [
+        "FINDING-01410"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "8ae004063d88716c",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "inlet.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_8ae004063d88716c\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(inlet.flowPort.medium.rho=0);\nend V2OMC_8ae004063d88716c;",
+      "report_ids": [
+        "FINDING-01405"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_8ae004063d88716c\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "5d3b2ce9b2add9fa",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "inlet.medium.rho = 0",
+      "wrapper": "model V2OMC_5d3b2ce9b2add9fa\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(inlet.medium.rho=0);\nend V2OMC_5d3b2ce9b2add9fa;",
+      "report_ids": [
+        "FINDING-01404"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "a582b67029215ce3",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "outlet.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_a582b67029215ce3\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(outlet.flowPort.medium.rho=0);\nend V2OMC_a582b67029215ce3;",
+      "report_ids": [
+        "FINDING-01415"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_a582b67029215ce3\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "624c6939c8a4e028",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "outlet.medium.rho = 0",
+      "wrapper": "model V2OMC_624c6939c8a4e028\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(outlet.medium.rho=0);\nend V2OMC_624c6939c8a4e028;",
+      "report_ids": [
+        "FINDING-01414"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "382ce9df9375f984",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "volumeFlow.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_382ce9df9375f984\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(volumeFlow.flowPort_a.medium.rho=0);\nend V2OMC_382ce9df9375f984;",
+      "report_ids": [
+        "FINDING-01408"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_382ce9df9375f984\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2e095b94ce8d3d26",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "volumeFlow.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_2e095b94ce8d3d26\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(volumeFlow.flowPort_b.medium.rho=0);\nend V2OMC_2e095b94ce8d3d26;",
+      "report_ids": [
+        "FINDING-01409"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_2e095b94ce8d3d26\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "4589f03833005ff3",
+      "model": "Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling",
+      "witness": "volumeFlow.medium.rho = 0",
+      "wrapper": "model V2OMC_4589f03833005ff3\n  extends Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling(volumeFlow.medium.rho=0);\nend V2OMC_4589f03833005ff3;",
+      "report_ids": [
+        "FINDING-01406"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "abadc27e744f84c9",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "absolutePressure.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_abadc27e744f84c9\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(absolutePressure.flowPort.medium.rho=0);\nend V2OMC_abadc27e744f84c9;",
+      "report_ids": [
+        "FINDING-04773"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_abadc27e744f84c9\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "d614630ccc629678",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "absolutePressure.medium.rho = 0",
+      "wrapper": "model V2OMC_d614630ccc629678\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(absolutePressure.medium.rho=0);\nend V2OMC_d614630ccc629678;",
+      "report_ids": [
+        "FINDING-04772"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "ae03f2250ee3bc0d",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_ae03f2250ee3bc0d\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(ambient1.flowPort.medium.rho=0);\nend V2OMC_ae03f2250ee3bc0d;",
+      "report_ids": [
+        "FINDING-04759"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_ae03f2250ee3bc0d\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2b89d46e4f609701",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_2b89d46e4f609701\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(ambient1.medium.rho=0);\nend V2OMC_2b89d46e4f609701;",
+      "report_ids": [
+        "FINDING-04758"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "050a68a2ea5328f9",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_050a68a2ea5328f9\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(ambient2.flowPort.medium.rho=0);\nend V2OMC_050a68a2ea5328f9;",
+      "report_ids": [
+        "FINDING-04765"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_050a68a2ea5328f9\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "c2924b5a01224bfc",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_c2924b5a01224bfc\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(ambient2.medium.rho=0);\nend V2OMC_c2924b5a01224bfc;",
+      "report_ids": [
+        "FINDING-04764"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "74b9eea0145f69e5",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "innerMedium.rho = 0",
+      "wrapper": "model V2OMC_74b9eea0145f69e5\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(innerMedium.rho=0);\nend V2OMC_74b9eea0145f69e5;",
+      "report_ids": [
+        "FINDING-04757"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "f508e5fd754b02e2",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "innerPipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_f508e5fd754b02e2\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(innerPipe.flowPort_a.medium.rho=0);\nend V2OMC_f508e5fd754b02e2;",
+      "report_ids": [
+        "FINDING-04784"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_f508e5fd754b02e2\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2deab66f5b2c1dbc",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "innerPipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_2deab66f5b2c1dbc\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(innerPipe.flowPort_b.medium.rho=0);\nend V2OMC_2deab66f5b2c1dbc;",
+      "report_ids": [
+        "FINDING-04785"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_2deab66f5b2c1dbc\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2670e14fd7db1830",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "innerPipe.medium.rho = 0",
+      "wrapper": "model V2OMC_2670e14fd7db1830\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(innerPipe.medium.rho=0);\nend V2OMC_2670e14fd7db1830;",
+      "report_ids": [
+        "FINDING-04782"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "3d2636dc7d050a48",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "innerPump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_3d2636dc7d050a48\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(innerPump.flowPort_a.medium.rho=0);\nend V2OMC_3d2636dc7d050a48;",
+      "report_ids": [
+        "FINDING-04776"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_3d2636dc7d050a48\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "1f59ceb162546033",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "innerPump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_1f59ceb162546033\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(innerPump.flowPort_b.medium.rho=0);\nend V2OMC_1f59ceb162546033;",
+      "report_ids": [
+        "FINDING-04777"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_1f59ceb162546033\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "d9e50b12f89e55f0",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "innerPump.medium.rho = 0",
+      "wrapper": "model V2OMC_d9e50b12f89e55f0\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(innerPump.medium.rho=0);\nend V2OMC_d9e50b12f89e55f0;",
+      "report_ids": [
+        "FINDING-04774"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "b75e6d6571e2d0cf",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "outerMedium.rho = 0",
+      "wrapper": "model V2OMC_b75e6d6571e2d0cf\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(outerMedium.rho=0);\nend V2OMC_b75e6d6571e2d0cf;",
+      "report_ids": [
+        "FINDING-04756"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "8db7e0211bd43996",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "outerPipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_8db7e0211bd43996\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(outerPipe.flowPort_a.medium.rho=0);\nend V2OMC_8db7e0211bd43996;",
+      "report_ids": [
+        "FINDING-04780"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_8db7e0211bd43996\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "f40a8812e73c192f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "outerPipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_f40a8812e73c192f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(outerPipe.flowPort_b.medium.rho=0);\nend V2OMC_f40a8812e73c192f;",
+      "report_ids": [
+        "FINDING-04781"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_f40a8812e73c192f\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "3b40624dce3a9c57",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "outerPipe.medium.rho = 0",
+      "wrapper": "model V2OMC_3b40624dce3a9c57\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(outerPipe.medium.rho=0);\nend V2OMC_3b40624dce3a9c57;",
+      "report_ids": [
+        "FINDING-04778"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "d6040099d3ea3b55",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "outerPump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_d6040099d3ea3b55\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(outerPump.flowPort_a.medium.rho=0);\nend V2OMC_d6040099d3ea3b55;",
+      "report_ids": [
+        "FINDING-04762"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_d6040099d3ea3b55\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "ca847061727ac928",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "outerPump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_ca847061727ac928\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(outerPump.flowPort_b.medium.rho=0);\nend V2OMC_ca847061727ac928;",
+      "report_ids": [
+        "FINDING-04763"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_ca847061727ac928\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "d984176b589067f7",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "outerPump.medium.rho = 0",
+      "wrapper": "model V2OMC_d984176b589067f7\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(outerPump.medium.rho=0);\nend V2OMC_d984176b589067f7;",
+      "report_ids": [
+        "FINDING-04760"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "28db390c6e8153ad",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "pipe1.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_28db390c6e8153ad\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(pipe1.flowPort_a.medium.rho=0);\nend V2OMC_28db390c6e8153ad;",
+      "report_ids": [
+        "FINDING-04770"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_28db390c6e8153ad\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "ce7e86f4a011bac3",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "pipe1.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_ce7e86f4a011bac3\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(pipe1.flowPort_b.medium.rho=0);\nend V2OMC_ce7e86f4a011bac3;",
+      "report_ids": [
+        "FINDING-04771"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_ce7e86f4a011bac3\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "74220f6319e7c9e7",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling",
+      "witness": "pipe1.medium.rho = 0",
+      "wrapper": "model V2OMC_74220f6319e7c9e7\n  extends Modelica.Thermal.FluidHeatFlow.Examples.IndirectCooling(pipe1.medium.rho=0);\nend V2OMC_74220f6319e7c9e7;",
+      "report_ids": [
+        "FINDING-04768"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "24e6d133aa54ba28",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_24e6d133aa54ba28\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(ambient1.flowPort.medium.rho=0);\nend V2OMC_24e6d133aa54ba28;",
+      "report_ids": [
+        "FINDING-04812"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_24e6d133aa54ba28\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "168f69cd69dd8fac",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_168f69cd69dd8fac\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(ambient1.medium.rho=0);\nend V2OMC_168f69cd69dd8fac;",
+      "report_ids": [
+        "FINDING-04811"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "0600174c6e8495b2",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_0600174c6e8495b2\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(ambient2.flowPort.medium.rho=0);\nend V2OMC_0600174c6e8495b2;",
+      "report_ids": [
+        "FINDING-04822"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_0600174c6e8495b2\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "05616ccac8e8b122",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_05616ccac8e8b122\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(ambient2.medium.rho=0);\nend V2OMC_05616ccac8e8b122;",
+      "report_ids": [
+        "FINDING-04821"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "55a21f16b37dd25f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "medium.rho = 0",
+      "wrapper": "model V2OMC_55a21f16b37dd25f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(medium.rho=0);\nend V2OMC_55a21f16b37dd25f;",
+      "report_ids": [
+        "FINDING-04810"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "9d733724c33b570f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "pipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_9d733724c33b570f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(pipe.flowPort_a.medium.rho=0);\nend V2OMC_9d733724c33b570f;",
+      "report_ids": [
+        "FINDING-04819"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_9d733724c33b570f\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "1f42c713317297ea",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "pipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_1f42c713317297ea\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(pipe.flowPort_b.medium.rho=0);\nend V2OMC_1f42c713317297ea;",
+      "report_ids": [
+        "FINDING-04820"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_1f42c713317297ea\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "578afa33134d37c3",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "pipe.medium.rho = 0",
+      "wrapper": "model V2OMC_578afa33134d37c3\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(pipe.medium.rho=0);\nend V2OMC_578afa33134d37c3;",
+      "report_ids": [
+        "FINDING-04817"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "c2c7ef23e505a1d6",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "pump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_c2c7ef23e505a1d6\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(pump.flowPort_a.medium.rho=0);\nend V2OMC_c2c7ef23e505a1d6;",
+      "report_ids": [
+        "FINDING-04815"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_c2c7ef23e505a1d6\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "fe5bbd3c38bd0426",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "pump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_fe5bbd3c38bd0426\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(pump.flowPort_b.medium.rho=0);\nend V2OMC_fe5bbd3c38bd0426;",
+      "report_ids": [
+        "FINDING-04816"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_fe5bbd3c38bd0426\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "1da9a473959f128f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.OneMass",
+      "witness": "pump.medium.rho = 0",
+      "wrapper": "model V2OMC_1da9a473959f128f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.OneMass(pump.medium.rho=0);\nend V2OMC_1da9a473959f128f;",
+      "report_ids": [
+        "FINDING-04813"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "84a34aa5ae497ef2",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_84a34aa5ae497ef2\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(ambient1.flowPort.medium.rho=0);\nend V2OMC_84a34aa5ae497ef2;",
+      "report_ids": [
+        "FINDING-04840"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_84a34aa5ae497ef2\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "007cd6efac556081",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_007cd6efac556081\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(ambient1.medium.rho=0);\nend V2OMC_007cd6efac556081;",
+      "report_ids": [
+        "FINDING-04839"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "35d7448ef93d3548",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_35d7448ef93d3548\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(ambient2.flowPort.medium.rho=0);\nend V2OMC_35d7448ef93d3548;",
+      "report_ids": [
+        "FINDING-04858"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_35d7448ef93d3548\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "7fa2de680527584f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_7fa2de680527584f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(ambient2.medium.rho=0);\nend V2OMC_7fa2de680527584f;",
+      "report_ids": [
+        "FINDING-04857"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "770f4e47f182f2ed",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "medium.rho = 0",
+      "wrapper": "model V2OMC_770f4e47f182f2ed\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(medium.rho=0);\nend V2OMC_770f4e47f182f2ed;",
+      "report_ids": [
+        "FINDING-04838"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "8035b5a6889a6ab0",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe1.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_8035b5a6889a6ab0\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe1.flowPort_a.medium.rho=0);\nend V2OMC_8035b5a6889a6ab0;",
+      "report_ids": [
+        "FINDING-04847"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_8035b5a6889a6ab0\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "e64785edddc869c9",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe1.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_e64785edddc869c9\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe1.flowPort_b.medium.rho=0);\nend V2OMC_e64785edddc869c9;",
+      "report_ids": [
+        "FINDING-04848"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_e64785edddc869c9\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "79d7d0e296ddf25f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe1.medium.rho = 0",
+      "wrapper": "model V2OMC_79d7d0e296ddf25f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe1.medium.rho=0);\nend V2OMC_79d7d0e296ddf25f;",
+      "report_ids": [
+        "FINDING-04845"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "9a1b198ae3d502c9",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe2.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_9a1b198ae3d502c9\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe2.flowPort_a.medium.rho=0);\nend V2OMC_9a1b198ae3d502c9;",
+      "report_ids": [
+        "FINDING-04851"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_9a1b198ae3d502c9\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "30f8cf28a4abbb61",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe2.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_30f8cf28a4abbb61\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe2.flowPort_b.medium.rho=0);\nend V2OMC_30f8cf28a4abbb61;",
+      "report_ids": [
+        "FINDING-04852"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_30f8cf28a4abbb61\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "bceea7e026d3a462",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe2.medium.rho = 0",
+      "wrapper": "model V2OMC_bceea7e026d3a462\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe2.medium.rho=0);\nend V2OMC_bceea7e026d3a462;",
+      "report_ids": [
+        "FINDING-04849"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "2dd729912745e40f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe3.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_2dd729912745e40f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe3.flowPort_a.medium.rho=0);\nend V2OMC_2dd729912745e40f;",
+      "report_ids": [
+        "FINDING-04855"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_2dd729912745e40f\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "c2028ed443131771",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe3.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_c2028ed443131771\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe3.flowPort_b.medium.rho=0);\nend V2OMC_c2028ed443131771;",
+      "report_ids": [
+        "FINDING-04856"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_c2028ed443131771\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "64867456cf3b7025",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pipe3.medium.rho = 0",
+      "wrapper": "model V2OMC_64867456cf3b7025\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pipe3.medium.rho=0);\nend V2OMC_64867456cf3b7025;",
+      "report_ids": [
+        "FINDING-04853"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "a4949dc9ca2ac34a",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_a4949dc9ca2ac34a\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pump.flowPort_a.medium.rho=0);\nend V2OMC_a4949dc9ca2ac34a;",
+      "report_ids": [
+        "FINDING-04843"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_a4949dc9ca2ac34a\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "d68d93f07e77a172",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_d68d93f07e77a172\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pump.flowPort_b.medium.rho=0);\nend V2OMC_d68d93f07e77a172;",
+      "report_ids": [
+        "FINDING-04844"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_d68d93f07e77a172\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "e0f99dcef100e1bf",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling",
+      "witness": "pump.medium.rho = 0",
+      "wrapper": "model V2OMC_e0f99dcef100e1bf\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelCooling(pump.medium.rho=0);\nend V2OMC_e0f99dcef100e1bf;",
+      "report_ids": [
+        "FINDING-04841"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "f2b8e51527950531",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_f2b8e51527950531\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(ambient1.flowPort.medium.rho=0);\nend V2OMC_f2b8e51527950531;",
+      "report_ids": [
+        "FINDING-04882"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_f2b8e51527950531\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "0a366d1119e5cdda",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_0a366d1119e5cdda\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(ambient1.medium.rho=0);\nend V2OMC_0a366d1119e5cdda;",
+      "report_ids": [
+        "FINDING-04881"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "89b45b955a07a8be",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_89b45b955a07a8be\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(ambient2.flowPort.medium.rho=0);\nend V2OMC_89b45b955a07a8be;",
+      "report_ids": [
+        "FINDING-04900"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_89b45b955a07a8be\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "63ca2a5a32bad417",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_63ca2a5a32bad417\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(ambient2.medium.rho=0);\nend V2OMC_63ca2a5a32bad417;",
+      "report_ids": [
+        "FINDING-04899"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "58b4f165d74480dc",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "medium.rho = 0",
+      "wrapper": "model V2OMC_58b4f165d74480dc\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(medium.rho=0);\nend V2OMC_58b4f165d74480dc;",
+      "report_ids": [
+        "FINDING-04880"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "80b8ef0043f356e3",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe1.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_80b8ef0043f356e3\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe1.flowPort_a.medium.rho=0);\nend V2OMC_80b8ef0043f356e3;",
+      "report_ids": [
+        "FINDING-04889"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_80b8ef0043f356e3\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "661663722a212ffa",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe1.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_661663722a212ffa\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe1.flowPort_b.medium.rho=0);\nend V2OMC_661663722a212ffa;",
+      "report_ids": [
+        "FINDING-04890"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_661663722a212ffa\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "798d57fe93b5a05a",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe1.medium.rho = 0",
+      "wrapper": "model V2OMC_798d57fe93b5a05a\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe1.medium.rho=0);\nend V2OMC_798d57fe93b5a05a;",
+      "report_ids": [
+        "FINDING-04887"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "78c5ed3371b51115",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe2.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_78c5ed3371b51115\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe2.flowPort_a.medium.rho=0);\nend V2OMC_78c5ed3371b51115;",
+      "report_ids": [
+        "FINDING-04893"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_78c5ed3371b51115\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "58a1386f215f166f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe2.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_58a1386f215f166f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe2.flowPort_b.medium.rho=0);\nend V2OMC_58a1386f215f166f;",
+      "report_ids": [
+        "FINDING-04894"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_58a1386f215f166f\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "c735a46abb5f6b94",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe2.medium.rho = 0",
+      "wrapper": "model V2OMC_c735a46abb5f6b94\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe2.medium.rho=0);\nend V2OMC_c735a46abb5f6b94;",
+      "report_ids": [
+        "FINDING-04891"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "2ea28facafb39b14",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe3.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_2ea28facafb39b14\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe3.flowPort_a.medium.rho=0);\nend V2OMC_2ea28facafb39b14;",
+      "report_ids": [
+        "FINDING-04897"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_2ea28facafb39b14\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "4fd5c676ab8389cc",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe3.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_4fd5c676ab8389cc\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe3.flowPort_b.medium.rho=0);\nend V2OMC_4fd5c676ab8389cc;",
+      "report_ids": [
+        "FINDING-04898"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_4fd5c676ab8389cc\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2efd0acf6e577cd0",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pipe3.medium.rho = 0",
+      "wrapper": "model V2OMC_2efd0acf6e577cd0\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pipe3.medium.rho=0);\nend V2OMC_2efd0acf6e577cd0;",
+      "report_ids": [
+        "FINDING-04895"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "03a249328034c0ef",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_03a249328034c0ef\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pump.flowPort_a.medium.rho=0);\nend V2OMC_03a249328034c0ef;",
+      "report_ids": [
+        "FINDING-04885"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_03a249328034c0ef\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "ebf0472a0b485eb0",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_ebf0472a0b485eb0\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pump.flowPort_b.medium.rho=0);\nend V2OMC_ebf0472a0b485eb0;",
+      "report_ids": [
+        "FINDING-04886"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_ebf0472a0b485eb0\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "57cf71d60f3ec189",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut",
+      "witness": "pump.medium.rho = 0",
+      "wrapper": "model V2OMC_57cf71d60f3ec189\n  extends Modelica.Thermal.FluidHeatFlow.Examples.ParallelPumpDropOut(pump.medium.rho=0);\nend V2OMC_57cf71d60f3ec189;",
+      "report_ids": [
+        "FINDING-04883"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "3598b1f16f0b7be4",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_3598b1f16f0b7be4\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(ambient1.flowPort.medium.rho=0);\nend V2OMC_3598b1f16f0b7be4;",
+      "report_ids": [
+        "FINDING-04926"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_3598b1f16f0b7be4\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2a39463b95d5c559",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_2a39463b95d5c559\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(ambient1.medium.rho=0);\nend V2OMC_2a39463b95d5c559;",
+      "report_ids": [
+        "FINDING-04925"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "419b7f1be2a47c0c",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_419b7f1be2a47c0c\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(ambient2.flowPort.medium.rho=0);\nend V2OMC_419b7f1be2a47c0c;",
+      "report_ids": [
+        "FINDING-04941"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_419b7f1be2a47c0c\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "d01062198417f6d5",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_d01062198417f6d5\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(ambient2.medium.rho=0);\nend V2OMC_d01062198417f6d5;",
+      "report_ids": [
+        "FINDING-04940"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "7dad126838edf414",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "idealPump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_7dad126838edf414\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(idealPump.flowPort_a.medium.rho=0);\nend V2OMC_7dad126838edf414;",
+      "report_ids": [
+        "FINDING-04929"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_7dad126838edf414\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "e53240db74f54ca0",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "idealPump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_e53240db74f54ca0\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(idealPump.flowPort_b.medium.rho=0);\nend V2OMC_e53240db74f54ca0;",
+      "report_ids": [
+        "FINDING-04930"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_e53240db74f54ca0\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "070375de03e435dc",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "idealPump.medium.rho = 0",
+      "wrapper": "model V2OMC_070375de03e435dc\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(idealPump.medium.rho=0);\nend V2OMC_070375de03e435dc;",
+      "report_ids": [
+        "FINDING-04927"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "69659ed463ef8615",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "medium.rho = 0",
+      "wrapper": "model V2OMC_69659ed463ef8615\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(medium.rho=0);\nend V2OMC_69659ed463ef8615;",
+      "report_ids": [
+        "FINDING-04924"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "8067200e41857f43",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "pipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_8067200e41857f43\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(pipe.flowPort_a.medium.rho=0);\nend V2OMC_8067200e41857f43;",
+      "report_ids": [
+        "FINDING-04938"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_8067200e41857f43\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "8b47a7f59523111d",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "pipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_8b47a7f59523111d\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(pipe.flowPort_b.medium.rho=0);\nend V2OMC_8b47a7f59523111d;",
+      "report_ids": [
+        "FINDING-04939"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_8b47a7f59523111d\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "66c3466cd3276579",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "pipe.medium.rho = 0",
+      "wrapper": "model V2OMC_66c3466cd3276579\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(pipe.medium.rho=0);\nend V2OMC_66c3466cd3276579;",
+      "report_ids": [
+        "FINDING-04936"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "41ad2f1b23755829",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "valve.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_41ad2f1b23755829\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(valve.flowPort_a.medium.rho=0);\nend V2OMC_41ad2f1b23755829;",
+      "report_ids": [
+        "FINDING-04933"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_41ad2f1b23755829\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "abe958c8fb7a2324",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "valve.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_abe958c8fb7a2324\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(valve.flowPort_b.medium.rho=0);\nend V2OMC_abe958c8fb7a2324;",
+      "report_ids": [
+        "FINDING-04934"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_abe958c8fb7a2324\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "b200309990e09e09",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve",
+      "witness": "valve.medium.rho = 0",
+      "wrapper": "model V2OMC_b200309990e09e09\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpAndValve(valve.medium.rho=0);\nend V2OMC_b200309990e09e09;",
+      "report_ids": [
+        "FINDING-04931"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "a18b7a87129420be",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_a18b7a87129420be\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(ambient1.flowPort.medium.rho=0);\nend V2OMC_a18b7a87129420be;",
+      "report_ids": [
+        "FINDING-04970"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_a18b7a87129420be\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "1731873e320edd6b",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_1731873e320edd6b\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(ambient1.medium.rho=0);\nend V2OMC_1731873e320edd6b;",
+      "report_ids": [
+        "FINDING-04969"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "7158abfae7f70617",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_7158abfae7f70617\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(ambient2.flowPort.medium.rho=0);\nend V2OMC_7158abfae7f70617;",
+      "report_ids": [
+        "FINDING-04980"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_7158abfae7f70617\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "bcc688cd20db9be3",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_bcc688cd20db9be3\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(ambient2.medium.rho=0);\nend V2OMC_bcc688cd20db9be3;",
+      "report_ids": [
+        "FINDING-04979"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "ea3552c7516b9fcb",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "medium.rho = 0",
+      "wrapper": "model V2OMC_ea3552c7516b9fcb\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(medium.rho=0);\nend V2OMC_ea3552c7516b9fcb;",
+      "report_ids": [
+        "FINDING-04968"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "dc19ab6357a01d5e",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "pipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_dc19ab6357a01d5e\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(pipe.flowPort_a.medium.rho=0);\nend V2OMC_dc19ab6357a01d5e;",
+      "report_ids": [
+        "FINDING-04977"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_dc19ab6357a01d5e\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "05cead50e5387b42",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "pipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_05cead50e5387b42\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(pipe.flowPort_b.medium.rho=0);\nend V2OMC_05cead50e5387b42;",
+      "report_ids": [
+        "FINDING-04978"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_05cead50e5387b42\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "7d6498f60db8720b",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "pipe.medium.rho = 0",
+      "wrapper": "model V2OMC_7d6498f60db8720b\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(pipe.medium.rho=0);\nend V2OMC_7d6498f60db8720b;",
+      "report_ids": [
+        "FINDING-04975"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "1fe832e079e078c2",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "pump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_1fe832e079e078c2\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(pump.flowPort_a.medium.rho=0);\nend V2OMC_1fe832e079e078c2;",
+      "report_ids": [
+        "FINDING-04973"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_1fe832e079e078c2\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "b2848dfd71992366",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "pump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_b2848dfd71992366\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(pump.flowPort_b.medium.rho=0);\nend V2OMC_b2848dfd71992366;",
+      "report_ids": [
+        "FINDING-04974"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_b2848dfd71992366\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "53d26f6f2be5969f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut",
+      "witness": "pump.medium.rho = 0",
+      "wrapper": "model V2OMC_53d26f6f2be5969f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.PumpDropOut(pump.medium.rho=0);\nend V2OMC_53d26f6f2be5969f;",
+      "report_ids": [
+        "FINDING-04971"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "06c6ffd8e7a73da0",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_06c6ffd8e7a73da0\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(ambient1.flowPort.medium.rho=0);\nend V2OMC_06c6ffd8e7a73da0;",
+      "report_ids": [
+        "FINDING-04997"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_06c6ffd8e7a73da0\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "fee706fbcad21040",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_fee706fbcad21040\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(ambient1.medium.rho=0);\nend V2OMC_fee706fbcad21040;",
+      "report_ids": [
+        "FINDING-04996"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "0d0a7e85c0b18673",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_0d0a7e85c0b18673\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(ambient2.flowPort.medium.rho=0);\nend V2OMC_0d0a7e85c0b18673;",
+      "report_ids": [
+        "FINDING-05007"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_0d0a7e85c0b18673\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "abbe7a08433955e1",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_abbe7a08433955e1\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(ambient2.medium.rho=0);\nend V2OMC_abbe7a08433955e1;",
+      "report_ids": [
+        "FINDING-05006"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "ba9de46f518c2399",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "medium.rho = 0",
+      "wrapper": "model V2OMC_ba9de46f518c2399\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(medium.rho=0);\nend V2OMC_ba9de46f518c2399;",
+      "report_ids": [
+        "FINDING-04995"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "e6fb8bc17c391a0c",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "pipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_e6fb8bc17c391a0c\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(pipe.flowPort_a.medium.rho=0);\nend V2OMC_e6fb8bc17c391a0c;",
+      "report_ids": [
+        "FINDING-05004"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_e6fb8bc17c391a0c\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "3a97b78d3e99d0e6",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "pipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_3a97b78d3e99d0e6\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(pipe.flowPort_b.medium.rho=0);\nend V2OMC_3a97b78d3e99d0e6;",
+      "report_ids": [
+        "FINDING-05005"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_3a97b78d3e99d0e6\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "0e54e5a870e4283d",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "pipe.medium.rho = 0",
+      "wrapper": "model V2OMC_0e54e5a870e4283d\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(pipe.medium.rho=0);\nend V2OMC_0e54e5a870e4283d;",
+      "report_ids": [
+        "FINDING-05002"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "660d7cefc8b3661b",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "pump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_660d7cefc8b3661b\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(pump.flowPort_a.medium.rho=0);\nend V2OMC_660d7cefc8b3661b;",
+      "report_ids": [
+        "FINDING-05000"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_660d7cefc8b3661b\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2abb76bcdbfe0bec",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "pump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_2abb76bcdbfe0bec\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(pump.flowPort_b.medium.rho=0);\nend V2OMC_2abb76bcdbfe0bec;",
+      "report_ids": [
+        "FINDING-05001"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_2abb76bcdbfe0bec\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "f1d08172af11b1db",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling",
+      "witness": "pump.medium.rho = 0",
+      "wrapper": "model V2OMC_f1d08172af11b1db\n  extends Modelica.Thermal.FluidHeatFlow.Examples.SimpleCooling(pump.medium.rho=0);\nend V2OMC_f1d08172af11b1db;",
+      "report_ids": [
+        "FINDING-04998"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "b0aed83ac9a46f15",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_b0aed83ac9a46f15\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(ambient1.flowPort.medium.rho=0);\nend V2OMC_b0aed83ac9a46f15;",
+      "report_ids": [
+        "FINDING-05022"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_b0aed83ac9a46f15\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "287639b6faa7abbb",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_287639b6faa7abbb\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(ambient1.medium.rho=0);\nend V2OMC_287639b6faa7abbb;",
+      "report_ids": [
+        "FINDING-05021"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "66d6e6b44758ad4b",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_66d6e6b44758ad4b\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(ambient2.flowPort.medium.rho=0);\nend V2OMC_66d6e6b44758ad4b;",
+      "report_ids": [
+        "FINDING-05040"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_66d6e6b44758ad4b\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "d485dccb034604af",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_d485dccb034604af\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(ambient2.medium.rho=0);\nend V2OMC_d485dccb034604af;",
+      "report_ids": [
+        "FINDING-05039"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "65a5307b62576489",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "medium.rho = 0",
+      "wrapper": "model V2OMC_65a5307b62576489\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(medium.rho=0);\nend V2OMC_65a5307b62576489;",
+      "report_ids": [
+        "FINDING-05020"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "e9bd39fc866a6975",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe1.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_e9bd39fc866a6975\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe1.flowPort_a.medium.rho=0);\nend V2OMC_e9bd39fc866a6975;",
+      "report_ids": [
+        "FINDING-05029"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_e9bd39fc866a6975\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "58ce614f328c55de",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe1.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_58ce614f328c55de\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe1.flowPort_b.medium.rho=0);\nend V2OMC_58ce614f328c55de;",
+      "report_ids": [
+        "FINDING-05030"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_58ce614f328c55de\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2fdaf33894fa8199",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe1.medium.rho = 0",
+      "wrapper": "model V2OMC_2fdaf33894fa8199\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe1.medium.rho=0);\nend V2OMC_2fdaf33894fa8199;",
+      "report_ids": [
+        "FINDING-05027"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "815e949c9e295599",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe2.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_815e949c9e295599\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe2.flowPort_a.medium.rho=0);\nend V2OMC_815e949c9e295599;",
+      "report_ids": [
+        "FINDING-05033"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_815e949c9e295599\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "361d44d0aad66f2b",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe2.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_361d44d0aad66f2b\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe2.flowPort_b.medium.rho=0);\nend V2OMC_361d44d0aad66f2b;",
+      "report_ids": [
+        "FINDING-05034"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_361d44d0aad66f2b\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "746261c244cf2cb2",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe2.medium.rho = 0",
+      "wrapper": "model V2OMC_746261c244cf2cb2\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe2.medium.rho=0);\nend V2OMC_746261c244cf2cb2;",
+      "report_ids": [
+        "FINDING-05031"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "372fb0825039d960",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe3.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_372fb0825039d960\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe3.flowPort_a.medium.rho=0);\nend V2OMC_372fb0825039d960;",
+      "report_ids": [
+        "FINDING-05037"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_372fb0825039d960\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "3498256339203547",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe3.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_3498256339203547\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe3.flowPort_b.medium.rho=0);\nend V2OMC_3498256339203547;",
+      "report_ids": [
+        "FINDING-05038"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_3498256339203547\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "4665d9cc77f64042",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pipe3.medium.rho = 0",
+      "wrapper": "model V2OMC_4665d9cc77f64042\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pipe3.medium.rho=0);\nend V2OMC_4665d9cc77f64042;",
+      "report_ids": [
+        "FINDING-05035"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "b3caa2fb51833485",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_b3caa2fb51833485\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pump.flowPort_a.medium.rho=0);\nend V2OMC_b3caa2fb51833485;",
+      "report_ids": [
+        "FINDING-05025"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_b3caa2fb51833485\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "a59e44a69b2ecbe6",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_a59e44a69b2ecbe6\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pump.flowPort_b.medium.rho=0);\nend V2OMC_a59e44a69b2ecbe6;",
+      "report_ids": [
+        "FINDING-05026"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_a59e44a69b2ecbe6\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "fab95d90a5cfebd1",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoMass",
+      "witness": "pump.medium.rho = 0",
+      "wrapper": "model V2OMC_fab95d90a5cfebd1\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoMass(pump.medium.rho=0);\nend V2OMC_fab95d90a5cfebd1;",
+      "report_ids": [
+        "FINDING-05023"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "a05881ee8a16c235",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks",
+      "witness": "openTank1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_a05881ee8a16c235\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks(openTank1.flowPort.medium.rho=0);\nend V2OMC_a05881ee8a16c235;",
+      "report_ids": [
+        "FINDING-05067"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_a05881ee8a16c235\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortBottom.mo:12:54-12:67:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "c885bb165fd5ae2a",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks",
+      "witness": "openTank2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_c885bb165fd5ae2a\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks(openTank2.flowPort.medium.rho=0);\nend V2OMC_c885bb165fd5ae2a;",
+      "report_ids": [
+        "FINDING-05070"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_c885bb165fd5ae2a\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortBottom.mo:12:54-12:67:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "c3e0ab9a366e316d",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks",
+      "witness": "pipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_c3e0ab9a366e316d\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks(pipe.flowPort_a.medium.rho=0);\nend V2OMC_c3e0ab9a366e316d;",
+      "report_ids": [
+        "FINDING-05074"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_c3e0ab9a366e316d\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "277b0d133e025f50",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks",
+      "witness": "pipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_277b0d133e025f50\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks(pipe.flowPort_b.medium.rho=0);\nend V2OMC_277b0d133e025f50;",
+      "report_ids": [
+        "FINDING-05075"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_277b0d133e025f50\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "4a5a7b6550c65559",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks",
+      "witness": "pipe.medium.rho = 0",
+      "wrapper": "model V2OMC_4a5a7b6550c65559\n  extends Modelica.Thermal.FluidHeatFlow.Examples.TwoTanks(pipe.medium.rho=0);\nend V2OMC_4a5a7b6550c65559;",
+      "report_ids": [
+        "FINDING-05072"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "2b7b6a410093fdee",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "ambient1.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_2b7b6a410093fdee\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(ambient1.flowPort.medium.rho=0);\nend V2OMC_2b7b6a410093fdee;",
+      "report_ids": [
+        "FINDING-05089"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_2b7b6a410093fdee\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "6f45ea43c6e7cf91",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "ambient1.medium.rho = 0",
+      "wrapper": "model V2OMC_6f45ea43c6e7cf91\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(ambient1.medium.rho=0);\nend V2OMC_6f45ea43c6e7cf91;",
+      "report_ids": [
+        "FINDING-05088"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "f012c3c115e256d9",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "ambient2.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_f012c3c115e256d9\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(ambient2.flowPort.medium.rho=0);\nend V2OMC_f012c3c115e256d9;",
+      "report_ids": [
+        "FINDING-05109"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_f012c3c115e256d9\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/SinglePortLeft.mo:12:40-12:53:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2addcf0b0efce969",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "ambient2.medium.rho = 0",
+      "wrapper": "model V2OMC_2addcf0b0efce969\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(ambient2.medium.rho=0);\nend V2OMC_2addcf0b0efce969;",
+      "report_ids": [
+        "FINDING-05108"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "e0dd622de7883e98",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "idealPump.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_e0dd622de7883e98\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(idealPump.flowPort_a.medium.rho=0);\nend V2OMC_e0dd622de7883e98;",
+      "report_ids": [
+        "FINDING-05092"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_e0dd622de7883e98\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "0d2812b6d4a5a316",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "idealPump.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_0d2812b6d4a5a316\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(idealPump.flowPort_b.medium.rho=0);\nend V2OMC_0d2812b6d4a5a316;",
+      "report_ids": [
+        "FINDING-05093"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_0d2812b6d4a5a316\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "2c618670f0c83505",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "idealPump.medium.rho = 0",
+      "wrapper": "model V2OMC_2c618670f0c83505\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(idealPump.medium.rho=0);\nend V2OMC_2c618670f0c83505;",
+      "report_ids": [
+        "FINDING-05090"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "7a440e0ca024702f",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "oneWayValve.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_7a440e0ca024702f\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(oneWayValve.flowPort_a.medium.rho=0);\nend V2OMC_7a440e0ca024702f;",
+      "report_ids": [
+        "FINDING-05102"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_7a440e0ca024702f\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "127578e802461e41",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "oneWayValve.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_127578e802461e41\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(oneWayValve.flowPort_b.medium.rho=0);\nend V2OMC_127578e802461e41;",
+      "report_ids": [
+        "FINDING-05103"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_127578e802461e41\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "b772f68b270902e3",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "oneWayValve.medium.rho = 0",
+      "wrapper": "model V2OMC_b772f68b270902e3\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(oneWayValve.medium.rho=0);\nend V2OMC_b772f68b270902e3;",
+      "report_ids": [
+        "FINDING-05100"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "150afe904fafa69d",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "pipe.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_150afe904fafa69d\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(pipe.flowPort_a.medium.rho=0);\nend V2OMC_150afe904fafa69d;",
+      "report_ids": [
+        "FINDING-05106"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_150afe904fafa69d\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "9eae2911e6ed2665",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "pipe.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_9eae2911e6ed2665\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(pipe.flowPort_b.medium.rho=0);\nend V2OMC_9eae2911e6ed2665;",
+      "report_ids": [
+        "FINDING-05107"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_9eae2911e6ed2665\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "469141f0ba7388ff",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "pipe.medium.rho = 0",
+      "wrapper": "model V2OMC_469141f0ba7388ff\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(pipe.medium.rho=0);\nend V2OMC_469141f0ba7388ff;",
+      "report_ids": [
+        "FINDING-05104"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "e847d04561342c4c",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "pressureSensor.flowPort.medium.rho = 0",
+      "wrapper": "model V2OMC_e847d04561342c4c\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(pressureSensor.flowPort.medium.rho=0);\nend V2OMC_e847d04561342c4c;",
+      "report_ids": [
+        "FINDING-05099"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_e847d04561342c4c\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/Interfaces/AbsoluteSensor.mo:6:54-6:67:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "0ae52f641a06172b",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "pressureSensor.medium.rho = 0",
+      "wrapper": "model V2OMC_0ae52f641a06172b\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(pressureSensor.medium.rho=0);\nend V2OMC_0ae52f641a06172b;",
+      "report_ids": [
+        "FINDING-05098"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "c8de2ff9a0843b3e",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "volumeFlowSensor.flowPort_a.medium.rho = 0",
+      "wrapper": "model V2OMC_c8de2ff9a0843b3e\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(volumeFlowSensor.flowPort_a.medium.rho=0);\nend V2OMC_c8de2ff9a0843b3e;",
+      "report_ids": [
+        "FINDING-05096"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_c8de2ff9a0843b3e\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:28:56-28:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "8bfcb29b8b69465a",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "volumeFlowSensor.flowPort_b.medium.rho = 0",
+      "wrapper": "model V2OMC_8bfcb29b8b69465a\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(volumeFlowSensor.flowPort_b.medium.rho=0);\nend V2OMC_8bfcb29b8b69465a;",
+      "report_ids": [
+        "FINDING-05097"
+      ],
+      "outcome": "refuted-illegal-witness",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "failed",
+      "diagnostic": "messages = \"Failed to build model: V2OMC_8bfcb29b8b69465a\",\n[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/FluidHeatFlow/BaseClasses/TwoPort.mo:30:56-30:69:writable] Error: Trying to override final element medium with modifier '(rho = 0)'."
+    },
+    {
+      "case_key": "7d64a29eb0399105",
+      "model": "Modelica.Thermal.FluidHeatFlow.Examples.WaterPump",
+      "witness": "volumeFlowSensor.medium.rho = 0",
+      "wrapper": "model V2OMC_7d64a29eb0399105\n  extends Modelica.Thermal.FluidHeatFlow.Examples.WaterPump(volumeFlowSensor.medium.rho=0);\nend V2OMC_7d64a29eb0399105;",
+      "report_ids": [
+        "FINDING-05094"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "89ca586d54ccdba5",
+      "model": "ModelicaTest.Magnetic.FluxTubes.Sensors",
+      "witness": "genericFluxTube.area = -1",
+      "wrapper": "model V2OMC_89ca586d54ccdba5\n  extends ModelicaTest.Magnetic.FluxTubes.Sensors(genericFluxTube.area=-1);\nend V2OMC_89ca586d54ccdba5;",
+      "report_ids": [
+        "FINDING-05351"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "8cb64eece63523c8",
+      "model": "ModelicaTest.Magnetic.FluxTubes.Sources",
+      "witness": "genericFluxTube.area = -1",
+      "wrapper": "model V2OMC_8cb64eece63523c8\n  extends ModelicaTest.Magnetic.FluxTubes.Sources(genericFluxTube.area=-1);\nend V2OMC_8cb64eece63523c8;",
+      "report_ids": [
+        "FINDING-05333"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "9ae69da51924d37b",
+      "model": "ModelicaTest.Magnetic.FluxTubes.Sources",
+      "witness": "genericFluxTube1.area = -1",
+      "wrapper": "model V2OMC_9ae69da51924d37b\n  extends ModelicaTest.Magnetic.FluxTubes.Sources(genericFluxTube1.area=-1);\nend V2OMC_9ae69da51924d37b;",
+      "report_ids": [
+        "FINDING-05334"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "54c647c3b36cb311",
+      "model": "ModelicaTest.Magnetic.FluxTubes.Sources",
+      "witness": "genericFluxTube2.area = -1",
+      "wrapper": "model V2OMC_54c647c3b36cb311\n  extends ModelicaTest.Magnetic.FluxTubes.Sources(genericFluxTube2.area=-1);\nend V2OMC_54c647c3b36cb311;",
+      "report_ids": [
+        "FINDING-05335"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    },
+    {
+      "case_key": "bf4483009472494e",
+      "model": "ModelicaTest.Magnetic.FluxTubes.Sources",
+      "witness": "genericFluxTube3.area = -1",
+      "wrapper": "model V2OMC_bf4483009472494e\n  extends ModelicaTest.Magnetic.FluxTubes.Sources(genericFluxTube3.area=-1);\nend V2OMC_bf4483009472494e;",
+      "report_ids": [
+        "FINDING-05336"
+      ],
+      "outcome": "witness-executes-cleanly",
+      "baseline": "clean",
+      "baseline_diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.",
+      "trigger": "clean",
+      "diagnostic": "messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully."
+    }
+  ]
+}

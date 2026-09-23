@@ -1,0 +1,42 @@
+{
+  "command": [
+    "omc",
+    "/data/mrumoca/rumoca/target/bug-review-20260915/omc-extra-7def794e383a0da2/verify.mos"
+  ],
+  "cwd": "/data/mrumoca/rumoca/target/bug-review-20260915/omc-extra-7def794e383a0da2",
+  "status": "completed",
+  "returncode": 0,
+  "seconds": 5.683,
+  "stdout": "true\ntrue\ntrue\ntrue\ntrue\ntrue\n\"Notification: Automatically loaded package Complex 4.1.0 due to uses annotation from Modelica.\nNotification: Automatically loaded package ModelicaServices 4.1.0 due to uses annotation from Modelica.\n\"\nAUDIT_CASE Baseline\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/bug-review-20260915/omc-extra-7def794e383a0da2/Baseline_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'Baseline', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.006001141000000001,\n    timeBackend = 0.012366016,\n    timeSimCode = 0.002254816,\n    timeTemplates = 0.005180797,\n    timeCompile = 1.163905716,\n    timeSimulation = 0.020835172000000002,\n    timeTotal = 1.210720561\nend SimulationResult;\n\"\"\nAUDIT_CASE FINDING00780\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'FINDING00780', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Failed to build model: FINDING00780\",\n    timeFrontend = 0.0,\n    timeBackend = 0.0,\n    timeSimCode = 0.0,\n    timeTemplates = 0.0,\n    timeCompile = 0.0,\n    timeSimulation = 0.0,\n    timeTotal = 0.0\nend SimulationResult;\n\"Error: Template error: A template call failed (/usr/bin/../lib/x86_64-linux-gnu/omc/libOpenModelicaCompiler.so: (null)). One possible reason could be that a template imported function call failed (which should not happen for functions called from within template code; templates assert pure 'match'/non-failing semantics).\n\"\nAUDIT_CASE FINDING00781\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'FINDING00781', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Simulation execution failed for model: FINDING00781\nLOG_ASSERT        | debug   | division by zero at time 0, (a=15) / (b=0), where divisor b expression is: 0.0\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n\",\n    timeFrontend = 0.005270963,\n    timeBackend = 0.011596454,\n    timeSimCode = 0.0020204280000000003,\n    timeTemplates = 0.004735113,\n    timeCompile = 1.193307912,\n    timeSimulation = 0.017999347000000002,\n    timeTotal = 1.235063253\nend SimulationResult;\n\"\"\nAUDIT_CASE FinalFINDING00780\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'FinalFINDING00780', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Failed to build model: FinalFINDING00780\",\n    timeFrontend = 0.0,\n    timeBackend = 0.0,\n    timeSimCode = 0.0,\n    timeTemplates = 0.0,\n    timeCompile = 0.0,\n    timeSimulation = 0.0,\n    timeTotal = 0.0\nend SimulationResult;\n\"Error: Template error: A template call failed (/usr/bin/../lib/x86_64-linux-gnu/omc/libOpenModelicaCompiler.so: (null)). One possible reason could be that a template imported function call failed (which should not happen for functions called from within template code; templates assert pure 'match'/non-failing semantics).\n\"\nAUDIT_CASE FinalFINDING00781\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'FinalFINDING00781', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Simulation execution failed for model: FinalFINDING00781\nLOG_ASSERT        | debug   | division by zero at time 0, (a=15) / (b=0), where divisor b expression is: 0.0\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n\",\n    timeFrontend = 0.005842102,\n    timeBackend = 0.014455829000000002,\n    timeSimCode = 0.002414362,\n    timeTemplates = 0.005618101,\n    timeCompile = 1.212154522,\n    timeSimulation = 0.020196857000000002,\n    timeTotal = 1.260841983\nend SimulationResult;\n\"\"\nAUDIT_OVERRIDE FINDING00780\n\nLOG_STDOUT        | warning | It is not possible to override the following quantity: f\n|                 | |       | It seems to be structural, final, protected or evaluated or has a non-constant binding.\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n0\nAUDIT_OVERRIDE FINDING00781\n\nLOG_STDOUT        | warning | It is not possible to override the following quantity: Vps\n|                 | |       | It seems to be structural, final, protected or evaluated or has a non-constant binding.\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n0\n",
+  "stderr": "",
+  "model": "Modelica.Electrical.Analog.Examples.OpAmps.Comparator",
+  "cases": [
+    [
+      "Baseline",
+      null,
+      null
+    ],
+    [
+      "FINDING00780",
+      "f",
+      0.0
+    ],
+    [
+      "FINDING00781",
+      "Vps",
+      -15.0
+    ],
+    [
+      "FinalFINDING00780",
+      "f",
+      0.0
+    ],
+    [
+      "FinalFINDING00781",
+      "Vps",
+      -15.0
+    ]
+  ],
+  "modelica_source": "model Baseline\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Comparator;\nend Baseline;\nmodel FINDING00780\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Comparator(f=0);\nend FINDING00780;\nmodel FINDING00781\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Comparator(Vps=-15);\nend FINDING00781;\nmodel FinalFINDING00780\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Comparator(final f=0);\nend FinalFINDING00780;\nmodel FinalFINDING00781\n  extends Modelica.Electrical.Analog.Examples.OpAmps.Comparator(final Vps=-15);\nend FinalFINDING00781;\n",
+  "mos": "setCommandLineOptions(\"--numProcs=1 --evaluateFinalParameters=true\");\nsetCompiler(\"gcc\");\nsetCXXCompiler(\"g++\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/Modelica/package.mo\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/package.mo\");\nloadFile(\"Cases.mo\");\ngetErrorString();\nprint(\"AUDIT_CASE Baseline\\n\");\nsimulate(Baseline, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FINDING00780\\n\");\nsimulate(FINDING00780, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FINDING00781\\n\");\nsimulate(FINDING00781, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FinalFINDING00780\\n\");\nsimulate(FinalFINDING00780, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FinalFINDING00781\\n\");\nsimulate(FinalFINDING00781, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_OVERRIDE FINDING00780\\n\");\nsystem(\"./Baseline -override f=0 -r=FINDING00780_override.csv\");\nprint(\"AUDIT_OVERRIDE FINDING00781\\n\");\nsystem(\"./Baseline -override Vps=-15 -r=FINDING00781_override.csv\");\n"
+}

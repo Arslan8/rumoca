@@ -1,0 +1,74 @@
+# Modelica.Electrical.Machines.Examples.InductionMachines.IMS_Start
+
+68 findings.
+
+| ID | Reached as | Kind | |
+|---|---|---|---|
+| [FINDING-02084](../FINDING-02084-ims-start-lm.md) | `aims.airGap.Lm` | `physical-domain-unenforced` |  |
+| [FINDING-02085](../FINDING-02085-ims-start-l.md) | `aims.airGap.L` | `physical-domain-unenforced` |  |
+| [FINDING-02086](../FINDING-02086-ims-start-gcref.md) | `aims.rotorCore.coreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02087](../FINDING-02087-ims-start-gcref.md) | `aims.rotorCoreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02088](../FINDING-02088-ims-start-gcref.md) | `aims.statorCore.coreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02089](../FINDING-02089-ims-start-gcref.md) | `aims.statorCoreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02090](../FINDING-02090-ims-start-gcref.md) | `aimsData.rotorCoreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02091](../FINDING-02091-ims-start-gcref.md) | `aimsData.statorCoreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02092](../FINDING-02092-ims-start-wload.md) | `wLoad` | `divisor-reachable-zero` |  |
+| [FINDING-02093](../FINDING-02093-ims-start-jload.md) | `JLoad` | `physical-domain-unenforced` |  |
+| [FINDING-02094](../FINDING-02094-ims-start-rstart.md) | `Rstart` | `physical-domain-unenforced` |  |
+| [FINDING-02095](../FINDING-02095-ims-start-lm.md) | `aims.Lm` | `physical-domain-unenforced` |  |
+| [FINDING-02096](../FINDING-02096-ims-start-lrsigma.md) | `aims.Lrsigma` | `physical-domain-unenforced` |  |
+| [FINDING-02097](../FINDING-02097-ims-start-lrzero.md) | `aims.Lrzero` | `physical-domain-unenforced` |  |
+| [FINDING-02098](../FINDING-02098-ims-start-rr.md) | `aims.Rr` | `physical-domain-unenforced` |  |
+| [FINDING-02099](../FINDING-02099-ims-start-lrzero.md) | `aimsData.Lrzero` | `physical-domain-unenforced` |  |
+| [FINDING-02100](../FINDING-02100-ims-start-rr.md) | `aimsData.Rr` | `physical-domain-unenforced` |  |
+| [FINDING-02101](../FINDING-02101-ims-start-vsnominal.md) | `aimsData.VsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02102](../FINDING-02102-ims-start-lm.md) | `aimsData.Lm` | `physical-domain-unenforced` |  |
+| [FINDING-02103](../FINDING-02103-ims-start-lrsigma.md) | `aimsData.Lrsigma` | `physical-domain-unenforced` |  |
+| [FINDING-02104](../FINDING-02104-ims-start-ron.md) | `idealCloser.Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02105](../FINDING-02105-ims-start-goff.md) | `idealCloser.Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02106](../FINDING-02106-ims-start-ron.md) | `switchedRheostat.idealCommutingSwitch.Ron` | `physical-domain-unenforced` |  |
+| [FINDING-02107](../FINDING-02107-ims-start-goff.md) | `switchedRheostat.idealCommutingSwitch.Goff` | `physical-domain-unenforced` |  |
+| [FINDING-02108](../FINDING-02108-ims-start-ron.md) | `idealCloser.idealClosingSwitch[1].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02109](../FINDING-02109-ims-start-ron.md) | `idealCloser.idealClosingSwitch[2].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02110](../FINDING-02110-ims-start-ron.md) | `idealCloser.idealClosingSwitch[3].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02111](../FINDING-02111-ims-start-goff.md) | `idealCloser.idealClosingSwitch[1].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02112](../FINDING-02112-ims-start-goff.md) | `idealCloser.idealClosingSwitch[2].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02113](../FINDING-02113-ims-start-goff.md) | `idealCloser.idealClosingSwitch[3].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02114](../FINDING-02114-ims-start-ron.md) | `switchedRheostat.idealCommutingSwitch.idealCommutingSwitch[1].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02115](../FINDING-02115-ims-start-ron.md) | `switchedRheostat.idealCommutingSwitch.idealCommutingSwitch[2].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02116](../FINDING-02116-ims-start-ron.md) | `switchedRheostat.idealCommutingSwitch.idealCommutingSwitch[3].Ron` | `physical-bound-permits-zero` |  |
+| [FINDING-02117](../FINDING-02117-ims-start-goff.md) | `switchedRheostat.idealCommutingSwitch.idealCommutingSwitch[1].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02118](../FINDING-02118-ims-start-goff.md) | `switchedRheostat.idealCommutingSwitch.idealCommutingSwitch[2].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02119](../FINDING-02119-ims-start-goff.md) | `switchedRheostat.idealCommutingSwitch.idealCommutingSwitch[3].Goff` | `physical-bound-permits-zero` |  |
+| [FINDING-02120](../FINDING-02120-ims-start-rs.md) | `aimsData.Rs` | `physical-domain-unenforced` |  |
+| [FINDING-02121](../FINDING-02121-ims-start-rs.md) | `aimsData.Rs` | `divisor-reachable-zero` |  |
+| [FINDING-02122](../FINDING-02122-ims-start-rs.md) | `aimsData.Rs` | `divisor-reachable-zero` |  |
+| [FINDING-02123](../FINDING-02123-ims-start-lszero.md) | `aimsData.Lszero` | `physical-domain-unenforced` |  |
+| [FINDING-02124](../FINDING-02124-ims-start-lssigma.md) | `aimsData.Lssigma` | `physical-domain-unenforced` |  |
+| [FINDING-02125](../FINDING-02125-ims-start-m.md) | `aimsData.m` | `divisor-reachable-zero` |  |
+| [FINDING-02126](../FINDING-02126-ims-start-jr.md) | `aimsData.Jr` | `physical-domain-unenforced` |  |
+| [FINDING-02127](../FINDING-02127-ims-start-js.md) | `aimsData.Js` | `physical-domain-unenforced` |  |
+| [FINDING-02128](../FINDING-02128-ims-start-fsnominal.md) | `aimsData.fsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02129](../FINDING-02129-ims-start-fsnominal.md) | `aimsData.fsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02130](../FINDING-02130-ims-start-fsnominal.md) | `aimsData.fsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02131](../FINDING-02131-ims-start-l.md) | `aims.lrsigma.L` | `physical-domain-unenforced` |  |
+| [FINDING-02132](../FINDING-02132-ims-start-l.md) | `aims.lssigma.L` | `physical-domain-unenforced` |  |
+| [FINDING-02133](../FINDING-02133-ims-start-l.md) | `aims.lrzero.L` | `physical-domain-unenforced` |  |
+| [FINDING-02134](../FINDING-02134-ims-start-l.md) | `aims.lszero.L` | `physical-domain-unenforced` |  |
+| [FINDING-02135](../FINDING-02135-ims-start-j.md) | `aims.inertiaRotor.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02136](../FINDING-02136-ims-start-j.md) | `aims.inertiaStator.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02137](../FINDING-02137-ims-start-j.md) | `loadInertia.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02138](../FINDING-02138-ims-start-rs.md) | `aims.Rs` | `physical-domain-unenforced` |  |
+| [FINDING-02139](../FINDING-02139-ims-start-zsref.md) | `aims.ZsRef` | `physical-domain-unenforced` |  |
+| [FINDING-02140](../FINDING-02140-ims-start-pi.md) | `aims.pi` | `divisor-reachable-zero` |  |
+| [FINDING-02141](../FINDING-02141-ims-start-pi.md) | `aims.pi` | `divisor-reachable-zero` |  |
+| [FINDING-02142](../FINDING-02142-ims-start-lszero.md) | `aims.Lszero` | `physical-domain-unenforced` |  |
+| [FINDING-02143](../FINDING-02143-ims-start-lssigma.md) | `aims.Lssigma` | `physical-domain-unenforced` |  |
+| [FINDING-02144](../FINDING-02144-ims-start-jr.md) | `aims.Jr` | `physical-domain-unenforced` |  |
+| [FINDING-02145](../FINDING-02145-ims-start-js.md) | `aims.Js` | `physical-domain-unenforced` |  |
+| [FINDING-02146](../FINDING-02146-ims-start-r.md) | `aims.rr.R` | `physical-domain-unenforced` |  |
+| [FINDING-02147](../FINDING-02147-ims-start-r.md) | `aims.rs.R` | `physical-domain-unenforced` |  |
+| [FINDING-02148](../FINDING-02148-ims-start-r.md) | `switchedRheostat.rheostat.R` | `physical-domain-unenforced` |  |
+| [FINDING-02149](../FINDING-02149-ims-start-m.md) | `aims.spacePhasorR.m` | `divisor-reachable-zero` |  |
+| [FINDING-02150](../FINDING-02150-ims-start-m.md) | `aims.spacePhasorS.m` | `divisor-reachable-zero` |  |
+| [FINDING-02151](../FINDING-02151-ims-start-rstart.md) | `switchedRheostat.RStart` | `physical-domain-unenforced` |  |

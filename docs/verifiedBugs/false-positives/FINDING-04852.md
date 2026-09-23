@@ -1,0 +1,67 @@
+# FINDING-04852: A zero-duration ramp is a supported step
+
+| Field | Value |
+|---|---|
+| Verdict | false-positives |
+| Scope / group | zero-duration-ramp |
+| Model | ModelicaTest.Blocks.Exponentiation |
+| Target | negativeToPositiveRamp.duration |
+| Student classification | divisor-reachable-zero |
+| Original report | [FINDING-exponentiation-negativetopositiveramp-duration-divunreach.md](../../v2/bugs/FINDING-exponentiation-negativetopositiveramp-duration-divunreach.md) — reviewed as `FINDING-04852-exponentiation-negativetopositiveramp-duration.md`, which a later run renamed |
+| Original SHA-256 | c0c6b95637b92cedf3806fc08dc161a5e4ad1449cc5322ed4c9c98ef950a606d |
+
+## Why this is a false positive
+
+The declaration explicitly says duration=0 gives a Step. Division by duration occurs only after time>=startTime and while time<startTime+duration. For duration=0 those conditions cannot both hold, so that branch is unreachable. The independent Ramp control also runs at zero. A Rumoca projection failure for a step is not evidence of a reachable division in this source.
+
+## Source evidence
+
+Compiler/source-resolved declaration: `Blocks/Sources.mo:247`. Role: `parameter`; binding: `1`; effective min: `0.0`; effective max: `None`. 
+
+[Blocks/Sources.mo — source snapshot](../evidence/sources/565331012685bd19-Sources.mo)
+
+```modelica
+245:     parameter Real height=1 "Height of ramp"
+246:       annotation(Dialog(groupImage="modelica://Modelica/Resources/Images/Blocks/Sources/Ramp.png"));
+247:     parameter SI.Time duration(min=0.0, start=2)
+248:       "Duration of ramp (= 0.0 gives a Step)";
+249:     extends Interfaces.SignalSource;
+250: 
+```
+
+[Blocks/Sources.mo — source snapshot](../evidence/sources/565331012685bd19-Sources.mo)
+
+```modelica
+244:   block Ramp "Generate ramp signal"
+245:     parameter Real height=1 "Height of ramp"
+246:       annotation(Dialog(groupImage="modelica://Modelica/Resources/Images/Blocks/Sources/Ramp.png"));
+247:     parameter SI.Time duration(min=0.0, start=2)
+248:       "Duration of ramp (= 0.0 gives a Step)";
+249:     extends Interfaces.SignalSource;
+250: 
+251:   equation
+252:     y = offset + (if time < startTime then 0 else if time < (startTime +
+253:       duration) then (time - startTime)*height/duration else height);
+254:     annotation (
+```
+
+
+## Execution evidence
+
+[Rumoca commands, return codes, integrity hashes, bounded output and metadata](../evidence/e0b98c52b2116396.json). Baseline: **clean**.
+
+| Probe | Outcome |
+|---|---|
+| `negativeToPositiveRamp.duration=0` | clean |
+
+[Independent controls and actual library-record projections](../evidence/control-initialization.json) include source wrappers, compiler options, and full results.
+
+## Recommended action
+
+Correct the detector/adjudicator for this specific semantic case; do not impose a blanket strictly-positive bound on the library declaration.
+
+## Scope and limitations
+
+A source-level verdict addresses the reported declaration/claim, not every possible connected system. Tests cover 0–0.5 seconds and are not a proof of long-run stability. Shared instances are not distinct root causes. A missing bound, timeout, compiler error or failed nominal run alone never counts as a verified bug or a false positive. Fixes are proposals; no library/compiler implementation was changed.
+
+[Group and related reports](../groups/zero-duration-ramp.md) · [Index](../README.md)

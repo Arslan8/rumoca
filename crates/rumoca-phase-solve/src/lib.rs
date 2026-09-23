@@ -15,6 +15,7 @@ mod model_wire;
 pub mod ad;
 pub mod diagnostic_codes;
 pub mod fmi;
+pub mod execution;
 
 pub use ad::{
     lower_compute_block_full_jvp, lower_compute_block_jvp, lower_scalar_program_block_ad,

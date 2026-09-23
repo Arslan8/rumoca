@@ -1,0 +1,36 @@
+; rumoca bitcode, textual form
+rbc 1
+producer "rumoca 0.10.0"
+model "Decay"
+
+; sources
+!0 source "docs/examples/ir/Decay.mo"
+
+; types
+$0 type real
+$1 type integer
+
+; variables
+%0 var "k" $0 parameter parameter scalars 1 class "Decay" tunable from_source start ^1 binding ^0 @src 0 85 91 2 13
+%1 var "tau" $0 parameter parameter scalars 1 class "Decay" tunable from_source start ^7 binding ^4 @src 0 111 119 3 13
+%2 var "x" $0 state local scalars 1 class "Decay" fixed true from_source start ^8 @src 0 131 137 4 3
+
+; expressions
+^0 expr $0 lit real 2.5 @src 0 94 97 2 22
+^1 expr $0 lit real 2.5 @src 0 94 97 2 22
+^2 expr $1 lit integer 1 @src 0 122 123 3 24
+^3 expr $0 coord param %0 @src 0 126 127 3 28
+^4 expr $0 bin div ^2 ^3 @src 0 122 127 3 24
+^5 expr $1 lit integer 1 @src 0 122 123 3 24
+^6 expr $0 coord param %0 @src 0 126 127 3 28
+^7 expr $0 bin div ^5 ^6 @src 0 122 127 3 24
+^8 expr $1 lit integer 1 @src 0 146 147 4 18
+^9 expr $0 coord der %2 @src 0 175 181 6 3
+^10 expr $0 coord state %2 @src 0 185 186 6 13
+^11 expr $0 coord param %1 @src 0 189 192 6 17
+^12 expr $0 bin div ^10 ^11 @src 0 185 192 6 13
+^13 expr $0 un negate ^12 @src 0 184 192 6 12
+^14 expr $0 bin sub ^9 ^13 @src 0 175 181 6 3
+
+; eq
+eq 0 ^14 reads %1 %2 dreads %2 @src 0 175 192 6 3

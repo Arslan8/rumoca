@@ -1,0 +1,54 @@
+setModelicaPath(getEnvironmentVar("RUMOCA_REPO") + "/target/msl/ModelicaStandardLibrary-4.1.0:" + getModelicaPath());
+loadModel(Modelica, {"4.1.0"});
+loadFile(getEnvironmentVar("RUMOCA_REPO") + "/docs/llm/bugs/repro/LLM_FirstOrderZero.mo");
+loadFile(getEnvironmentVar("RUMOCA_REPO") + "/docs/llm/bugs/repro/LLM_CriticalDampingOrderZero.mo");
+loadFile(getEnvironmentVar("RUMOCA_REPO") + "/docs/llm/bugs/repro/LLM_BlocksCriticalDampingOrderZero.mo");
+loadFile(getEnvironmentVar("RUMOCA_REPO") + "/docs/llm/bugs/repro/LLM_SignalPWMFrequencyZero.mo");
+loadFile(getEnvironmentVar("RUMOCA_REPO") + "/docs/llm/bugs/repro/LLM_CompareTransformersRatioZero.mo");
+loadFile(getEnvironmentVar("RUMOCA_REPO") + "/docs/llm/bugs/repro/LLM_ThyristorITMZero.mo");
+print("MSL " + getVersion(Modelica) + "\n");
+
+print("CASE FirstOrder nominal\n");
+simulate(LLM_FirstOrderNominal, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+print("CASE FirstOrder zero\n");
+simulate(LLM_FirstOrderZero, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+
+print("CASE CriticalDamping nominal\n");
+simulate(LLM_CriticalDampingOrderTwo, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+print("CASE CriticalDamping zero\n");
+simulate(LLM_CriticalDampingOrderZero, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+
+print("CASE Blocks CriticalDamping nominal\n");
+simulate(LLM_BlocksCriticalDampingOrderTwo, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+print("CASE Blocks CriticalDamping zero\n");
+simulate(LLM_BlocksCriticalDampingOrderZero, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+
+print("CASE SignalPWM nominal\n");
+simulate(LLM_SignalPWMFrequencyNominal, stopTime=0.01, numberOfIntervals=10);
+print(getErrorString());
+print("CASE SignalPWM zero\n");
+simulate(LLM_SignalPWMFrequencyZero, stopTime=0.01, numberOfIntervals=10);
+print(getErrorString());
+
+print("CASE CompareTransformers nominal\n");
+simulate(LLM_CompareTransformersRatioNominal, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+print("CASE CompareTransformers zero\n");
+simulate(LLM_CompareTransformersRatioZero, stopTime=0.1, numberOfIntervals=10);
+print(getErrorString());
+
+print("CASE Thyristor nominal\n");
+simulate(LLM_ThyristorITMNominal, stopTime=0.001, numberOfIntervals=10);
+print(getErrorString());
+print("CASE Thyristor zero\n");
+simulate(LLM_ThyristorITMZero, stopTime=0.001, numberOfIntervals=10);
+print(getErrorString());
+print("CASE Thyristor IH zero\n");
+simulate(LLM_ThyristorIHZero, stopTime=0.001, numberOfIntervals=10);
+print(getErrorString());

@@ -1,0 +1,1151 @@
+{
+  "model": "Modelica.Mechanics.MultiBody.Examples.Elementary.DoublePendulum",
+  "source": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Examples/Elementary/DoublePendulum.mo",
+  "variables": {
+    "world.defaultWidthFraction": {
+      "name": "world.defaultWidthFraction",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.World",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/package.mo",
+      "line": 128,
+      "binding": "20",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 39,
+        "name": "world.defaultWidthFraction",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 10,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 2,
+            "start": 7997,
+            "end": 8022,
+            "line": 128,
+            "column": 13
+          }
+        },
+        "component": 5,
+        "declaring_class": "Modelica.Mechanics.MultiBody.World",
+        "description": "Default for shape width as a fraction of shape length (e.g., for Parts.FixedTranslation)",
+        "binding": 145,
+        "start": 146,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "world.defaultFrameDiameterFraction": {
+      "name": "world.defaultFrameDiameterFraction",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.World",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/package.mo",
+      "line": 134,
+      "binding": "40",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 41,
+        "name": "world.defaultFrameDiameterFraction",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 10,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 2,
+            "start": 8344,
+            "end": 8377,
+            "line": 134,
+            "column": 13
+          }
+        },
+        "component": 5,
+        "declaring_class": "Modelica.Mechanics.MultiBody.World",
+        "description": "Default for arrow diameter of a coordinate system as a fraction of axis length",
+        "binding": 153,
+        "start": 154,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.density": {
+      "name": "boxBody1.density",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 37,
+      "binding": "7700",
+      "minimum": "0.0",
+      "maximum": "None",
+      "raw": {
+        "id": 320,
+        "name": "boxBody1.density",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 44,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 1825,
+            "end": 1843,
+            "line": 37,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg/m3",
+        "physical_quantity": "Density",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Density of cylinder (e.g., steel: 7700 .. 7900, wood : 400 .. 800)",
+        "binding": 585,
+        "start": 586,
+        "min": 587,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.mo": {
+      "name": "boxBody1.mo",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 101,
+      "binding": "(((boxBody1.density * boxBody1.length) * boxBody1.width) * boxBody1.height)",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 336,
+        "name": "boxBody1.mo",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5089,
+            "end": 5099,
+            "line": 101,
+            "column": 19
+          }
+        },
+        "component": 0,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Mass of box without hole",
+        "binding": 677,
+        "start": 684,
+        "min": 685,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody1.mi": {
+      "name": "boxBody1.mi",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 103,
+      "binding": "(((boxBody1.density * boxBody1.length) * boxBody1.innerWidth) * boxBody1.innerHeight)",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 337,
+        "name": "boxBody1.mi",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5187,
+            "end": 5197,
+            "line": 103,
+            "column": 19
+          }
+        },
+        "component": 0,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Mass of hole of box",
+        "binding": 692,
+        "start": 699,
+        "min": 700,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody1.m": {
+      "name": "boxBody1.m",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 105,
+      "binding": "(boxBody1.mo - boxBody1.mi)",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 338,
+        "name": "boxBody1.m",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5290,
+            "end": 5299,
+            "line": 105,
+            "column": 19
+          }
+        },
+        "component": 0,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Mass of box",
+        "binding": 703,
+        "start": 706,
+        "min": 707,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody1.I": {
+      "name": "boxBody1.I",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 111,
+      "binding": "Modelica.Mechanics.MultiBody.Frames.resolveDyade1(boxBody1.R.T, boxBody1.R.w, diagonal(({((boxBody1.mo * ((boxBody1.width * boxBody1.width) + (boxBody1.height * boxBody1.height))) - (boxBody1.mi * ((boxBody1.innerWidth * boxBody1.innerWidth) + (boxBody1.innerHeight * boxBody1.innerHeight)))), ((boxBody1.mo * ((boxBody1.length * boxBody1.length) + (boxBody1.height * boxBody1.height))) - (boxBody1.mi * ((boxBody1.length * boxBody1.length) + (boxBody1.innerHeight * boxBody1.innerHeight)))), ((boxBody1.mo * ((boxBody1.length * boxBody1.length) + (boxBody1.width * boxBody1.width))) - (boxBody1.mi * ((boxBody1.length * boxBody1.length) + (boxBody1.innerWidth * boxBody1.innerWidth))))} / 12)))",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 342,
+        "name": "boxBody1.I",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 51,
+        "scalar_count": 9,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5702,
+            "end": 5714,
+            "line": 111,
+            "column": 19
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Inertia tensor of body box with respect to center of mass, parallel to frame_a",
+        "binding": 2263,
+        "start": 2327,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.m": {
+      "name": "boxBody1.body.m",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 16,
+      "binding": "boxBody1.m",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 350,
+        "name": "boxBody1.body.m",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 689,
+            "end": 698,
+            "line": 16,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Mass of rigid body",
+        "binding": 720,
+        "start": 721,
+        "min": 722,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.I_11": {
+      "name": "boxBody1.body.I_11",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 17,
+      "binding": "boxBody1.I[1, 1]",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 351,
+        "name": "boxBody1.body.I_11",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 749,
+            "end": 764,
+            "line": 17,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (1,1) of inertia tensor",
+        "binding": 726,
+        "min": 727,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.I_22": {
+      "name": "boxBody1.body.I_22",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 19,
+      "binding": "boxBody1.I[2, 2]",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 352,
+        "name": "boxBody1.body.I_22",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 925,
+            "end": 940,
+            "line": 19,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (2,2) of inertia tensor",
+        "binding": 731,
+        "min": 732,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.I_33": {
+      "name": "boxBody1.body.I_33",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 21,
+      "binding": "boxBody1.I[3, 3]",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 353,
+        "name": "boxBody1.body.I_33",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1101,
+            "end": 1116,
+            "line": 21,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (3,3) of inertia tensor",
+        "binding": 736,
+        "min": 737,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.I_21": {
+      "name": "boxBody1.body.I_21",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 23,
+      "binding": "boxBody1.I[2, 1]",
+      "minimum": "-1.7976931348623157e+308",
+      "maximum": "None",
+      "raw": {
+        "id": 354,
+        "name": "boxBody1.body.I_21",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1277,
+            "end": 1292,
+            "line": 23,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (2,1) of inertia tensor",
+        "binding": 741,
+        "min": 743,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.I_31": {
+      "name": "boxBody1.body.I_31",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 25,
+      "binding": "boxBody1.I[3, 1]",
+      "minimum": "-1.7976931348623157e+308",
+      "maximum": "None",
+      "raw": {
+        "id": 355,
+        "name": "boxBody1.body.I_31",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1454,
+            "end": 1469,
+            "line": 25,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (3,1) of inertia tensor",
+        "binding": 747,
+        "min": 749,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.I_32": {
+      "name": "boxBody1.body.I_32",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 27,
+      "binding": "boxBody1.I[3, 2]",
+      "minimum": "-1.7976931348623157e+308",
+      "maximum": "None",
+      "raw": {
+        "id": 356,
+        "name": "boxBody1.body.I_32",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1631,
+            "end": 1646,
+            "line": 27,
+            "column": 13
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (3,2) of inertia tensor",
+        "binding": 753,
+        "min": 755,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody1.body.I": {
+      "name": "boxBody1.body.I",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 114,
+      "binding": "cat1(cat2(boxBody1.body.I_11, boxBody1.body.I_21, boxBody1.body.I_31), cat2(boxBody1.body.I_21, boxBody1.body.I_22, boxBody1.body.I_32), cat2(boxBody1.body.I_31, boxBody1.body.I_32, boxBody1.body.I_33))",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 375,
+        "name": "boxBody1.body.I",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 51,
+        "scalar_count": 9,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 5705,
+            "end": 5717,
+            "line": 114,
+            "column": 19
+          }
+        },
+        "component": 0,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Inertia tensor",
+        "binding": 829,
+        "start": 842,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody2.density": {
+      "name": "boxBody2.density",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 37,
+      "binding": "7700",
+      "minimum": "0.0",
+      "maximum": "None",
+      "raw": {
+        "id": 495,
+        "name": "boxBody2.density",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 44,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 1825,
+            "end": 1843,
+            "line": 37,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg/m3",
+        "physical_quantity": "Density",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Density of cylinder (e.g., steel: 7700 .. 7900, wood : 400 .. 800)",
+        "binding": 1016,
+        "start": 1017,
+        "min": 1018,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.mo": {
+      "name": "boxBody2.mo",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 101,
+      "binding": "(((boxBody2.density * boxBody2.length) * boxBody2.width) * boxBody2.height)",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 511,
+        "name": "boxBody2.mo",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5089,
+            "end": 5099,
+            "line": 101,
+            "column": 19
+          }
+        },
+        "component": 1,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Mass of box without hole",
+        "binding": 1108,
+        "start": 1115,
+        "min": 1116,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody2.mi": {
+      "name": "boxBody2.mi",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 103,
+      "binding": "(((boxBody2.density * boxBody2.length) * boxBody2.innerWidth) * boxBody2.innerHeight)",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 512,
+        "name": "boxBody2.mi",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5187,
+            "end": 5197,
+            "line": 103,
+            "column": 19
+          }
+        },
+        "component": 1,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Mass of hole of box",
+        "binding": 1123,
+        "start": 1130,
+        "min": 1131,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody2.m": {
+      "name": "boxBody2.m",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 105,
+      "binding": "(boxBody2.mo - boxBody2.mi)",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 513,
+        "name": "boxBody2.m",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5290,
+            "end": 5299,
+            "line": 105,
+            "column": 19
+          }
+        },
+        "component": 1,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Mass of box",
+        "binding": 1134,
+        "start": 1137,
+        "min": 1138,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody2.I": {
+      "name": "boxBody2.I",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/BodyBox.mo",
+      "line": 111,
+      "binding": "Modelica.Mechanics.MultiBody.Frames.resolveDyade1(boxBody2.R.T, boxBody2.R.w, diagonal(({((boxBody2.mo * ((boxBody2.width * boxBody2.width) + (boxBody2.height * boxBody2.height))) - (boxBody2.mi * ((boxBody2.innerWidth * boxBody2.innerWidth) + (boxBody2.innerHeight * boxBody2.innerHeight)))), ((boxBody2.mo * ((boxBody2.length * boxBody2.length) + (boxBody2.height * boxBody2.height))) - (boxBody2.mi * ((boxBody2.length * boxBody2.length) + (boxBody2.innerHeight * boxBody2.innerHeight)))), ((boxBody2.mo * ((boxBody2.length * boxBody2.length) + (boxBody2.width * boxBody2.width))) - (boxBody2.mi * ((boxBody2.length * boxBody2.length) + (boxBody2.innerWidth * boxBody2.innerWidth))))} / 12)))",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 517,
+        "name": "boxBody2.I",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 51,
+        "scalar_count": 9,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 16,
+            "start": 5702,
+            "end": 5714,
+            "line": 111,
+            "column": 19
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.BodyBox",
+        "description": "Inertia tensor of body box with respect to center of mass, parallel to frame_a",
+        "binding": 2531,
+        "start": 2595,
+        "tunable": false,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.m": {
+      "name": "boxBody2.body.m",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 16,
+      "binding": "boxBody2.m",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 525,
+        "name": "boxBody2.body.m",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 50,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 689,
+            "end": 698,
+            "line": 16,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg",
+        "physical_quantity": "Mass",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Mass of rigid body",
+        "binding": 1151,
+        "start": 1152,
+        "min": 1153,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.I_11": {
+      "name": "boxBody2.body.I_11",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 17,
+      "binding": "boxBody2.I[1, 1]",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 526,
+        "name": "boxBody2.body.I_11",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 749,
+            "end": 764,
+            "line": 17,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (1,1) of inertia tensor",
+        "binding": 1157,
+        "min": 1158,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.I_22": {
+      "name": "boxBody2.body.I_22",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 19,
+      "binding": "boxBody2.I[2, 2]",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 527,
+        "name": "boxBody2.body.I_22",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 925,
+            "end": 940,
+            "line": 19,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (2,2) of inertia tensor",
+        "binding": 1162,
+        "min": 1163,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.I_33": {
+      "name": "boxBody2.body.I_33",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 21,
+      "binding": "boxBody2.I[3, 3]",
+      "minimum": "0",
+      "maximum": "None",
+      "raw": {
+        "id": 528,
+        "name": "boxBody2.body.I_33",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1101,
+            "end": 1116,
+            "line": 21,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (3,3) of inertia tensor",
+        "binding": 1167,
+        "min": 1168,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.I_21": {
+      "name": "boxBody2.body.I_21",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 23,
+      "binding": "boxBody2.I[2, 1]",
+      "minimum": "-1.7976931348623157e+308",
+      "maximum": "None",
+      "raw": {
+        "id": 529,
+        "name": "boxBody2.body.I_21",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1277,
+            "end": 1292,
+            "line": 23,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (2,1) of inertia tensor",
+        "binding": 1172,
+        "min": 1174,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.I_31": {
+      "name": "boxBody2.body.I_31",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 25,
+      "binding": "boxBody2.I[3, 1]",
+      "minimum": "-1.7976931348623157e+308",
+      "maximum": "None",
+      "raw": {
+        "id": 530,
+        "name": "boxBody2.body.I_31",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1454,
+            "end": 1469,
+            "line": 25,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (3,1) of inertia tensor",
+        "binding": 1178,
+        "min": 1180,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.I_32": {
+      "name": "boxBody2.body.I_32",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 27,
+      "binding": "boxBody2.I[3, 2]",
+      "minimum": "-1.7976931348623157e+308",
+      "maximum": "None",
+      "raw": {
+        "id": 531,
+        "name": "boxBody2.body.I_32",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 52,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 1631,
+            "end": 1646,
+            "line": 27,
+            "column": 13
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Element (3,2) of inertia tensor",
+        "binding": 1184,
+        "min": 1186,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "boxBody2.body.I": {
+      "name": "boxBody2.body.I",
+      "role": "parameter",
+      "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+      "source": "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Parts/Body.mo",
+      "line": 114,
+      "binding": "cat1(cat2(boxBody2.body.I_11, boxBody2.body.I_21, boxBody2.body.I_31), cat2(boxBody2.body.I_21, boxBody2.body.I_22, boxBody2.body.I_32), cat2(boxBody2.body.I_31, boxBody2.body.I_32, boxBody2.body.I_33))",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 550,
+        "name": "boxBody2.body.I",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 51,
+        "scalar_count": 9,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 18,
+            "start": 5705,
+            "end": 5717,
+            "line": 114,
+            "column": 19
+          }
+        },
+        "component": 1,
+        "unit": "kg.m2",
+        "physical_quantity": "MomentOfInertia",
+        "declaring_class": "Modelica.Mechanics.MultiBody.Parts.Body",
+        "description": "Inertia tensor",
+        "binding": 1260,
+        "start": 1273,
+        "tunable": false,
+        "from_source": true
+      }
+    }
+  },
+  "trials": {},
+  "compile": {
+    "command": [
+      "/data/mrumoca/rumoca/target/debug/rumoca",
+      "compile",
+      "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Mechanics/MultiBody/Examples/Elementary/DoublePendulum.mo",
+      "--model",
+      "Modelica.Mechanics.MultiBody.Examples.Elementary.DoublePendulum",
+      "--emit-bitcode",
+      "/data/mrumoca/rumoca/target/bug-review-20260915/69ffce7f37cd1d7e.rbc",
+      "--source-root",
+      "target/msl/ModelicaStandardLibrary-4.1.0",
+      "--source-root",
+      "target/corpus/ModelicaStandardLibrary-4.1.0",
+      "--source-root",
+      "target/cmm/CMM-a642c381"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 8.955,
+    "stdout": "",
+    "stderr": "failed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/b3a32a66919e704f9aae7be84a411ea818aa2860ff46de4c2839a1945d34dd17.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8f759fdf40e3c2d6b31992b1a4488d0d0d6c2533ec797135a32a6d2e24a1f932.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/32ba73357e793ea86064c6b4479b35e48bb22de043180249bba647eb7eabfc7c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/43b2e9dac922fb89e9ac66f0fb4aeccccf971a2aedd357a6ebef7e84813c3699.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/7aa55668d6e57cdcdc9251ef21ceeada417b308c36857aedabf9b1c99a59a0d5.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/53036016a891fb9cf712408fb9f43883d25c14b9e687ef76a435e5be46d03180.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8d4e04fa67492f73f77bd7932b488838aaefb881053c9f8bdea80186303466e9.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6d0f7cf7ab6d980492f676ea7f32bb8a19fd8d0ad6863f4d999655364188d6b4.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4314e17d9f77e827a2f0048383fe5b58c4a466dae78186da97d44949027e022d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/9def7b1f7f110ecd38fd6010a7fbe833cc83955079590fbfa240835ce3447eff.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/43c91260a7bb0bf0170def3d224d27b7f882306b81ad27479ca9a7fdbac0b7b8.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/b8a99134ed1153d2bc6175e605b0a6121379bbb2b72925c5b23509bdd0f4df5e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/603ec88568da99d9b96f1cb8b070860d523a51357ab32b92fe35ef8e601010e1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/462052be74b151f96309f202c2c63b284b5c368b4032570a4db5dcaf10d4ae8f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/209afa2c1e08ef4a1dbbeedb5a35b828af56d13c070c8fe103c123a37b4b76f2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/671f07b6ee9949595642600044a24500063795ad2e21b1411b581fac2d855da2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/2c66f9ab5b597da18753c0d96355074c7983bda30871d8a20b4b4206c7f0d159.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8e0aedb3f439eac7ada504128fe4903016e86c3d5aa33edc0663fc839b5abd6e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/d1e2b6a959496e585c8436dacb2d78cccef2064cdf72a9f2130afdf3d047ba1b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/7598a0061bac8254360bb9f03c4080d75d7fb5f509618fcb58f4fef851eb4517.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/298a71ead5fe48b78cacbe283fff9f58fc0f1da84a5c9e8a01797a92759543a4.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/41b7f160fdc1b4a1b36a5bb3841e44f8880e89d2408775e5cb5d3868174e8536.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/eb61f46901bc11ab332b92ba7b654d8e1690d6a431abc09a03286c5fc94a72f5.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/12aa8e308311b51dca41b9ab4fc21f03fadfd362bed9b0631d90cfdefc7253cc.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/03ea9be860402088a705ed9e0debbac7076249e7b9ea43ae4dfd1c0801b1456a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/1ec3bb8047a64169678a5d77286a48e33eab2a00c38f0f40a012de0f79df43ca.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/276bf66f90f0dc597f13c1c5c7ca94b46ca526c5b33205619363f8d109a04d66.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0c073fe4f5128f59ba1e40309ba1fc397aa6f3510fce4a108dda6a46385e5b24.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/2233942a442dcaca803980ae79d9fa2c2d95ebe91d584ee00487eff9ed0403cc.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/32cc35b4f1bd71849c5722ae7ce100294265ad3c46eb92aeda602ced0fb6696a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/29c160d9e12e37ed177bd5bc0e8c63018ece5b301c164ea7a40d0e9131811e99.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/817054a96bae3ae03943d04eff287333969ec491173bb00e7434a9662d568f14.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8d0cf1916f286e008b1675e6ea904601f1c070fc2f3cadd02ea50b642d5250a3.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/7f28462b1eae3ad66ec708f35380b5d66740d98dd8fb1d3efdac059860e26404.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8d1f16673cb8392fde1f5604f423da8acc9a3a4fc0457669fec52c372bd91d3e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/9ced7cba0b2c2abcbee7ad8db77db4f9eaee2fc5c52eb4dcc9c128e74934c342.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ce9e9ce46d9c7f47ed0937927706b634b7b1b6dc2b60c177f17adf70af8bd299.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/1fb1df51415fe54d0dbec7c149f44dadffdc6dd5d3d1a89035367bdb7b3ec24a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/5ca7132fb73dabbc081ec23900c6e54a33707c0f42f41c1763a0c623d0679506.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0719cbb225c846329e5e1d093298d46987eb907cae54178ca6a83c55df7e4c40.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4c481e118e180c7f217dd481831c75e6c7b031a2cedbeba072b9437a359ef1a3.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/35a11cbc5d8bee99751155cb0dc7d4874c6965d53c28737291ed5463cce5389a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/3694956ae6a63b96103b4c5d41915cce6b7229bea342b974ee80ee3b9fa1f9d1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/3fe592c49f4d526bfc375669b2d1a13be08d431b97c2501724e9888132840b5b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/fb1c6b177d79c786f675f606e3ca701d8c103bd4772a53259405a73556f9aa60.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0675a6201c99dcac31741522c84a42d45a94f9e9a3234f9cf180489ab787e851.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4126c57e7c9a8368c15960909b1aebbf87f14a4a37e9aa9d2a6e20a6ce9c5893.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/60fec6a49582fadc96ae81870ad1737cbe76bef2764f425412565dbb4481288c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/739ee4805f0b4ee67009991412d8dd6f0e32a370752a0727fe565f48f3911d04.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/95badfede7a98bcd446a5ae8b32d8895705ec9283d4029876528252022de9c04.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f1e02f1f16a44360a6523c76fee00fd0350690b07b42365c36735e610980b2f1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0aa3e3c31588d93c96f111f9318d5f00d9a62a33c9ddfc129fb182d5f78bd980.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/752710c04308b5eb1d8c8641f2ec927ac240e19becec3467e2adbe4950fd232b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/734751cb10eef69f77884fbf94b05b145232895b1010b96190ff4794d54db6af.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6c18683d787c43f3b2e2eaf28a37545b514d207fab50fafc8faf96871950db97.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a19ce9dbd630934e98a92e7f33a91cc7795843fe866e2c9480f44af3bd0e2253.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/b1fe8b08766e260044c9977201c106d944a03565fcc2278d5cefe0098d8b62e2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/801685b4e9d138993e9e4b76a63e702d5554df1dfc79369326708485f64f996b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/2ad9dfcf782ba518a2a509f55d76beae09f151d16b691d7d99b98d2dfb16da2e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/713bfa7ad3a32422563735d2da4fff1b6c6ac8619a79d9f37c020b55b70edf37.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/e60b78666b7a65038b7aed03d68779e8e7012f59ca4a5d0bf30b1feb13777ad2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/9861bd933757b9fc3180bee77ec517d87bdb80c7acd025fe7f447a78c4079f5c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f814ac5df5aecbe582e861519dde68d0c58779f17cdf1725cc7996c8e6887021.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/991c9c7c00984e5b64064f83ea1824e026a8a9850e517e7a19616dc17edfed94.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/183be8f92f768810426cb0052eb010c8cc0e44c3207b3c27b19017b39a7a0488.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ccf7b981635f1da0248cdc6e8daf45435153ef88c8c6a8cdb5da106607e56242.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4bb347445684e6f164e1d3eb3e7c22f8e102fba2d16a605b07be40d0fc18218d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a241f0e8179e6202a4cfef951d5a974a4dabdf08eb65b7c3bc4cfa266a1bfa9d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4d346416b7ed98ef1a5356849815cd4cf7f123b2fd9c3d2cd88343d02153f678.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/fcbaddd4ea7d4a0f9d64f4318e6e0f6b9844de1aef69f3dfa7ef6cccecd67c9b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/60c1e327f4c46eed55455785978e99d745b5d65a856c986074eb81e691bc61ad.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/cb753a0377beac129446de687f3513aa3fda8748f441c32ca8f487a9e2445739.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/61b01872273dccfd2d1e4a922bbf9ecef1931cca495903b0f99da1083401343c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f47b9248ae0c5e2f39feb5e2f075e4ab283b57ac738122606d1cb624a5061e6d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8b7f1b00a484c93c3713255aab84ce1755d7308374feba78f0506c3f9fa1d40f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/e1f4f6dc3d9081d04b512056d1d24da035978dc7365ff7f21f72901f37a97a4d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/2b819df7182533d5a0bb2b3a0c0dfc0a6be1c50c5b9a8b15ac80bf9601050aa9.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8f10ad4aa11fd626cc097fe5ac2e003a5ccdccdf2db23f06789387f129f6faeb.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6f1b028068db7ab555b809f0a259355a3b18ba77ef53214d0f776a4b3b438418.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/e6222b87762cbfc4fdeb0c1158054abe1e19abcc3507932b226b567baf458415.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/27e34c1c0ca534a298e5038cfac91047710f791dcf412d7b920cc6fca9939fd1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/1149533f9a9d73c3cb4ac01729f92f36b8f099f27e67488976698e4568738b55.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6fa7cd08793fabc052e4fcda5e47db6324a04591cc198bd2bbae7a11662db992.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/d80d54356b39bc49b2b884b8896f5676799a136580967300348044870ca46e69.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/aaf944c67f990423b1d6f45e5c0b943f9bb47e5e3de4ce2f8f5ccd11be4746e6.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/466f13b7ba38bb20a7e9e6a95606a72917d051c4a15ff0dde67e4b0f39e04496.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/673a14588ce720a1e18ee937cf25a2ad742432be494f554795b1430b11bbbf6e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ac9302b59df7bfa0527a9f0d4264399b7e3d0617afe652995d76c0e39553900a.bin: Read-only file system (os error 30)\nfailed to record\n... 453054 bytes omitted; verify with stderr_sha256 ...\nfile system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ef074302765506f1a8ef9b27531bdfa62da128ce6cedb8cd4d91983fa1b7a1d9.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/5d2b998112a9b7d7550b236e935302c61321f4ba3a3b174d4bd88ea5c6e0702e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ccaaed08185a652d56774c14aa821860e054396ae232a40e18748f01d7e9d6df.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/71d7ecdbd69e95e19fb5dc2b7e7fbf8dda395988666d5c390829b3f373049852.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/db0f9fe7303290697b351509653570693014df63d6dc40c964cc19b15aeb36f4.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f942d4ab95220b26d6b5b663e96adf306299e0a6e02746e0b0c4a80a8e29d10a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/fe36ee07815e3e525abb02957e62e570410064aab9c194ef1cb56f02a6f6454f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/5cef17f45dfb52db442532f8405f671712e950bccae5eb4612c2ea185b6162ad.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/1ebbe7923231e47f9a8eaf30a75ed48e81792a21143a8db2a5125e89f39619cb.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/460bbd87ddd38eb8a0780df3afddeac25e08b63ae41a6e7323307f0963cb2ee1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/46380aaff36b61e4eaf52fe8e82fde95d54acbaf35ba711d8e4d9b89a291a35a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/865295f551031b994f1315e14edc96a564020c8777b700868785f81410c982ca.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/049b77748c2ca0dee632f302218f309b5a58eed42001e6ad8225e5d1369d8ff1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/09f7ec8517f51f5469f7845f8f5cb20dd2b71031090432d618df6ebf8feed72a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/be16c03168a5ee834dd865bc6642d22d5c11c0dd5c9d48e76e53d1de7e6c8b9e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a0713e520a37e9b94cd42287e50318f5639f2d355f1509f68d68dfe07d7fe425.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/63196a6de4f6d47504a42c264ac8158d9fd406fcb502c9f3ebb3d6d8e4a46c94.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/9506bd20f93f6fbee4240152c25be9b0da0baf93edcef022d6e4eefe2427b4a2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/67da57f4fbc894d44259e54e789a31f1f5c9df98fb27bac0811ac9fa0e59c071.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/d37424ffb70d0387a60dc4dcc2ddaf585e9b8c5c2f69b5ddb0ad3801d0190188.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/c938e1025c0c2a6dcbb59c2072f01640584a7738f2c0e49c79a02b38ba4edb44.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4a7dedf5643a76f2ddc0c3273d890350e8705bd26cdb0b1071012114f2a56107.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/7b9af4511de0e5e0acca68c633248e8d505543576c253d3bbd3e4c1ee5bc66a3.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/29b190b2897b8cb480915e8e8999c2fc0d8150f4b6900d279314cb2aa721c6aa.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/eeb6d120d4779c25d5ba6072c6db57c917ac351f3cdc131506a5cef11f789c31.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/31504aff344a956a2f69de6fd9afea4dea7ac710555e36a4cc45ed13e66ce57d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/86cde9f5907f073df3be65a9fed7a864aa50d62a88742a44828f582edf683ad1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a005db5bdc26ae402352c9e1c992b5a629ca3c281dc8fba0f6eca00ba3873f89.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8651f363057f248fda285fa2d24cc89e43caeca6dd15e56778c5cc07ec1de0a1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/e8e8cc39828b66ed6e28d462c613f082767f7c8ad245f9184218157eccd21e8a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/078793c3dd62682153b16dafd44891dd294d74b3561b9ac671332fe1e95e66bd.bin: Read-only file system (os error 30)\n[rumoca] warning[WR006]: annotation Evaluate has no effect on function local 'm': only components declared with the parameter prefix are evaluated (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/SpacePhasors/Functions/ToSpacePhasor.mo:10:54)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:105:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:138:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:151:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:178:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:191:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:215:14)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicExactClock.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'period' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicRealClock.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SubSample.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SuperSample.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/InductorDC.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/PartialAirGapDC.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ElectricalExcited.mo:54:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_PermanentMagnet.mo:56:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ReluctanceRotor.mo:48:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMEE.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMPM.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMR.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMEE.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMPM.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMR.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_n.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_p.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4469:28)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4684:29)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4892:30)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5082:65)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcarddiode' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5224:31)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:19:18)\n[rumoca] warning[WR005]: Evaluate=true on 'orientation' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:21:22)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/QuasiStatic/FundamentalWave/Components/QuasiStaticAnalogElectroMagneticConverter.mo:22:18)\n[rumoca] warning[WR005]: Evaluate=true on 'useFixedTemperature' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/HeatTransfer/Sensors/ConditionalFixedHeatFlowSensor.mo:5:21)\n[rumoca] warning[WR001]: external function 'readTimeTableData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:211:18)\n[rumoca] warning[WR001]: external function 'readTable1DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:225:18)\n[rumoca] warning[WR001]: external function 'readTable2DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:239:18)\n[rumoca] warning[WR001]: external function 'dgegv' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1724:18)\n[rumoca] warning[WR001]: external function 'dgelsx' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1970:18)\n[rumoca] warning[WR001]: external function 'dgelsx_vec' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2104:18)\n[rumoca] warning[WR001]: external function 'dgeqpf' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2238:18)\nwrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/bug-review-20260915/69ffce7f37cd1d7e.rbc\n",
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 485822,
+    "stderr_sha256": "5cc84b3f199ac6986c9a4d2310be499f3ccf32caaccf255b1ab9e285ee8985e3",
+    "stderr_truncated": true
+  },
+  "baseline": {
+    "command": [
+      "/data/mrumoca/rumoca/target/debug/rumoca",
+      "compile-bitcode",
+      "/data/mrumoca/rumoca/target/bug-review-20260915/69ffce7f37cd1d7e.rbc",
+      "--simulate",
+      "--check",
+      "--t-end",
+      "0.5"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 1,
+    "seconds": 0.018,
+    "stdout": "",
+    "stderr": "reading /data/mrumoca/rumoca/target/bug-review-20260915/69ffce7f37cd1d7e.rbc (bitcode v1, cbor)\n  \u001b[31m\u001b[0m bitcode failed validation:\n  \u001b[31m\u2502\u001b[0m   - expression 1380 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1381 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1383 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1384 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1388 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1389 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1405 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1406 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1408 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1413 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1414 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1415 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1417 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1830 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1833 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1836 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1841 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1843 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1985 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1986 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1988 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1989 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1991 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1993 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 1997 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2007 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2008 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2014 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2016 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2022 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2023 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2026 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2028 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2036 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2037 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2041 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2042 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2043 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2045 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2047 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2050 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2051 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2053 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2054 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 2058 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n\n",
+    "outcome": "tool-error"
+  }
+}

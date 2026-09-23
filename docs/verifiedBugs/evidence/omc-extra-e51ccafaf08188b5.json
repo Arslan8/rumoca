@@ -1,0 +1,32 @@
+{
+  "command": [
+    "omc",
+    "/data/mrumoca/rumoca/target/bug-review-20260915/omc-extra-e51ccafaf08188b5/verify.mos"
+  ],
+  "cwd": "/data/mrumoca/rumoca/target/bug-review-20260915/omc-extra-e51ccafaf08188b5",
+  "status": "completed",
+  "returncode": 0,
+  "seconds": 3.183,
+  "stdout": "true\ntrue\ntrue\ntrue\ntrue\ntrue\n\"Notification: Automatically loaded package Complex 4.1.0 due to uses annotation from Modelica.\nNotification: Automatically loaded package ModelicaServices 4.1.0 due to uses annotation from Modelica.\n\"\nAUDIT_CASE Baseline\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/bug-review-20260915/omc-extra-e51ccafaf08188b5/Baseline_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'Baseline', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.0059928690000000005,\n    timeBackend = 0.016073912000000003,\n    timeSimCode = 0.002310064,\n    timeTemplates = 0.005497186,\n    timeCompile = 1.223846518,\n    timeSimulation = 0.020397055,\n    timeTotal = 1.274253768\nend SimulationResult;\n\"\"\nAUDIT_CASE FINDING00936\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'FINDING00936', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Failed to build model: FINDING00936\",\n    timeFrontend = 0.0,\n    timeBackend = 0.0,\n    timeSimCode = 0.0,\n    timeTemplates = 0.0,\n    timeCompile = 0.0,\n    timeSimulation = 0.0,\n    timeTotal = 0.0\nend SimulationResult;\n\"Error: Template error: A template call failed (/usr/bin/../lib/x86_64-linux-gnu/omc/libOpenModelicaCompiler.so: (null)). One possible reason could be that a template imported function call failed (which should not happen for functions called from within template code; templates assert pure 'match'/non-failing semantics).\n\"\nAUDIT_CASE FinalFINDING00936\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'FinalFINDING00936', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Failed to build model: FinalFINDING00936\",\n    timeFrontend = 0.0,\n    timeBackend = 0.0,\n    timeSimCode = 0.0,\n    timeTemplates = 0.0,\n    timeCompile = 0.0,\n    timeSimulation = 0.0,\n    timeTotal = 0.0\nend SimulationResult;\n\"Error: Template error: A template call failed (/usr/bin/../lib/x86_64-linux-gnu/omc/libOpenModelicaCompiler.so: (null)). One possible reason could be that a template imported function call failed (which should not happen for functions called from within template code; templates assert pure 'match'/non-failing semantics).\n\"\nAUDIT_OVERRIDE FINDING00936\n\nLOG_STDOUT        | warning | It is not possible to override the following quantity: f\n|                 | |       | It seems to be structural, final, protected or evaluated or has a non-constant binding.\nLOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n0\n",
+  "stderr": "",
+  "model": "Modelica.Electrical.Analog.Examples.OpAmps.VoltageFollower",
+  "cases": [
+    [
+      "Baseline",
+      null,
+      null
+    ],
+    [
+      "FINDING00936",
+      "f",
+      0.0
+    ],
+    [
+      "FinalFINDING00936",
+      "f",
+      0.0
+    ]
+  ],
+  "modelica_source": "model Baseline\n  extends Modelica.Electrical.Analog.Examples.OpAmps.VoltageFollower;\nend Baseline;\nmodel FINDING00936\n  extends Modelica.Electrical.Analog.Examples.OpAmps.VoltageFollower(f=0);\nend FINDING00936;\nmodel FinalFINDING00936\n  extends Modelica.Electrical.Analog.Examples.OpAmps.VoltageFollower(final f=0);\nend FinalFINDING00936;\n",
+  "mos": "setCommandLineOptions(\"--numProcs=1 --evaluateFinalParameters=true\");\nsetCompiler(\"gcc\");\nsetCXXCompiler(\"g++\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/Modelica/package.mo\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/package.mo\");\nloadFile(\"Cases.mo\");\ngetErrorString();\nprint(\"AUDIT_CASE Baseline\\n\");\nsimulate(Baseline, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FINDING00936\\n\");\nsimulate(FINDING00936, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FinalFINDING00936\\n\");\nsimulate(FinalFINDING00936, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_OVERRIDE FINDING00936\\n\");\nsystem(\"./Baseline -override f=0 -r=FINDING00936_override.csv\");\n"
+}

@@ -1,0 +1,6 @@
+id,status,affected_class,trigger,root_cause,report,reproducer
+LLM-BUG-001,confirmed,Modelica.Blocks.Continuous.FirstOrder,T=0,Public time constant reaches a direct denominator,LLM-BUG-001-firstorder-zero-time-constant.md,repro/LLM_FirstOrderZero.mo
+LLM-BUG-002,confirmed,Modelica.Blocks.Continuous.CriticalDamping and Modelica.Clocked.Examples.Systems.Utilities.ComponentsMixingUnit.CriticalDamping,n=0,Public order creates an empty state vector that source indexes and also reaches 1/n,LLM-BUG-002-criticaldamping-zero-order.md,repro/LLM_BlocksCriticalDampingOrderZero.mo
+LLM-BUG-003,confirmed,Modelica.Electrical.Analog.Semiconductors.Thyristor,ITM=0 or IH=0,Public current parameters reach protected resistance denominators,LLM-BUG-003-thyristor-zero-current-parameters.md,repro/LLM_ThyristorITMZero.mo
+LLM-BUG-004,confirmed,Modelica.Electrical.PowerConverters.DCDC.Control.SignalPWM,f=0,Public switching frequency reaches four period/timing denominators,LLM-BUG-004-signalpwm-zero-frequency.md,repro/LLM_SignalPWMFrequencyZero.mo
+LLM-BUG-005,confirmed,Modelica.Electrical.Analog.Examples.CompareTransformers and Modelica.Electrical.Analog.Ideal.IdealTransformer,n=0,Public turns ratio reaches multiple transformer denominators,LLM-BUG-005-comparetransformers-zero-turns-ratio.md,repro/LLM_CompareTransformersRatioZero.mo

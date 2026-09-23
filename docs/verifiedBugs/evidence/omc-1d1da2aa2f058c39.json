@@ -1,0 +1,32 @@
+{
+  "command": [
+    "omc",
+    "/data/mrumoca/rumoca/target/bug-review-20260915/omc-1d1da2aa2f058c39/verify.mos"
+  ],
+  "cwd": "/data/mrumoca/rumoca/target/bug-review-20260915/omc-1d1da2aa2f058c39",
+  "status": "completed",
+  "returncode": 0,
+  "seconds": 5.419,
+  "stdout": "true\ntrue\ntrue\ntrue\ntrue\ntrue\n\"Notification: Automatically loaded package Complex 4.1.0 due to uses annotation from Modelica.\nNotification: Automatically loaded package ModelicaServices 4.1.0 due to uses annotation from Modelica.\n\"\nAUDIT_CASE Baseline\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/bug-review-20260915/omc-1d1da2aa2f058c39/Baseline_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'Baseline', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.0050324110000000005,\n    timeBackend = 0.00574876,\n    timeSimCode = 0.001590185,\n    timeTemplates = 0.00820584,\n    timeCompile = 1.117039173,\n    timeSimulation = 0.019702459000000002,\n    timeTotal = 1.157430872\nend SimulationResult;\n\"\"\nAUDIT_CASE BUG017\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'BUG017', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Simulation execution failed for model: BUG017\nLOG_ASSERT        | debug   | division by zero at time 0, (a=-9.899999999999999) / (b=0), where divisor b expression is: inertia2.m\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n\",\n    timeFrontend = 0.0036006840000000003,\n    timeBackend = 0.005152645,\n    timeSimCode = 0.00145917,\n    timeTemplates = 0.015545415000000002,\n    timeCompile = 1.120796179,\n    timeSimulation = 0.018383382,\n    timeTotal = 1.165117294\nend SimulationResult;\n\"\"\nAUDIT_CASE FinalBUG017\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.5, numberOfIntervals = 100, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'FinalBUG017', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Simulation execution failed for model: FinalBUG017\nLOG_INIT          | error   | The initialization problem is inconsistent due to the following equation: 0 != 0.9 = $START.inertia2.s - inertia2.s\nLOG_STDOUT        | warning | Error in initialization. Storing results and exiting.\n|                 | |       | Use -lv=LOG_INIT -w for more information.\n\",\n    timeFrontend = 0.0037019830000000003,\n    timeBackend = 0.005822776,\n    timeSimCode = 0.001259897,\n    timeTemplates = 0.003177221,\n    timeCompile = 1.169406277,\n    timeSimulation = 0.018015124,\n    timeTotal = 1.201490409\nend SimulationResult;\n\"Warning: It was not possible to determine if the initialization problem is consistent, because of not evaluable parameters/start values during compile time: inertia2.v = $START.inertia2.v (0.0 = $START.inertia2.v)\nWarning: It was not possible to determine if the initialization problem is consistent, because of not evaluable parameters/start values during compile time: inertia2.s = $START.inertia2.s (fixed2.s0 + spring2.s_rel0 + (-0.5) * inertia2.L = $START.inertia2.s)\nWarning: The initial conditions are over specified. For more information set -d=initialization. In OMEdit Tools->Options->Simulation->Show additional information from the initialization process, in OMNotebook call setCommandLineOptions(\\\"-d=initialization\\\").\n\"\nAUDIT_OVERRIDE BUG017\n\nLOG_STDOUT        | warning | You are overriding inertia2.m with a small value or zero.\n|                 | |       | This could lead to numerically dirty solutions or divisions by zero if not tearingStrictness=veryStrict.\nLOG_ASSERT        | debug   | division by zero at time 0, (a=-9.899999999999999) / (b=0), where divisor b expression is: inertia2.m\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n255\n",
+  "stderr": "",
+  "model": "Modelica.Mechanics.Translational.Examples.WhyArrows",
+  "cases": [
+    [
+      "Baseline",
+      null,
+      null
+    ],
+    [
+      "BUG017",
+      "inertia2.m",
+      0.0
+    ],
+    [
+      "FinalBUG017",
+      "inertia2.m",
+      0.0
+    ]
+  ],
+  "modelica_source": "model Baseline\n  extends Modelica.Mechanics.Translational.Examples.WhyArrows;\nend Baseline;\nmodel BUG017\n  extends Modelica.Mechanics.Translational.Examples.WhyArrows(inertia2(m=0));\nend BUG017;\nmodel FinalBUG017\n  extends Modelica.Mechanics.Translational.Examples.WhyArrows(inertia2(final m=0));\nend FinalBUG017;\n",
+  "mos": "setCommandLineOptions(\"--numProcs=1 --evaluateFinalParameters=true\");\nsetCompiler(\"gcc\");\nsetCXXCompiler(\"g++\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/Modelica/package.mo\");\nloadFile(\"/data/mrumoca/rumoca/target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/package.mo\");\nloadFile(\"Cases.mo\");\ngetErrorString();\nprint(\"AUDIT_CASE Baseline\\n\");\nsimulate(Baseline, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE BUG017\\n\");\nsimulate(BUG017, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_CASE FinalBUG017\\n\");\nsimulate(FinalBUG017, stopTime=0.5, numberOfIntervals=100, outputFormat=\"csv\");\ngetErrorString();\nprint(\"AUDIT_OVERRIDE BUG017\\n\");\nsystem(\"./Baseline -override inertia2.m=0 -r=BUG017_override.csv\");\n"
+}

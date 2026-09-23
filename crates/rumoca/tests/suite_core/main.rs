@@ -27,6 +27,8 @@
 mod history_operator_checked;
 
 mod algorithm_parameter_range;
+mod bitcode_disasm;
+mod type_level_bounds;
 mod array_der_coupling_test;
 mod array_subscript_test;
 mod backend_executor_differential;
@@ -84,6 +86,7 @@ mod neural_ode_tensor_solve_ir;
 mod omc_differential_semantics;
 mod overdetermined_connection_loop;
 mod override_promoted_array_mask;
+mod parameter_binding_fold_option;
 mod periodic_source_counter_regression;
 mod pipeline_test;
 mod prepared_vectors_refresh;

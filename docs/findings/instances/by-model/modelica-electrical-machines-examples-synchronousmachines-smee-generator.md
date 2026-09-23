@@ -1,0 +1,71 @@
+# Modelica.Electrical.Machines.Examples.SynchronousMachines.SMEE_Generator
+
+65 findings.
+
+| ID | Reached as | Kind | |
+|---|---|---|---|
+| [FINDING-02225](../FINDING-02225-smee-generator-l.md) | `smee.airGap.L` | `physical-domain-unenforced` |  |
+| [FINDING-02226](../FINDING-02226-smee-generator-lmd.md) | `smee.airGap.Lmd` | `physical-domain-unenforced` |  |
+| [FINDING-02227](../FINDING-02227-smee-generator-lmq.md) | `smee.airGap.Lmq` | `physical-domain-unenforced` |  |
+| [FINDING-02228](../FINDING-02228-smee-generator-gcref.md) | `smee.statorCore.coreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02229](../FINDING-02229-smee-generator-gcref.md) | `smee.statorCoreParameters.GcRef` | `physical-invariant-violated` |  |
+| [FINDING-02230](../FINDING-02230-smee-generator-m.md) | `smee.statorCoreParameters.m` | `divisor-reachable-zero` |  |
+| [FINDING-02231](../FINDING-02231-smee-generator-lrsigmad.md) | `smee.damperCage.Lrsigmad` | `physical-domain-unenforced` |  |
+| [FINDING-02232](../FINDING-02232-smee-generator-lrsigmaq.md) | `smee.damperCage.Lrsigmaq` | `physical-domain-unenforced` |  |
+| [FINDING-02233](../FINDING-02233-smee-generator-rrd.md) | `smee.damperCage.Rrd` | `physical-domain-unenforced` |  |
+| [FINDING-02234](../FINDING-02234-smee-generator-rrq.md) | `smee.damperCage.Rrq` | `physical-domain-unenforced` |  |
+| [FINDING-02235](../FINDING-02235-smee-generator-l.md) | `smee.lssigma.L` | `physical-domain-unenforced` |  |
+| [FINDING-02236](../FINDING-02236-smee-generator-l.md) | `smee.lesigma.L` | `physical-domain-unenforced` |  |
+| [FINDING-02237](../FINDING-02237-smee-generator-l.md) | `smee.lszero.L` | `physical-domain-unenforced` |  |
+| [FINDING-02238](../FINDING-02238-smee-generator-j.md) | `smee.inertiaRotor.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02239](../FINDING-02239-smee-generator-j.md) | `smee.inertiaStator.J` | `physical-bound-permits-zero` |  |
+| [FINDING-02240](../FINDING-02240-smee-generator-rs.md) | `smee.Rs` | `physical-domain-unenforced` |  |
+| [FINDING-02241](../FINDING-02241-smee-generator-zsref.md) | `smee.ZsRef` | `physical-domain-unenforced` |  |
+| [FINDING-02242](../FINDING-02242-smee-generator-pi.md) | `smee.pi` | `divisor-reachable-zero` |  |
+| [FINDING-02243](../FINDING-02243-smee-generator-pi.md) | `smee.pi` | `divisor-reachable-zero` |  |
+| [FINDING-02244](../FINDING-02244-smee-generator-lszero.md) | `smee.Lszero` | `physical-domain-unenforced` |  |
+| [FINDING-02245](../FINDING-02245-smee-generator-lssigma.md) | `smee.Lssigma` | `physical-domain-unenforced` |  |
+| [FINDING-02246](../FINDING-02246-smee-generator-jr.md) | `smee.Jr` | `physical-domain-unenforced` |  |
+| [FINDING-02247](../FINDING-02247-smee-generator-js.md) | `smee.Js` | `physical-domain-unenforced` |  |
+| [FINDING-02248](../FINDING-02248-smee-generator-r.md) | `smee.rs.R` | `physical-domain-unenforced` |  |
+| [FINDING-02249](../FINDING-02249-smee-generator-m.md) | `rotorDisplacementAngle.m` | `divisor-reachable-zero` |  |
+| [FINDING-02250](../FINDING-02250-smee-generator-lesigma.md) | `smee.Lesigma` | `physical-domain-unenforced` |  |
+| [FINDING-02251](../FINDING-02251-smee-generator-lmd.md) | `smee.Lmd` | `physical-domain-unenforced` |  |
+| [FINDING-02252](../FINDING-02252-smee-generator-lmq.md) | `smee.Lmq` | `physical-domain-unenforced` |  |
+| [FINDING-02253](../FINDING-02253-smee-generator-lrsigmad.md) | `smee.Lrsigmad` | `physical-domain-unenforced` |  |
+| [FINDING-02254](../FINDING-02254-smee-generator-lrsigmaq.md) | `smee.Lrsigmaq` | `physical-domain-unenforced` |  |
+| [FINDING-02255](../FINDING-02255-smee-generator-rrd.md) | `smee.Rrd` | `physical-domain-unenforced` |  |
+| [FINDING-02256](../FINDING-02256-smee-generator-rrq.md) | `smee.Rrq` | `physical-domain-unenforced` |  |
+| [FINDING-02257](../FINDING-02257-smee-generator-re.md) | `smee.Re` | `physical-domain-unenforced` |  |
+| [FINDING-02258](../FINDING-02258-smee-generator-duration.md) | `rampCurrent.signalSource.duration` | `divisor-reachable-zero` |  |
+| [FINDING-02259](../FINDING-02259-smee-generator-m.md) | `smee.spacePhasorS.m` | `divisor-reachable-zero` |  |
+| [FINDING-02260](../FINDING-02260-smee-generator-lmd.md) | `smeeData.Lmd` | `physical-domain-unenforced` |  |
+| [FINDING-02261](../FINDING-02261-smee-generator-lmq.md) | `smeeData.Lmq` | `physical-domain-unenforced` |  |
+| [FINDING-02262](../FINDING-02262-smee-generator-lrsigmad.md) | `smeeData.Lrsigmad` | `physical-domain-unenforced` |  |
+| [FINDING-02263](../FINDING-02263-smee-generator-lrsigmaq.md) | `smeeData.Lrsigmaq` | `physical-domain-unenforced` |  |
+| [FINDING-02264](../FINDING-02264-smee-generator-rrd.md) | `smeeData.Rrd` | `physical-domain-unenforced` |  |
+| [FINDING-02265](../FINDING-02265-smee-generator-zreference.md) | `smeeData.ZReference` | `physical-domain-unenforced` |  |
+| [FINDING-02266](../FINDING-02266-smee-generator-rrq.md) | `smeeData.Rrq` | `physical-domain-unenforced` |  |
+| [FINDING-02267](../FINDING-02267-smee-generator-re.md) | `smeeData.Re` | `physical-domain-unenforced` |  |
+| [FINDING-02268](../FINDING-02268-smee-generator-fsnominal.md) | `smeeData.fsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02269](../FINDING-02269-smee-generator-ieopencircuit.md) | `smeeData.IeOpenCircuit` | `divisor-reachable-zero` |  |
+| [FINDING-02270](../FINDING-02270-smee-generator-ieopencircuit.md) | `smeeData.IeOpenCircuit` | `divisor-reachable-zero` |  |
+| [FINDING-02271](../FINDING-02271-smee-generator-x0.md) | `smeeData.x0` | `divisor-reachable-zero` |  |
+| [FINDING-02272](../FINDING-02272-smee-generator-xd.md) | `smeeData.xd` | `divisor-reachable-zero` |  |
+| [FINDING-02273](../FINDING-02273-smee-generator-xd.md) | `smeeData.xd` | `divisor-zero-when-parameters-equal` |  |
+| [FINDING-02274](../FINDING-02274-smee-generator-xq.md) | `smeeData.xq` | `divisor-zero-when-parameters-equal` |  |
+| [FINDING-02275](../FINDING-02275-smee-generator-xdtransient.md) | `smeeData.xdTransient` | `divisor-reachable-zero` |  |
+| [FINDING-02276](../FINDING-02276-smee-generator-xdtransient.md) | `smeeData.xdTransient` | `divisor-zero-when-parameters-equal` |  |
+| [FINDING-02277](../FINDING-02277-smee-generator-xdsubtransient.md) | `smeeData.xdSubtransient` | `divisor-reachable-zero` |  |
+| [FINDING-02278](../FINDING-02278-smee-generator-xdsubtransient.md) | `smeeData.xdSubtransient` | `divisor-reachable-zero` |  |
+| [FINDING-02279](../FINDING-02279-smee-generator-xqsubtransient.md) | `smeeData.xqSubtransient` | `divisor-reachable-zero` |  |
+| [FINDING-02280](../FINDING-02280-smee-generator-xqsubtransient.md) | `smeeData.xqSubtransient` | `divisor-reachable-zero` |  |
+| [FINDING-02281](../FINDING-02281-smee-generator-ta.md) | `smeeData.Ta` | `divisor-reachable-zero` |  |
+| [FINDING-02282](../FINDING-02282-smee-generator-td0transient.md) | `smeeData.Td0Transient` | `divisor-reachable-zero` |  |
+| [FINDING-02283](../FINDING-02283-smee-generator-td0subtransient.md) | `smeeData.Td0Subtransient` | `divisor-reachable-zero` |  |
+| [FINDING-02284](../FINDING-02284-smee-generator-tq0subtransient.md) | `smeeData.Tq0Subtransient` | `divisor-reachable-zero` |  |
+| [FINDING-02285](../FINDING-02285-smee-generator-snominal.md) | `smeeData.SNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02286](../FINDING-02286-smee-generator-vsnominal.md) | `smeeData.VsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02287](../FINDING-02287-smee-generator-vsnominal.md) | `smeeData.VsNominal` | `divisor-reachable-zero` |  |
+| [FINDING-02288](../FINDING-02288-smee-generator-rs.md) | `smeeData.Rs` | `physical-domain-unenforced` |  |
+| [FINDING-02289](../FINDING-02289-smee-generator-lssigma.md) | `smeeData.Lssigma` | `physical-domain-unenforced` |  |

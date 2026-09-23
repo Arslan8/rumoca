@@ -26,7 +26,7 @@ corpus.
 **OpenModelica cannot be the analysis engine.** It offers no IR to read, so
 there is no incidence information to say *which* parameter is a sole
 coefficient. That is what makes the search targeted rather than brute force, and
-it is why [BUG-006](../findings/BUG-006-bound-propagated-into-a-different-component.md)
+it is why [BUG-006](../verified%20bugs/BUG-006-bound-propagated-into-a-different-component.md)
 was findable at all — the bound and the singular coefficient were in different
 components, linked through `C = k/(2*pi*f*R)`.
 
@@ -139,3 +139,7 @@ argument is about the declaration rather than about tool behaviour.
 | Guard + reachability | rejected the `EddyCurrent` and `Ramp` patterns |
 | Cross-confirmation | 12 → 10, removing 2 tool artifacts |
 | Text-level census (superseded) | ran at 23% precision; see [min0-census](../findings/min0-census.md) |
+
+- [divide-by-zero-analysis.md](divide-by-zero-analysis.md) — what the divisor detector must prove, and the regression cases that check it.
+- [zero-behavior-contracts.md](zero-behavior-contracts.md) — one classification of what zero means, shared by three detectors.
+- [physical-intent-advisory-instructions.md](physical-intent-advisory-instructions.md) — implementation and regression instructions for keeping uncertain physical anomalies visible without treating guessed intent as an error.

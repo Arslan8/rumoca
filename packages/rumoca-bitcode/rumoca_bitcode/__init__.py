@@ -24,21 +24,43 @@ from typing import Any, Iterable
 
 from . import _cbor
 from .model import (
+    ConnectionSet,
+    FlowBalance,
+    FlowTerm,
     MAGIC,
     VERSION,
+    ArrayExpr,
+    ArrayUpdate,
+    Call,
     BinaryOp,
+    Binder,
+    BinderRef,
     BitcodeError,
     BuiltinCall,
+    Comprehension,
     Component,
     Conditional,
     Connection,
+    DiscreteRealEquation,
+    Domain,
     Equation,
+    Function,
+    FunctionParameter,
+    FunctionParameterRef,
+    EquationFamily,
+    FieldAccess,
+    IndexExpr,
+    InitialDiscreteValue,
+    RangeExpr,
+    RecordExpr,
+    RecordField,
     Event,
     Expression,
     Literal,
     Provenance,
     Source,
     Span,
+    SymbolContract,
     TimeRef,
     TracePoint,
     UnaryOp,
@@ -53,12 +75,16 @@ __all__ = [
     "Variable",
     "Equation",
     "Connection",
+    "ConnectionSet",
+    "FlowBalance",
+    "FlowTerm",
     "Event",
     "TracePoint",
     "Component",
     "ValueType",
     "Source",
     "Span",
+    "SymbolContract",
     "Provenance",
     "Expression",
     "Literal",
@@ -68,8 +94,27 @@ __all__ = [
     "BinaryOp",
     "BuiltinCall",
     "Conditional",
+    "Domain",
+    "DiscreteRealEquation",
+    "InitialDiscreteValue",
+    "Function",
+    "FunctionParameter",
+    "FunctionParameterRef",
+    "Call",
+    "Binder",
+    "BinderRef",
+    "EquationFamily",
+    "ArrayExpr",
+    "RecordExpr",
+    "RecordField",
+    "FieldAccess",
+    "RangeExpr",
+    "Comprehension",
+    "IndexExpr",
+    "ArrayUpdate",
     "Unsupported",
     "BitcodeError",
+    "Builder",
     "MAGIC",
     "VERSION",
 ]
@@ -115,15 +160,29 @@ class Model:
                 id=entry["id"],
                 scalar=entry["scalar"],
                 dimensions=tuple(entry.get("dimensions", [])),
+                record_name=(entry.get("record") or {}).get("name"),
+                fields=tuple(
+                    RecordField(field["name"], field["value_type"])
+                    for field in (entry.get("record") or {}).get("fields", [])
+                ),
             )
             for entry in self._raw.get("types", [])
         ]
         self.components: list[Component] = [
-            Component(id=entry["id"], path=entry["path"])
+            Component(id=entry["id"], path=entry["path"],
+                      class_name=entry.get("class_name"))
             for entry in self._raw.get("components", [])
         ]
         self.variables: list[Variable] = [
             Variable(entry, self) for entry in self._raw.get("variables", [])
+        ]
+        # Domains and functions precede expressions: a binder, comprehension
+        # or call node names one.
+        self.domains: list[Domain] = [
+            Domain(entry, self) for entry in self._raw.get("domains", [])
+        ]
+        self.functions: list[Function] = [
+            Function(entry, self) for entry in self._raw.get("functions", [])
         ]
         self.expressions: list[Expression] = self._build_expressions()
         self.equations: list[Equation] = [
@@ -132,8 +191,28 @@ class Model:
         self.initial_equations: list[Equation] = [
             Equation(entry, self) for entry in self._raw.get("initial_equations", [])
         ]
+        self.equation_families: list[EquationFamily] = [
+            EquationFamily(entry, self)
+            for entry in self._raw.get("equation_families", [])
+        ]
+        self.initial_equation_families: list[EquationFamily] = [
+            EquationFamily(entry, self, initial=True)
+            for entry in self._raw.get("initial_equation_families", [])
+        ]
+        self.discrete_real_equations: list[DiscreteRealEquation] = [
+            DiscreteRealEquation(entry, self)
+            for entry in self._raw.get("discrete_real_equations", [])
+        ]
+        self.initial_discrete_values: list[InitialDiscreteValue] = [
+            InitialDiscreteValue(entry, self)
+            for entry in self._raw.get("initial_discrete_values", [])
+        ]
         self.connections: list[Connection] = [
             Connection(entry, self) for entry in self._raw.get("connections", [])
+        ]
+        self.connection_sets: list[ConnectionSet] = [
+            ConnectionSet(entry, self)
+            for entry in self._raw.get("connection_sets", [])
         ]
         self.events: list[Event] = [Event(entry, self) for entry in self._raw.get("events", [])]
         self.trace_points: list[TracePoint] = [
@@ -151,6 +230,85 @@ class Model:
     @classmethod
     def loads(cls, data: bytes) -> "Model":
         return cls(decode(data))
+
+    @classmethod
+    def empty(cls, name: str, producer: str = "rumoca-bitcode-sdk") -> "Model":
+        """A valid, minimal artifact with nothing in it.
+
+        The format calls itself an interchange format, and until this existed
+        the only program that could produce one was the Rumoca compiler. A
+        model with no variables and no equations is trivially valid, so a
+        producer starts from something the validator already accepts and adds
+        to it rather than assembling a document and hoping.
+        """
+        return cls({
+            "magic": MAGIC,
+            "bitcode_version": VERSION,
+            "producer": producer,
+            "model": {
+                "name": name,
+                # One source, so generated provenance has somewhere to point.
+                # A span names a source by id, and an empty source table makes
+                # every generated entity dangle — which the validator catches,
+                # correctly and confusingly, as "source 0 does not exist".
+                "sources": [{"id": 0, "name": f"<{producer}>"}],
+                "types": [], "variables": [],
+                "expressions": [], "equations": [], "initial_equations": [],
+                "relations": [], "conditions": [], "roots": [],
+                "events": [], "time_events": [], "connections": [],
+                "components": [], "trace_points": [],
+                "summary": {},
+            },
+        })
+
+    @property
+    def raw_model(self) -> dict[str, Any]:
+        """The underlying document's model table.
+
+        Public because a builder has to edit it, and a supported way to write
+        an artifact beats every consumer reaching past a leading underscore —
+        which is what the first builder did.
+        """
+        return self._raw
+
+    def builder(self, pass_name: str, generation: str = "synthetic_residual"):
+        """A [`Builder`] appending to this model on behalf of `pass_name`."""
+        from .builder import Builder
+
+        return Builder(model=self, pass_name=pass_name, generation=generation)
+
+    @property
+    def connectors(self):
+        from .connectors import Connector
+        return [Connector(raw, self) for raw in self._raw.get("connectors", [])]
+
+    def validate(self, strict: bool = True) -> None:
+        from .compiler import check_model
+        check_model(self, strict=strict)
+
+    def refresh(self) -> None:
+        """Rebuild the typed views from the document, and the summary.
+
+        A pass edits the document; the typed views are built once at load.
+        Leaving them stale makes the model summarise itself with the counts it
+        had before the pass ran, which the validator then rejects — that is
+        how the need for this was found.
+        """
+        Model.__init__(self, self._document)
+        self.recompute_summary()
+
+    def reload_trace_points(self) -> None:
+        """Rebuild the trace-point view from the raw document.
+
+        A pass that adds observations edits the document; the typed views are
+        built once at load. Without this the model keeps the list it was born
+        with, and `recompute_summary` then writes a count the validator
+        rejects --- which is how this was noticed.
+        """
+        self.trace_points = [
+            TracePoint(entry, self)
+            for entry in self._raw.get("trace_points", [])
+        ]
 
     def save(self, path: str | Path, *, format: str | None = None) -> None:
         """Write the model back out.
@@ -271,6 +429,7 @@ class Model:
             "events": len(self.events),
             "time_events": len(self._raw.get("time_events", [])),
             "connections": len(self.connections),
+            "connection_sets": len(self.connection_sets),
             "components": len(self.components),
             "trace_points": len(self.trace_points),
         }
@@ -317,6 +476,20 @@ class Model:
                 elif coordinate_kind in _COORDINATE_KINDS:
                     variable = self.variables[coordinate["variable"]]
                     built.append(VariableRef(identifier, provenance, coordinate_kind, variable))
+                elif coordinate_kind == "function_parameter":
+                    function, ordinal = coordinate["function"], coordinate["ordinal"]
+                    params = (self.functions[function].parameters
+                              if function < len(self.functions) else [])
+                    name = params[ordinal].name if ordinal < len(params) else None
+                    built.append(FunctionParameterRef(
+                        identifier, provenance, function, ordinal, name))
+                elif coordinate_kind == "binder":
+                    # Carry the source name: a family body printed as
+                    # `x[<binder 0.0>]` is unreadable next to `x[i]`.
+                    domain, ordinal = coordinate["domain"], coordinate["ordinal"]
+                    binders = self.domains[domain].binders if domain < len(self.domains) else []
+                    name = binders[ordinal].name if ordinal < len(binders) else None
+                    built.append(BinderRef(identifier, provenance, domain, ordinal, name))
                 else:
                     built.append(
                         Unsupported(identifier, provenance, f"coordinate {coordinate_kind}")
@@ -352,6 +525,37 @@ class Model:
                 built.append(
                     Conditional(identifier, provenance, branches, built[node["fallback"]])
                 )
+            elif kind == "call":
+                function = node["function"]
+                name = (self.functions[function].name
+                        if function < len(self.functions) else None)
+                built.append(Call(identifier, provenance, node["owner"], function,
+                                  node["output"],
+                                  [built[i] for i in node["arguments"]], name))
+            elif kind == "array":
+                built.append(ArrayExpr(identifier, provenance,
+                                       [built[i] for i in node["elements"]]))
+            elif kind == "record":
+                built.append(RecordExpr(identifier, provenance,
+                                        [built[i] for i in node["fields"]]))
+            elif kind == "field":
+                built.append(FieldAccess(identifier, provenance,
+                                         built[node["base"]], node["field"]))
+            elif kind == "range":
+                step = node.get("step")
+                built.append(RangeExpr(identifier, provenance, built[node["start"]],
+                                       None if step is None else built[step],
+                                       built[node["stop"]]))
+            elif kind == "comprehension":
+                built.append(Comprehension(identifier, provenance,
+                                           node["domain"], built[node["body"]]))
+            elif kind == "index":
+                built.append(IndexExpr(identifier, provenance, built[node["base"]],
+                                       _subscripts(node["subscripts"], built)))
+            elif kind == "array_update":
+                built.append(ArrayUpdate(identifier, provenance, built[node["base"]],
+                                         built[node["value"]],
+                                         _subscripts(node["subscripts"], built)))
             else:
                 built.append(Unsupported(identifier, provenance, node.get("detail", kind)))
         return built
@@ -361,6 +565,24 @@ class Model:
             f"<Model {self.name!r}: {len(self.variables)} variables, "
             f"{len(self.equations)} equations, {len(self.connections)} connections>"
         )
+
+
+def _subscripts(raw: list[dict], built: list[Expression]) -> list[Expression | None]:
+    """A whole-dimension `:` has no expression, and is reported as None."""
+    return [
+        None if entry["kind"] == "whole" else built[entry["expression"]]
+        for entry in raw
+    ]
+
+
+def __getattr__(name: str):
+    # Lazy, because `builder` imports nothing from here at module scope but a
+    # reader of the package expects `rumoca_bitcode.Builder` to exist.
+    if name == "Builder":
+        from .builder import Builder
+
+        return Builder
+    raise AttributeError(name)
 
 
 def decode(data: bytes) -> dict[str, Any]:

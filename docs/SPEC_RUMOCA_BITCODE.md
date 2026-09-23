@@ -142,6 +142,14 @@ object.
 
 ## 7. Model contents
 
+> **The per-type reference is [bitcode-reference.md](bitcode-reference.md)**,
+> generated from `schema.rs` by `tools/bitcode/gen_reference.py` and checked
+> for staleness in CI. This section is the narrative: what the major tables
+> are for and how they relate. It stopped tracking the schema once — 51 of 56
+> types had never appeared in it by name — which is why the reference half is
+> now a build product.
+
+
 ```
 RbcModel
   name                model name as compiled
@@ -286,6 +294,85 @@ rumoca compile Motor.mo --model Motor --emit-bitcode motor.rbc
 python connector_logger.py motor.rbc -o motor-traced.rbc
 rumoca compile-bitcode motor-traced.rbc --simulate --t-end 1.0 --trace-out traces.csv
 ```
+
+## 8a. Producing an artifact
+
+A consumer that is not the Rumoca compiler can write one.
+`rumoca_bitcode::build::Builder` in Rust and `rumoca_bitcode.Builder` in
+Python append to a model, or start from `Model.empty(name)`, and hold the
+three invariants that are cheap to break and expensive to find: the arena's
+topological order, dense ids, and generated provenance on everything a tool
+adds. `docs/writing-a-bitcode-pass.md` has the worked examples.
+
+Until they existed the only supported write operation was `add_trace_point`,
+which made this an export format that called itself an interchange format.
+
+## 9a. Computational power
+
+**Rumoca Bitcode is not Turing complete, and the analyses built on it depend
+on that.** A witness search, an interval propagation and a maximum-flow
+matching all terminate without a step budget because the artifact they read
+cannot express unbounded iteration. Three properties give that, each enforced
+rather than conventional:
+
+**The expression arena is a DAG, and a cycle is unrepresentable.** Validation
+requires every operand id to be strictly less than its node's id, so an
+artifact holding a cycle is rejected before reconstruction and evaluation is
+one forward pass. Not "no cycle has been seen": a cycle cannot be written down
+and be valid.
+
+**There is no control flow.** The node set has no assignment, no jump and no
+loop. The only iteration is `Comprehension` over a `DomainId` and
+`RbcEquationFamily` over extents the artifact carries as constants, so every
+trip count is known before evaluation starts.
+
+**Function bodies are not carried.** `RbcFunctionBody` is `ElidedModelica` or
+`External`; neither holds a body, so recursion is not expressible.
+
+Every artifact therefore denotes a finite system of equations over a finite
+index space, and every quantity it can express is computable in bounded steps.
+
+### The system it denotes is another matter
+
+The artifact describes a residual function and an event structure. *Running*
+it — integrating over time with `pre` state, events and `reinit` — is a hybrid
+dynamical system, and those encode Turing machines.
+
+[`Minsky.mo`](../crates/rumoca-bitcode/examples/Minsky.mo) is a two-counter machine written in Modelica and compiled to a
+valid strict artifact of **6 variables, 1 equation and 52 expressions**. Its
+step count grows with its input: `seed = 1` halts after 4 steps, `seed = 7`
+after 22, `seed = 20` after 61, and `seed = 40` has not halted at the horizon.
+A fixed, finite, total artifact; an unbounded computation.
+
+So:
+
+| Question | Status |
+|---|---|
+| does evaluating this expression terminate | yes, always, in one pass |
+| does this static analysis terminate | yes, and that is why none carries a budget |
+| does this model ever divide by zero when run | **undecidable** |
+
+The third is why the divisor analysis is three-valued rather than a predicate,
+and why `divisor-zero-unresolved` exists. It is forced by the semantics, not a
+convenience.
+
+### Three holes in the totality claim, named
+
+- `RbcFunctionBody::External { language, symbol }` — the artifact can call
+  arbitrary foreign code. Totality is a property of what the IR carries, not
+  of what running it does.
+- `RbcFunctionBody::ElidedModelica` — the body exists and is not here, so any
+  analysis that needs to look inside a function is working with a hole, and a
+  `Call` node is opaque to it.
+- `RbcExprNode::Unsupported` — explicitly "this schema version cannot
+  represent it"; a consumer must treat the model as not fully understood.
+
+The argument is machine-checked in `crates/rumoca-bitcode/src/tests.rs`: an
+exhaustive `match` with no wildcard classifies every node kind, so adding one
+fails to compile until somebody classifies it, and removing an arm was
+confirmed to produce `E0004` rather than a silent default. Two further tests
+assert that a self-referencing operand and a forward reference are both
+rejected.
 
 ## 10. Known limits of v1
 

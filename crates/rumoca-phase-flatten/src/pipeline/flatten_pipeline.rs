@@ -11,6 +11,12 @@ pub(crate) struct FlattenGraphData {
 pub(crate) struct OverlayScopeIndex<'a> {
     classes: rustc_hash::FxHashMap<ast::QualifiedName, &'a ast::ClassInstanceData>,
     components: rustc_hash::FxHashMap<ast::QualifiedName, &'a ast::InstanceData>,
+    /// Class occurrence -> the class definition it was instantiated from.
+    ///
+    /// The forward index is keyed by instance path; this answers the reverse
+    /// question a variable asks — "which class body declared me" — for which
+    /// only the owning occurrence's id is at hand.
+    class_definitions: rustc_hash::FxHashMap<rumoca_core::InstanceId, rumoca_core::DefId>,
 }
 
 #[derive(Default)]
@@ -35,10 +41,26 @@ impl<'a> OverlayScopeIndex<'a> {
             .values()
             .map(|component| (component.qualified_name.clone(), component))
             .collect();
+        let class_definitions = overlay
+            .classes
+            .values()
+            .filter_map(|class_data| {
+                Some((class_data.instance_id, class_data.class_def_id?))
+            })
+            .collect();
         Self {
             classes,
             components,
+            class_definitions,
         }
+    }
+
+    /// The class definition an occurrence was instantiated from.
+    pub(crate) fn class_definition(
+        &self,
+        occurrence: rumoca_core::InstanceId,
+    ) -> Option<rumoca_core::DefId> {
+        self.class_definitions.get(&occurrence).copied()
     }
 
     /// Class-body occurrence that instantiation created for the instance path

@@ -164,6 +164,20 @@ pub(crate) fn process_component_instance(
             request.tree,
         )?,
     );
+    // The class this declaration was written in. `owner_class_id` is the
+    // instantiated owner, so an inherited declaration is attributed to the
+    // class that declared it rather than to the one that extends it — which is
+    // the attribution a semantic rule wants: `Resistor.R` is a passive
+    // resistance whichever circuit instantiates it.
+    if let Some(owner) = request.instance_data.owner_class_id
+        && let Some(def_id) = request.scope_index.class_definition(owner)
+        && let Some(qualified) = request.class_index.qualified_name(def_id)
+    {
+        request
+            .flat
+            .variable_declaring_classes
+            .insert(var_name.clone(), qualified.to_string());
+    }
     if request.instance_data.is_final {
         request
             .flat

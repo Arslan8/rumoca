@@ -85,6 +85,7 @@ pub use integrator::{
     accepted_interval_contains, accepted_step_roundoff,
 };
 pub use kernel::SolveMeKernel;
+pub use trace::PublicationObserver;
 pub use session::{
     MeAdvanceOutcome, MeComponentHost, MeOutputCursor, MePluginArity, MeRetainedComponent,
     MeSessionError, MeSessionLoss, MeSessionOptions, MeSessionOptionsInput, MeSimulationSession,

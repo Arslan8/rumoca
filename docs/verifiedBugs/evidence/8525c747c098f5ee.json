@@ -1,0 +1,340 @@
+{
+  "model": "RigidBody.Examples.RoverPlant",
+  "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+  "variables": {
+    "mass": {
+      "name": "mass",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "/data/mrumoca/rumoca/target/cmm/CMM-a642c381/RigidBody/package.mo",
+      "line": 3,
+      "binding": "18.0",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 0,
+        "name": "mass",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 1,
+            "start": 62,
+            "end": 71,
+            "line": 3,
+            "column": 15
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Mass [kg]",
+        "binding": 0,
+        "start": 1,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "wheel_radius": {
+      "name": "wheel_radius",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "line": 15,
+      "binding": "0.15",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 30,
+        "name": "wheel_radius",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 246,
+            "end": 263,
+            "line": 15,
+            "column": 13
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Wheel radius [m]",
+        "binding": 109,
+        "start": 110,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "max_speed": {
+      "name": "max_speed",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "line": 16,
+      "binding": "8.0",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 31,
+        "name": "max_speed",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 303,
+            "end": 317,
+            "line": 16,
+            "column": 13
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Maximum forward speed [m/s]",
+        "binding": 111,
+        "start": 112,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "speed_tau": {
+      "name": "speed_tau",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "line": 18,
+      "binding": "0.35",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 33,
+        "name": "speed_tau",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 431,
+            "end": 445,
+            "line": 18,
+            "column": 13
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Longitudinal speed response time [s]",
+        "binding": 115,
+        "start": 116,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "yaw_tau": {
+      "name": "yaw_tau",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "line": 19,
+      "binding": "0.25",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 34,
+        "name": "yaw_tau",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 505,
+            "end": 517,
+            "line": 19,
+            "column": 13
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Yaw-rate response time [s]",
+        "binding": 117,
+        "start": 118,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "side_tau": {
+      "name": "side_tau",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "line": 20,
+      "binding": "0.12",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 35,
+        "name": "side_tau",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 567,
+            "end": 580,
+            "line": 20,
+            "column": 13
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Lateral velocity damping time [s]",
+        "binding": 119,
+        "start": 120,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "vertical_tau": {
+      "name": "vertical_tau",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "line": 21,
+      "binding": "0.05",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 36,
+        "name": "vertical_tau",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 637,
+            "end": 654,
+            "line": 21,
+            "column": 13
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Vertical velocity damping time [s]",
+        "binding": 121,
+        "start": 122,
+        "tunable": true,
+        "from_source": true
+      }
+    },
+    "height_tau": {
+      "name": "height_tau",
+      "role": "parameter",
+      "declaring_class": "RigidBody.Examples.RoverPlant",
+      "source": "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "line": 22,
+      "binding": "0.08",
+      "minimum": "None",
+      "maximum": "None",
+      "raw": {
+        "id": 37,
+        "name": "height_tau",
+        "role": "parameter",
+        "causality": "parameter",
+        "value_type": 0,
+        "scalar_count": 1,
+        "declaration": {
+          "origin": {
+            "kind": "source"
+          },
+          "span": {
+            "source": 0,
+            "start": 712,
+            "end": 727,
+            "line": 22,
+            "column": 13
+          }
+        },
+        "declaring_class": "RigidBody.Examples.RoverPlant",
+        "description": "Ground-height correction time [s]",
+        "binding": 123,
+        "start": 124,
+        "tunable": true,
+        "from_source": true
+      }
+    }
+  },
+  "trials": {},
+  "compile": {
+    "command": [
+      "/data/mrumoca/rumoca/target/debug/rumoca",
+      "compile",
+      "target/cmm/CMM-a642c381/RigidBody/Examples/RoverPlant.mo",
+      "--model",
+      "RigidBody.Examples.RoverPlant",
+      "--emit-bitcode",
+      "/data/mrumoca/rumoca/target/bug-review-20260915/8525c747c098f5ee.rbc",
+      "--source-root",
+      "target/msl/ModelicaStandardLibrary-4.1.0",
+      "--source-root",
+      "target/corpus/ModelicaStandardLibrary-4.1.0",
+      "--source-root",
+      "target/cmm/CMM-a642c381"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 0.149,
+    "stdout": "",
+    "stderr": "failed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/3416f739ac535a7e885099340d7b21b04a0bbc38960fcf056bb919407f154de6.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4cfa9c90d4be491deb52e8fa8fbfada2166883d354a07a5ae95dc2b36d32d91f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/2799db346c7970a6f099c82f6e0342e6582c1228e4a4f87eec15cd1170df443e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/44f6182c7d3f73138ebec2443718fb60e4208433d5aaef0b4e3ea68e30ddfda1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/cbd3931965519d895f6ceaa70b3fe1124b408641427445eccac9f206c7f10d7e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/c3dac41e42b9feab88af08e99dc3b27d9a14012cad7f188ee5a4355473182125.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/536c81d7d9071f5658a5e0310bdab6e01880cb93cc141a30d84cc61595ee1e41.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4a8d21e80f0a2e49f4805eaa1293260c9d8073c44459b11f88f5cbdde6016d9c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/b780705a697f578144d86e92fbfa0f86b8084aa62da21f4c92deb24de9ae6f5b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a3efacfb8c586b9626817350783ad5e0c01bb7ef44ead55c414248c930e2e94f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/5ed4b4eb38d16f5d7104c52ceee110a78083c70d61d1585e1c823d2b8e58260a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/53f6c5f583704e2b14ed7fc189e9178b09e259c44dd680ac7a179cfb9960d022.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ed03200ca5c85e87a92c2348ee16aa834e4151575bfeb025695560e254b4d570.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a78f45eede6581d3ed0ec485d99d80b7404bbb5259ca1e1c211b8bdab10f5d54.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/5b6fc904ad1c3fa7a8cb82c648014c3e3483515b7b05eca5b24073548ddbf187.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/c4ab082663e06452d93c1e1d0a90b7e74132b05358dc61f1842759ae1a22cdd8.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/e5b8ac54f25d6d3104a961f8fdcc3b66ff9713e7866f50c4ae4880d3c10319ff.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8797f42c8358134076ab06cea3b1eae8be188b6e8499f3fe0ba1f313c6998fd3.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8c1defbbc36affdeb9b3d474ee76dabfd48d1d4de0fba775f80b438987a0f354.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4a12be752a398b2cb0d4baa194e44ef365b06714dbda1956b7f6bea81003b09a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/e1ee50c2ccdc378a36f20d328cff85ea58730e2477f895cfb42b3388f9e3d74d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/bfd53d6e811038cbc678a1dc8d8321196c0615fe201e24f30ab076cfcb4a8c5f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/35a82fa208fb32f2211c8373f98987ec263dff8dd88a33166d4ca476e423f9f4.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0bcd78b1c51f4399c679845875c587e0f4c649a2ab95598c0abcff0599eff4c5.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/e1241e6efedeeb67fd7e58e691b507315d3634bd6c874b794da96547c782eb12.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f4b8d47eb40edfc22d532fbca2cc97fd50dc339b6d46abdc28c5fd1ea907c032.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/194387889e2b27243952a8bce6be5aca1c114c5ef6f6eb5f3140834c6a246905.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/7cbb37f1489c42d445ae2b4b809be2e967a2109dea027eaeee0e5f3d685f36f6.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6b9349632c86a7b98f35b91032c37cf122fa74fccff4a5835bfdf91e53357451.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/b00df339cd446fffc23dc8f709a8dde45896cd5e693fa016b9154d0f1f89ec6f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/9b14be2d9e4c33574a24a336afe7c1973534e8c98a6451c6fe14cbb39a6d9e41.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0657f26c6f33baa5a0ef43257d536435be77d88ba7299ebd04def41f53c3f116.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/727e75424cf7d92739ef1cfe74bdd2bc5f461ba7d7182e28743c3181438e8d39.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f0c29c410e6b127ae40d4b04ad7946fb3d0ad3f710b1906f5c0634340eb9428c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0e4ca15e173c6ff0c8439d2514a9ac830579af8a15f62cbf4b517b8c5f702919.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/011acd64945e8892b2dae2c340ba769d448afdd0723fd66ddd2358831c7a7e04.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/acafff11008952fd74b3fb1f5dec6ee488c83151da9fe4b16b6e0d86a2f7ea4b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/c3d0a929358bc985e8aa14fb666d86683381778865e62bb010dc87be5275cb77.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/79ef3d6ea67716f7620ed1750983ef25dfca6174128592dca343cb6fc1fde0b2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/2996268e5c3ca6a23b0cc96fd59b22532a7f65a7c2f6bff8ad86704ce755530c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8495ca7042747e86a475aeff4fc5c41ead94d64437f03d795662f512a4f21c94.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f16ab05473d872ccaad2f4a9c044c9c37bdbbecd73a998faf9bd30749fa3df92.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/98e6ca1f98d8bcd5caffe3f41a6bd5359728e4c390a89d2e2cd382ae6a7d9984.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8de398b8713a44bc6c9dc4e804ae9a918230e6520b601d58d9931cdba7264ca3.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/c292e36154d601531579d9b1cd5bcd052e92ef5a0e37b3e114c0fe4feea66195.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/b074f4c793e1bcc2450f43483c651a58eb1cd929d862102633f9764d89d15412.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/47706330887a9d8006a6f3fffc4502fed408fcf0ea875d2a780d84f8d478a7eb.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/88c24c0e05a1c228768d1c664e8008db81885ea975aeadc14728675955c03006.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4dd17a193f0e569493fb5f7edf1e443ebfcef0fa13cae31b020256ff513b969c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/1c4cf60d1c477297e09b16c70f017842a36ef1bb43b0234a81218d6601cf48d9.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/620012708df645b566f2d652d77a5cc9bf5bfd3d984730c3bbd0bfa0df9215f3.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/23449a53e9b4047aeee8147ecbdab4e016abd01fa7c0196caa1587c686dc53f3.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/03ae7d6afba8ae7d6f2023b794742fbda64889b4cd22da6b39f1825ac03fe137.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4d215ca5d997e30fc727d0e700da3273c327ff15561dd02b43b6b615baee48c2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/51f429627691c59e92daf4b6db7c81f3ecbfb181f0e51460f499735960f1d320.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/bd33e0bbaa2963da21591c894088abd5e85b39da6a2e83c95172e99331ca5f0c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/fbae13626b1b7a9fc145f506f85436607711d9447fd18522deb26a14b3c17956.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/83d8f11098d02c27736b287dd44a9eaf47ed5df7b8cf625bea2f0ebcfbc694a4.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/278d9f72bbace5252b01344106c4999357ecabd7fdc0026e6e64bf3edc274875.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/86de20cce09e40cc103bbeaa5c68b05d1f4bc2eb53d0c0bc8391467241e7fc6c.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a7f6c7dc480b5f54a009156c6e9597d5e0cfab356b0f63ce7643ef5ba1cfc001.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/98a8388db7b35f0e767b6747604f6bc99cf36aa533f34aab57448c9a8fdfd0e8.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ac68e550ec401fe8b74d472c68c387379bfed9b4549f6ddd07b0097ce111f37d.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/c315d19e1be26d8750fa8be25bbffd8a7dee0df6674fd60ecf96a4c483bff274.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/4d7c7e9d7dd67f7129e46ee48457084fab69f418f920c044d31a306df0071526.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6df174bb7dd01724a012512ac6f2b991209f9a6b383cc025b4255c0f3137194a.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/c19ad283b15942eda642b31f50c13113b298bfc2bcc474c4377d3e794df6f09e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/7a0af8110259e47c7a3db2dad6d3b95aec49a9169235e5f2b712b94055e320a4.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a94ee4636bfa03138ce3b45b90f7f864241718db1da6f427cf7934f84c305675.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/07243129a37f5adee401ea15355dde881651aa557428a660bc1f92a601010cb1.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/99e48ee4726633c8a31b1f33cb57bbf6e788cceeb0b093491066ea5697b31851.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/f958455c688028984ce7c76432f8b4ad31f4c8e3814799c3cd5364ebfbed2e62.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/dc9f0dfe664ada481a336961844fa7c8ac59ddcc11418d99383f584b2bbad3e9.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/d4fce72208294f7b0952b5d1498c41961133b2dedcb4ea13df751268a87a741f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/43df08d4f474460d1baf64d3ef74bb83f53d9157e891ff6122d78e53bfb07fae.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6324fd5457f27f8396d0f9e1ac71379777e4bc9987eb06eeb97b92e154738b72.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/8d44e4b9269caf1ce2a0b3e5b2c23765e520c91f446bcc418676a26f4b4b1c8e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6eeb9b537fbe75dda0d21e7169c9be371901077c3d9595dde0a6dede8a444efd.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/ad63a8d3156c5cbb08b7b074920aabdd0265880b9dbe1c2baf5ddc97a8203190.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/58938c977f553c847c1aa64c44fef5247ddb01d6755f33dbfd198081fe216266.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/061cf1137055743ccc305dd7d75dc8652ab15a9d21554e376b3bd42aa297727f.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/28a78c2dfb58fd84e855f4be71f64e7ad71053dafcd894528a2076a6e5e4cecf.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6d5934adcdace183385d778be542de411e00a425a5ace39413e666294a79fc18.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/fd3a66fa75e40e7d4cf232560389047a5da9d950383ed90d51642cb4dae768eb.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/cfba060f555d786ba0d09a0e0350ac22d29689ffe3f8d6c57dbb6d5161746fef.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/84eafd8630b7d38b033ce6fcc80dda61859cba8bd3acaabb692bb40107d6af4b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/80878058a34fd62eca10152b311d22cf132829971308a3494cac2e3853818573.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/3fa0979b0a6e9167da075bc0182b0ddfc2a65421bcb82cbdc5b60fe80dea941e.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/7501f5b7ce9f7dfebb045fd07089b63913277c580e05b8ad5498931564a72676.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/3e33c75c3f8175c47d438c758850b66caef67a41925071c01d9b95e391ab3c55.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/86dfe5c087bc7090db1a93ce67fe0f9d8a4a6c9646971f1060a91972c85427c0.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/6d854116845519b9207d9530d2e90997024b1df156b9dab5ac18635a4aacd01b.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/2e1a5a19f40a2e6bfe5fecc3b1d3645ca19da87a531ed01ded21e400715e0935.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0997c23bebe920491b398f16a7e15611ae31ccf506157d71ad29fd21b827d7db.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/cae9c50edcee986e3972389028fd4d9cdbf4589d433a9e7cc55d129acb0353d9.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/634fd126a317183e7df75a091920e9229b4994613a9e409fcce63b302fded8c2.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/3a18b557be02fd36abace093df53917edc506fed9c9a5c79fb53653d00c13d76.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/0d937278e8a7bffd2c001a6b532f42cfe11e1d13af1b6bcdec4275f62e6d3cb8.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/a78f3f60b082730dc3b994e6e711422977c7e5039f26645cffeb030bc851c892.bin: Read-only file system (os error 30)\nfailed to record cache access for /data/.cache/rumoca/source-roots/parsed-files/71a38709ad3e96c23e0c0decd0395255a07703771de51f17d9e54360e974e6f9.bin: Read-only file system (os error 30)\nwrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/bug-review-20260915/8525c747c098f5ee.rbc\n",
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 18696,
+    "stderr_sha256": "7474da062a4dfcbbb2d5d76639626db807b813cc2a6aab1ecf07be6efffa83b9"
+  },
+  "baseline": {
+    "command": [
+      "/data/mrumoca/rumoca/target/debug/rumoca",
+      "compile-bitcode",
+      "/data/mrumoca/rumoca/target/bug-review-20260915/8525c747c098f5ee.rbc",
+      "--simulate",
+      "--check",
+      "--t-end",
+      "0.5"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 1,
+    "seconds": 0.007,
+    "stdout": "",
+    "stderr": "reading /data/mrumoca/rumoca/target/bug-review-20260915/8525c747c098f5ee.rbc (bitcode v1, cbor)\n  \u001b[31m\u001b[0m bitcode failed validation:\n  \u001b[31m\u2502\u001b[0m   - expression 263 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 291 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 320 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 337 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 338 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 340 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 341 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 343 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 344 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 346 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 347 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 349 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 350 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 352 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 353 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 355 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 356 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 358 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 359 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 361 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 362 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 364 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 365 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 367 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 368 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 370 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 372 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 380 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 381 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 384 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 389 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 390 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 393 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 398 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 399 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 402 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 406 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 407 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 409 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 411 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 413 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 418 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 419 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 422 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 427 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 428 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 431 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 436 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 437 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 440 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 444 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 445 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 447 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 449 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n  \u001b[31m\u2502\u001b[0m   - expression 451 is an unsupported node: expression form function_value\n  \u001b[31m\u2502\u001b[0m not in bitcode v1\n\n",
+    "outcome": "tool-error"
+  }
+}

@@ -164,5 +164,17 @@ class PhysicalInvariant:
     evidence: dict = field(default_factory=dict)
     """What matched this rule to this model — quantity, unit, connector role."""
 
+    premise: str = "unknown"
+    """Whether the rule's premise --- that this object *is* the component the
+    rule is about --- was established, refuted, or never settled. A first-class
+    field rather than a severity, so a later stage cannot promote an advisory
+    back into an error by changing one number."""
+
+    authority: str = "quantity_or_unit"
+    """What supplied that premise: a component contract, a user assumption, or
+    the declared quantity."""
+
+    canonical_declaration: str = ""
+
     def __str__(self) -> str:
         return f"[{self.domain.value}] {self.predicate}  ({self.rule.rule_id})"

@@ -824,7 +824,8 @@ target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/Utilities.mo	ModelicaTe
 target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/Utilities.mo	ModelicaTest.Utilities.TestReadFile
 target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/Utilities.mo	ModelicaTest.Utilities.TestInternal
 target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/Utilities.mo	ModelicaTest.Utilities.TestFiles
-target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/Utilities.mo	ModelicaTest.Utilities.TestExamplesCalculatorexamples/models/Ball.mo	Ball
+target/corpus/ModelicaStandardLibrary-4.1.0/ModelicaTest/Utilities.mo	ModelicaTest.Utilities.TestExamplesCalculator
+examples/models/Ball.mo	Ball
 examples/models/Circuit.mo	Circuit.Test
 examples/models/Drive.mo	Drive.System
 examples/models/FmiTensorDecay.mo	FmiTensorDecay

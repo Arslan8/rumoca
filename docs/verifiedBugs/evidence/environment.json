@@ -1,0 +1,53 @@
+{
+  "commit": {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 0.107,
+    "stdout": "a49b89dd99623de5e585adf8a93a8d543020157b\n",
+    "stderr": ""
+  },
+  "working_tree": {
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 0.226,
+    "stdout": " M .gitignore\n M crates/rumoca-bitcode/src/export.rs\n M crates/rumoca-bitcode/src/import.rs\n M crates/rumoca-bitcode/src/lib.rs\n M crates/rumoca-bitcode/src/schema.rs\n M crates/rumoca-bitcode/src/tests.rs\n M crates/rumoca-bitcode/src/validate.rs\n M crates/rumoca-compile/src/session/config.rs\n M crates/rumoca-ir-flat/src/lib.rs\n M crates/rumoca-phase-flatten/src/name_simplify.rs\n M crates/rumoca-phase-flatten/src/pipeline/context_and_tests/component_instance.rs\n M crates/rumoca-phase-flatten/src/pipeline/flatten_pipeline.rs\n M crates/rumoca-phase-flatten/src/variables.rs\n M crates/rumoca-phase-instantiate/src/attributes.rs\n M crates/rumoca-phase-instantiate/src/lib.rs\n M crates/rumoca/src/bitcode_cli.rs\n M crates/rumoca/src/cli.rs\n M crates/rumoca/src/compiler.rs\n M crates/rumoca/src/lib.rs\n M crates/rumoca/src/sim_bench.rs\n M crates/rumoca/tests/suite_core/main.rs\n M docs/README.md\n M docs/architecture/physical-sanitizers.md\n D docs/findings/BUG-002-msl-zero-mass-within-declared-bound.md\n D docs/findings/BUG-003-switchedrlc-zero-resistance.md\n D docs/findings/BUG-005-multibody-rotor1d-zero-inertia.md\n D docs/findings/BUG-006-bound-propagated-into-a-different-component.md\n D docs/findings/BUG-010-inductor-documents-zero-it-cannot-honour.md\n D docs/findings/BUG-011-fluxtubes-b-mymax-unguarded-divisor.md\n D docs/findings/BUG-012-variablepermeance-unbounded-input.md\n D docs/findings/BUG-013-capacitor-zero-capacitance-topology-dependent.md\n D docs/findings/BUG-014-genericfluxtube-geometry-divisors.md\n D docs/findings/BUG-015-idealgear-zero-ratio.md\n D docs/findings/BUG-016-relational-invariant-between-two-parameters.md\n M docs/findings/INDEX.md\n M docs/findings/README.md\n M docs/findings/UPSTREAM-rumoca-compiler-defects.md\n M docs/findings/min0-census.md\n M docs/findings/si-type-bounds.md\n M docs/method/README.md\n D docs/toolbugs/BUG-001-comprehension-in-for-equation-panic.md\n D docs/toolbugs/BUG-004-record-array-destructured-without-subscript.md\n D docs/toolbugs/BUG-007-dae-drops-predefined-enum-in-assert.md\n D docs/toolbugs/BUG-008-bitcode-enumeration-round-trip.md\n D docs/toolbugs/BUG-009-bitcode-omits-discrete-definitions.md\n M docs/toolbugs/README.md\n M docs/toolbugs/coverage-blockers.md\n M packages/modelsan/modelsan/analysis/context.py\n M packages/modelsan/modelsan/analysis/dependencies.py\n M packages/modelsan/modelsan/dae/traversal.py\n M packages/modelsan/modelsan/physical/domains/electrical.py\n M packages/modelsan/modelsan/physical/domains/mechanical.py\n M packages/modelsan/modelsan/physical/domains/thermal.py\n M packages/modelsan/modelsan/physical/engine.py\n M packages/modelsan/modelsan/physical/invariant.py\n M packages/modelsan/modelsan/physical/matching.py\n M packages/modelsan/modelsan/physical/rules.py\n M packages/modelsan/modelsan/sanitizers/__init__.py\n M packages/modelsan/modelsan/sanitizers/assertion.py\n M packages/modelsan/modelsan/sanitizers/divisor.py\n M packages/modelsan/modelsan/sanitizers/domain.py\n M packages/modelsan/modelsan/sanitizers/initialization.py\n M packages/modelsan/modelsan/sanitizers/numeric.py\n M packages/modelsan/modelsan/sanitizers/physical.py\n M packages/modelsan/modelsan/sanitizers/range.py\n M packages/modelsan/modelsan/sanitizers/singularity.py\n M packages/modelsan/tests/test_divisor.py\n M packages/modelsan/tests/test_physical.py\n M packages/rumoca-bitcode/rumoca_bitcode/__init__.py\n M packages/rumoca-bitcode/rumoca_bitcode/model.py\n M tools/sweep/ALL.list\n M tools/sweep/roundtrip_audit.py\n M tools/sweep/trajdiff.py\n?? crates/rumoca-bitcode/src/text.rs\n?? crates/rumoca/src/bitcode_disasm.rs\n?? crates/rumoca/tests/suite_core/bitcode_disasm.rs\n?? crates/rumoca/tests/suite_core/parameter_binding_fold_option.rs\n?? crates/rumoca/tests/suite_core/type_level_bounds.rs\n?? docs/RESULTS.md\n?? docs/VERIFY.md\n?? docs/architecture/initialization-representation.md\n?? docs/bitcode-reading.md\n?? docs/bugs/\n?? docs/declaration-sites/\n?? docs/examples/\n?? docs/findings/documented-sign-latitude.md\n?? docs/findings/instances/\n?? docs/findings/precision.md\n?? docs/findings/sentinel-parameters.md\n?? docs/llm/\n?? docs/method/aggregate-and-signed-domains.md\n?? docs/method/divide-by-zero-analysis.md\n?? docs/method/physical-intent-advisory-instructions.md\n?? docs/method/physical-intent-policy.md\n?? docs/method/zero-behavior-contracts.md\n?? docs/runs/\n?? docs/site-reports/\n?? docs/toolbugs/TOOLBUG-010-divisorsan-misread-non-literal-min.md\n?? docs/toolbugs/TOOLBUG-011-bitcode-cannot-encode-unary-plus.md\n?? docs/toolbugs/TOOLBUG-012-connection-ids-not-dense.md\n?? docs/toolbugs/TOOLBUG-013-type-level-bounds-dropped.md\n?? docs/toolbugs/TOOLBUG-014-structured-equations-not-exported.md\n?? docs/toolbugs/TOOLBUG-015-function-bodies-not-carried.md\n?? docs/toolbugs/TOOLBUG-016-incidence-edges-lost-and-invented.md\n?? docs/toolbugs/TOOLBUG-017-divisor-reported-parameters-not-denominators.md\n?? docs/toolbugs/TOOLBUG-018-ir-lost-the-symbol-contract.md\n?? docs/toolbugs/TOOLBUG-019-two-valued-divisor-classification.md\n?? docs/toolbugs/TOOLBUG-020-zero-behaviour-was-decided-three-times.md\n?? docs/toolbugs/TOOLBUG-021-locations-named-a-basename.md\n?? docs/toolbugs/TOOLBUG-022-a-violated-invariant-never-consulted-the-contract.md\n?? docs/toolbugs/TOOLBUG-023-a-tensor-checked-one-entry-at-a-time.md\n?? docs/v2/\n?? \"docs/verified bugs/\"\n?? docs/verifiedBugs/\n?? examples/bitcode-passes/trace_all.py\n?? packages/modelsan/modelsan/analysis/structure.py\n?? packages/modelsan/modelsan/conservation/\n?? packages/modelsan/modelsan/contracts/\n?? packages/modelsan/modelsan/divisor/\n?? packages/modelsan/modelsan/findings/location.py\n?? packages/modelsan/modelsan/intervals/\n?? packages/modelsan/modelsan/physical/aggregate.py\n?? packages/modelsan/modelsan/sanitizers/dimension.py\n?? packages/modelsan/modelsan/sanitizers/init_static.py\n?? packages/modelsan/modelsan/sanitizers/structure.py\n?? packages/modelsan/modelsan/semantics/\n?? packages/modelsan/modelsan/units/\n?? packages/modelsan/tests/test_aggregate_and_sign.py\n?? packages/modelsan/tests/test_conservation.py\n?? packages/modelsan/tests/test_divisor_reasoning.py\n?? packages/modelsan/tests/test_divisor_witness.py\n?? packages/modelsan/tests/test_init_static.py\n?? packages/modelsan/tests/test_intent_policy.py\n?? packages/modelsan/tests/test_location.py\n?? packages/modelsan/tests/test_semantics.py\n?? packages/modelsan/tests/test_structure.py\n?? packages/modelsan/tests/test_symbol_contract.py\n?? packages/modelsan/tests/test_zero_contracts.py\n?? tools/demo/\n?? tools/sweep/README.md\n?? tools/sweep/adjudicate.py\n?? tools/sweep/adjudicate_divisors.py\n?? tools/sweep/adjudicate_witnesses.py\n?? tools/sweep/await_run.sh\n?? tools/sweep/check_one.py\n?? tools/sweep/gather_evidence.py\n?? tools/sweep/gen_bug_reports.py\n?? tools/sweep/gen_declaration_reports.py\n?? tools/sweep/gen_finding_reports.py\n?? tools/sweep/gen_instance_reports.py\n?? tools/sweep/gen_site_reports.py\n?? tools/sweep/precision.py\n?? tools/sweep/precision_current.py\n?? tools/sweep/precision_table.py\n?? tools/sweep/sample_for_adjudication.py\n?? tools/sweep/static_eval.py\n?? tools/sweep/verify_bug_reports.py\n",
+    "stderr": ""
+  },
+  "rumoca_version": {
+    "command": [
+      "/data/mrumoca/rumoca/target/debug/rumoca",
+      "--version"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 0.006,
+    "stdout": "rumoca 0.10.0\n",
+    "stderr": ""
+  },
+  "omc_version": {
+    "command": [
+      "omc",
+      "--version"
+    ],
+    "cwd": "/data/mrumoca/rumoca",
+    "status": "completed",
+    "returncode": 0,
+    "seconds": 0.025,
+    "stdout": "OpenModelica 1.27.0~dev.beta.2\n",
+    "stderr": ""
+  },
+  "rumoca_binary_sha256": "ab27af06720820d5c75db3b7e2b2cd8546031e8173720fe577ca17168d00dc14"
+}

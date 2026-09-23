@@ -257,6 +257,10 @@ fn remap_variables(
         std::mem::take(&mut flat.variable_final_flags),
         ctx.rename_map,
     );
+    flat.variable_declaring_classes = remap_index_map_keys(
+        std::mem::take(&mut flat.variable_declaring_classes),
+        ctx.rename_map,
+    );
     Ok(())
 }
 
@@ -684,8 +688,31 @@ fn remap_component_reference(
 fn remap_equation_origin(origin: &mut flat::EquationOrigin, rename_map: &HashMap<String, String>) {
     match origin {
         flat::EquationOrigin::ComponentEquation { .. }
-        | flat::EquationOrigin::FlowSum { .. }
         | flat::EquationOrigin::Algorithm { .. } => {}
+        // Both forms are remapped. Only the rendered description existed at
+        // first and it was skipped here, so a flow sum kept the pre-simplified
+        // names and anything reading it saw variables the model no longer had.
+        flat::EquationOrigin::FlowSum {
+            description,
+            members,
+        } => {
+            for member in members.iter_mut() {
+                member.variable = remap_name_string(&member.variable, rename_map);
+            }
+            let signed: Vec<String> = members
+                .iter()
+                .map(|member| {
+                    if member.negated {
+                        format!("-{}", member.variable)
+                    } else {
+                        member.variable.clone()
+                    }
+                })
+                .collect();
+            if !signed.is_empty() {
+                *description = format!("{} = 0", signed.join(" + "));
+            }
+        }
         flat::EquationOrigin::Connection { lhs, rhs } => {
             *lhs = remap_name_string(lhs, rename_map);
             *rhs = remap_name_string(rhs, rename_map);

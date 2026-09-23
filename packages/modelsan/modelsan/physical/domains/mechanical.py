@@ -4,12 +4,19 @@ Damping is `>= 0` rather than `> 0` because a frictionless joint is a normal
 idealisation, while a *negative* damper injects energy. Stiffness is `> 0`
 because a zero-stiffness spring is not a spring — it is an absent constraint,
 and MSL models that intend one omit the component.
+
+Mass and inertia key on the declaring class as well as the quantity, and unlike
+the electrical elements the stronger claim survives scrutiny: MSL documents
+`Basic.Resistor`'s R as "allowed to be positive, zero, or negative" and grants
+`Mass` and `Inertia` no such latitude. `Rotational.Components.Inertia.J`
+declares `min=0` and cannot honour it, which is BUG-018.
 """
 
 from __future__ import annotations
 
 from ..invariant import Comparison, Domain, Enforcement
-from ..rules import QuantityRule, RulePack
+from ..rules import QuantityRule, RulePack, SemanticRule
+from ...semantics import role as roles
 
 MECHANICAL = Domain("mechanical")
 
@@ -17,8 +24,9 @@ PACK = RulePack(
     domain=MECHANICAL,
     description="Rigid-body and drive-train parameters.",
     rules=[
-        QuantityRule(
+        SemanticRule(
             rule_id="mech.mass.positive",
+            confirming_roles=frozenset({roles.TRANSLATIONAL_MASS}),
             domain=MECHANICAL,
             quantities=frozenset({"Mass"}),
             units=frozenset({"kg"}),
@@ -28,8 +36,9 @@ PACK = RulePack(
             reference="MSL Mechanics.Translational.Components.Mass",
             enforcement=Enforcement.STATIC, parameters_only=True,
         ),
-        QuantityRule(
+        SemanticRule(
             rule_id="mech.inertia.positive",
+            confirming_roles=frozenset({roles.ROTATIONAL_INERTIA}),
             domain=MECHANICAL,
             quantities=frozenset({"Inertia", "MomentOfInertia"}),
             units=frozenset({"kg.m2"}),

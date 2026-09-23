@@ -21,13 +21,13 @@ matter here only because they cap coverage, which the table below records.
 
 | ID | Severity | Target | Trigger | Cross-confirmed | Summary |
 |---|---|---|---|---|---|
-| [BUG-010](BUG-010-inductor-documents-zero-it-cannot-honour.md) | High | MSL 4.1.0 `Analog.Basic.Inductor` | `L = 0` | 3 models | No bound at all, and the documentation explicitly says zero is allowed. Both tools fail. `Capacitor` carries the identical sentence and honours it. |
-| [BUG-011](BUG-011-fluxtubes-b-mymax-unguarded-divisor.md) | Medium | MSL 4.1.0 `SoftMagnetic.BaseData` | `B_myMax = 0` | 2 models | Unguarded divisor in two files, no declared lower bound. |
-| [BUG-012](BUG-012-variablepermeance-unbounded-input.md) | Medium | MSL 4.1.0 `FluxTubes.VariablePermeance` | permeance input ≤ 0 | 1 model | Sole coefficient supplied as an *unbounded input*, where the declared bound is the only possible defense. |
-| [BUG-002](BUG-002-msl-zero-mass-within-declared-bound.md) | Medium | MSL 4.1.0 `Translational.Mass`, `Rotational.Inertia` | `m = 0` | 4 models | `min=0` admits a value that makes the model structurally singular. |
-| [BUG-003](BUG-003-switchedrlc-zero-resistance.md) | Low | `examples/models/SwitchedRLC.mo` | `R = 0` | — | Divides by a parameter with no declared lower bound. |
-| [BUG-005](BUG-005-multibody-rotor1d-zero-inertia.md) | Medium | MSL 4.1.0 `MultiBody.Parts.Rotor1D` | `J = 0` | static only | Same defect as BUG-002 in a package that report did not cover. |
-| [BUG-006](BUG-006-bound-propagated-into-a-different-component.md) | Medium | MSL 4.1.0 `OpAmpCircuits.Der` | `k = 0` | static only | The unsound bound and the singular coefficient are in *different components*, linked by `C = k/(2*pi*f*R)`. No per-component check finds it. |
+| [BUG-010](../verified%20bugs/BUG-010-inductor-documents-zero-it-cannot-honour.md) | High | MSL 4.1.0 `Analog.Basic.Inductor` | `L = 0` | 3 models | No bound at all, and the documentation explicitly says zero is allowed. Both tools fail. `Capacitor` carries the identical sentence and honours it. |
+| [BUG-011](../verified%20bugs/BUG-011-fluxtubes-b-mymax-unguarded-divisor.md) | Medium | MSL 4.1.0 `SoftMagnetic.BaseData` | `B_myMax = 0` | 2 models | Unguarded divisor in two files, no declared lower bound. |
+| [BUG-012](../verified%20bugs/BUG-012-variablepermeance-unbounded-input.md) | Medium | MSL 4.1.0 `FluxTubes.VariablePermeance` | permeance input ≤ 0 | 1 model | Sole coefficient supplied as an *unbounded input*, where the declared bound is the only possible defense. |
+| [BUG-002](../verified%20bugs/BUG-002-msl-zero-mass-within-declared-bound.md) | Medium | MSL 4.1.0 `Translational.Mass`, `Rotational.Inertia` | `m = 0` | 4 models | `min=0` admits a value that makes the model structurally singular. |
+| [BUG-003](../verified%20bugs/BUG-003-switchedrlc-zero-resistance.md) | Low | `examples/models/SwitchedRLC.mo` | `R = 0` | — | Divides by a parameter with no declared lower bound. |
+| [BUG-005](../verified%20bugs/BUG-005-multibody-rotor1d-zero-inertia.md) | Medium | MSL 4.1.0 `MultiBody.Parts.Rotor1D` | `J = 0` | static only | Same defect as BUG-002 in a package that report did not cover. |
+| [BUG-006](../verified%20bugs/BUG-006-bound-propagated-into-a-different-component.md) | Medium | MSL 4.1.0 `OpAmpCircuits.Der` | `k = 0` | static only | The unsound bound and the singular coefficient are in *different components*, linked by `C = k/(2*pi*f*R)`. No per-component check finds it. |
 
 **7 findings, 5 of them in MSL itself.** All are latent parameter-triggered
 failures: the model simulates cleanly at its declared values and fails at a
@@ -109,7 +109,7 @@ The eight confirmed components:
 
 `IdealizedOpAmpLimited.Vps` is the first finding from the negative-value probe,
 and the first whose missing constraint is *relational* rather than a box —
-see [BUG-016](BUG-016-relational-invariant-between-two-parameters.md).
+see [BUG-016](../verified%20bugs/BUG-016-relational-invariant-between-two-parameters.md).
 
 Nearly all of them are instances of one thing, written up as a study rather
 than as 147 bug reports: [MSL components inherit SI type bounds their equations

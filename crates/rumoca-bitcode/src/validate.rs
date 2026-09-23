@@ -19,6 +19,8 @@ use crate::schema::*;
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum ValidationError {
+    #[error("invalid semantic connector metadata: {0}")]
+    Connector(String),
     #[error(
         "{collection} entry at position {position} declares id {declared}, expected {expected}"
     )]
@@ -84,7 +86,11 @@ pub struct ValidateOptions {
 /// not just the first, so a pass author fixes one round of errors at a time.
 pub fn validate(model: &RbcModel, options: &ValidateOptions) -> Result<(), Vec<ValidationError>> {
     let mut errors = Vec::new();
+    if let Err(message) = crate::connector_validation::validate(model) {
+        errors.push(ValidationError::Connector(message));
+    }
 
+    check_discrete_real(&mut errors, model, &Counts::of(model));
     check_dense(&mut errors, "sources", model.sources.iter().map(|s| s.id.0));
     check_dense(&mut errors, "types", model.types.iter().map(|t| t.id.0));
     check_dense(
@@ -153,6 +159,9 @@ struct Counts {
     conditions: u32,
     components: u32,
     connections: u32,
+    connection_sets: u32,
+    domains: u32,
+    functions: u32,
 }
 
 impl Counts {
@@ -167,7 +176,40 @@ impl Counts {
             conditions: model.conditions.len() as u32,
             components: model.components.len() as u32,
             connections: model.connections.len() as u32,
+            connection_sets: model.connection_sets.len() as u32,
+            domains: model.domains.len() as u32,
+            functions: model.functions.len() as u32,
         }
+    }
+}
+
+/// The B.1b partition and the initialization-instant discrete values.
+fn check_discrete_real(
+    errors: &mut Vec<ValidationError>,
+    model: &RbcModel,
+    counts: &Counts,
+) {
+    check_dense(errors, "discrete_real_equations",
+                model.discrete_real_equations.iter().map(|e| e.id.0));
+    for equation in &model.discrete_real_equations {
+        let owner = format!("discrete real equation {}", equation.id.0);
+        reference(errors, owner.clone(), "expression",
+                  equation.residual.0, counts.expressions);
+        if let RbcDiscreteRealActivation::When { trigger, guard } = equation.activation {
+            reference(errors, owner.clone(), "condition", trigger.0, counts.conditions);
+            reference(errors, owner.clone(), "condition", guard.0, counts.conditions);
+        }
+        for variable in equation.reads.iter()
+            .chain(&equation.reads_derivative)
+            .chain(&equation.reads_previous)
+        {
+            reference(errors, owner.clone(), "variable", variable.0, counts.variables);
+        }
+    }
+    for (index, entry) in model.initial_discrete_values.iter().enumerate() {
+        let owner = format!("initial discrete value {index}");
+        reference(errors, owner.clone(), "variable", entry.target.0, counts.variables);
+        reference(errors, owner, "expression", entry.value.0, counts.expressions);
     }
 }
 
@@ -293,6 +335,18 @@ fn check_expressions(
         match &expression.node {
             RbcExprNode::Literal { .. } => {}
             RbcExprNode::Coordinate { coordinate } => {
+                match coordinate {
+                    RbcCoordinate::Binder { domain, .. } => reference(
+                        errors, format!("expression {index}"), "domain",
+                        domain.0, counts.domains),
+                    RbcCoordinate::Condition { condition } => reference(
+                        errors, format!("expression {index}"), "condition",
+                        condition.0, counts.conditions),
+                    RbcCoordinate::FunctionParameter { function, .. } => reference(
+                        errors, format!("expression {index}"), "function",
+                        function.0, counts.functions),
+                    _ => {}
+                }
                 if let Some(variable) = coordinate.variable() {
                     reference(
                         errors,
@@ -319,6 +373,102 @@ fn check_expressions(
                     operand(branch.value);
                 }
                 operand(*fallback);
+            }
+            RbcExprNode::Array {
+                elements,
+                empty_type,
+            } => {
+                for element in elements {
+                    operand(*element);
+                }
+                if let Some(ty) = empty_type {
+                    reference(
+                        errors,
+                        format!("expression {index}"),
+                        "type",
+                        ty.0,
+                        counts.types,
+                    );
+                }
+            }
+            RbcExprNode::Record { ty, fields } => {
+                for field in fields {
+                    operand(*field);
+                }
+                reference(
+                    errors,
+                    format!("expression {index}"),
+                    "type",
+                    ty.0,
+                    counts.types,
+                );
+            }
+            RbcExprNode::Field { base, .. } => operand(*base),
+            RbcExprNode::Range { start, step, stop } => {
+                operand(*start);
+                if let Some(step) = step {
+                    operand(*step);
+                }
+                operand(*stop);
+            }
+            RbcExprNode::Comprehension { domain, body } => {
+                operand(*body);
+                reference(
+                    errors,
+                    format!("expression {index}"),
+                    "domain",
+                    domain.0,
+                    counts.domains,
+                );
+            }
+            RbcExprNode::Index { base, subscripts } => {
+                operand(*base);
+                for subscript in subscripts {
+                    if let Some(expression) = subscript.expression() {
+                        operand(expression);
+                    }
+                }
+            }
+            RbcExprNode::ArrayUpdate {
+                base,
+                value,
+                subscripts,
+            } => {
+                operand(*base);
+                operand(*value);
+                for subscript in subscripts {
+                    if let Some(expression) = subscript.expression() {
+                        operand(expression);
+                    }
+                }
+            }
+            RbcExprNode::Call {
+                owner,
+                function,
+                arguments,
+                ..
+            } => {
+                // `owner` may be this node itself — a single-output call is
+                // its own owner — so it is checked as a backward-or-self
+                // reference rather than with the strict operand rule.
+                let forward_owner = owner.0 > index;
+                for argument in arguments {
+                    operand(*argument);
+                }
+                drop(operand);
+                if forward_owner {
+                    errors.push(ValidationError::NonTopologicalOperand {
+                        expression: index,
+                        operand: owner.0,
+                    });
+                }
+                reference(
+                    errors,
+                    format!("expression {index}"),
+                    "function",
+                    function.0,
+                    counts.functions,
+                );
             }
             RbcExprNode::Unsupported { detail } => {
                 if options.reject_unsupported {
@@ -537,6 +687,27 @@ fn check_connections(errors: &mut Vec<ValidationError>, model: &RbcModel, counts
             );
         }
     }
+    check_dense(errors, "connection_sets",
+                model.connection_sets.iter().map(|set| set.id.0));
+    for set in &model.connection_sets {
+        let owner = format!("connection set {}", set.id);
+        for potential in &set.potentials {
+            reference(errors, owner.clone(), "variable", potential.0, counts.variables);
+        }
+        for balance in &set.balances {
+            for term in &balance.terms {
+                reference(errors, owner.clone(), "variable", term.variable.0,
+                          counts.variables);
+            }
+            if let Some(equation) = balance.equation {
+                reference(errors, owner.clone(), "equation", equation.0,
+                          counts.equations);
+            }
+        }
+        for equation in &set.potential_equations {
+            reference(errors, owner.clone(), "equation", equation.0, counts.equations);
+        }
+    }
 }
 
 fn check_trace_points(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
@@ -564,6 +735,15 @@ fn check_trace_points(errors: &mut Vec<ValidationError>, model: &RbcModel, count
                 "connection",
                 connection.0,
                 counts.connections,
+            );
+        }
+        if let Some(set) = trace.connection_set {
+            reference(
+                errors,
+                format!("trace point {}", trace.id),
+                "connection_set",
+                set.0,
+                counts.connection_sets,
             );
         }
     }
@@ -663,6 +843,7 @@ fn check_summary(errors: &mut Vec<ValidationError>, model: &RbcModel) {
     check("events", summary.events, model.events.len());
     check("time_events", summary.time_events, model.time_events.len());
     check("connections", summary.connections, model.connections.len());
+    check("connection_sets", summary.connection_sets, model.connection_sets.len());
     check("components", summary.components, model.components.len());
     check(
         "trace_points",
@@ -681,7 +862,11 @@ pub fn recompute_summary(model: &mut RbcModel) {
             .filter(|variable| variable.role == role)
             .count() as u32
     };
+    let family_rows: u32 = model.equation_families.iter().map(|f| f.scalar_rows).sum();
     model.summary = RbcSummary {
+        domains: model.domains.len() as u32,
+        equation_families: model.equation_families.len() as u32,
+        family_scalar_rows: family_rows,
         variables: model.variables.len() as u32,
         states: count(RbcRole::State),
         parameters: count(RbcRole::Parameter),
@@ -700,8 +885,11 @@ pub fn recompute_summary(model: &mut RbcModel) {
         events: model.events.len() as u32,
         time_events: model.time_events.len() as u32,
         connections: model.connections.len() as u32,
+        connection_sets: model.connection_sets.len() as u32,
         components: model.components.len() as u32,
         trace_points: model.trace_points.len() as u32,
         discrete_definitions: model.discrete_definitions.len() as u32,
+        discrete_real_equations: model.discrete_real_equations.len() as u32,
+        initial_discrete_values: model.initial_discrete_values.len() as u32,
     };
 }

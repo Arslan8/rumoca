@@ -43,6 +43,17 @@ class AnalysisContext:
         return None
 
     def equation(self, equation_id: int):
+        """A scalar equation by id, or an equation family by its negative key.
+
+        Families and scalar equations are numbered independently, so they share
+        one anchor namespace through `analysis.structure.family_key`.
+        """
+        if equation_id < 0:
+            wanted = -equation_id - 1
+            for family in getattr(self.model, "equation_families", ()) or ():
+                if family.id == wanted:
+                    return family
+            return None
         for equation in self.model.equations:
             if equation.id == equation_id:
                 return equation

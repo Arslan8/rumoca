@@ -19,6 +19,19 @@ PACK = RulePack(
     rules=[
         QuantityRule(
             rule_id="thermal.temperature.above_absolute_zero",
+            # `SI.TemperatureDifference` shares `quantity="Thermodynamic\
+            # Temperature"` with `SI.ThermodynamicTemperature` and is
+            # legitimately negative — `port_a.T - port_b.T`. MSL separates them
+            # with `annotation(absoluteValue=false)`, which Rumoca does not
+            # parse, so the quantity cannot discriminate and every temperature
+            # difference in the corpus was reported.
+            #
+            # What does discriminate, *within MSL*: an absolute temperature
+            # always inherits `min=0` from its type, and a difference never
+            # carries one. So a ThermodynamicTemperature with no declared bound
+            # is a difference, and the rule stands down rather than asserting a
+            # domain it cannot establish.
+            requires_declared_bound=True,
             domain=THERMAL,
             quantities=frozenset({"ThermodynamicTemperature", "Temperature"}),
             units=frozenset({"K"}),

@@ -22,6 +22,7 @@ from dataclasses import dataclass
 
 from ..analysis.context import AnalysisContext
 from ..dae import BinaryOp, BuiltinCall, Expression
+from ..findings.location import locate
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..fuzz.testcase import TestCase
@@ -191,10 +192,10 @@ class DomainSan:
 
 
 def _location(expression: Expression) -> list[SourceLocation]:
-    provenance = getattr(expression, "provenance", None)
-    span = getattr(provenance, "span", None) if provenance else None
-    if span is None:
+    """An expression's site, with the column — a divisor is mid-line."""
+    found = locate(getattr(expression, "provenance", None))
+    if not found:
         return []
-    return [SourceLocation(file=getattr(span, "source_name", "") or "?",
-                           line=getattr(span, "line", 0) or 0,
+    span = getattr(getattr(expression, "provenance", None), "span", None)
+    return [SourceLocation(file=found[0].file, line=found[0].line,
                            column=getattr(span, "column", 0) or 0)]

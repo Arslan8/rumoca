@@ -9,7 +9,7 @@
 //! own scalar coordinate projection, so a consumer never has to re-derive them
 //! by walking expressions.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use rumoca_core::{Span, text_position};
 use rumoca_ir_dae as dae;
@@ -64,6 +64,7 @@ pub fn export(
 ) -> Result<RbcFile, ExportError> {
     let rbc = model.inspect(|view| build(view, model, flat, model_name, options))?;
     Ok(RbcFile {
+        execution: None,
         magic: RBC_MAGIC.to_string(),
         bitcode_version: RBC_VERSION,
         producer: format!("rumoca {}", env!("CARGO_PKG_VERSION")),
@@ -172,10 +173,15 @@ fn build(
 
     let types = export_types(view, &mut ctx);
     let expressions = export_expressions(view, &mut ctx, options)?;
-    let (components, component_of) = export_components(view);
+    let (components, component_of) = export_components(view, flat);
     let variables = export_variables(view, &mut ctx, flat, &component_of);
     let equations = export_equations(view, &mut ctx, options, EquationKind::Continuous)?;
     let initial_equations = export_equations(view, &mut ctx, options, EquationKind::Initial)?;
+    let domains = export_domains(view, &mut ctx);
+    let equation_families =
+        export_equation_families(view, &mut ctx, EquationKind::Continuous, options);
+    let initial_equation_families =
+        export_equation_families(view, &mut ctx, EquationKind::Initial, options);
     let relations = export_relations(view, &mut ctx);
     let conditions = export_conditions(view, &mut ctx);
     let roots = export_roots(view, &mut ctx);
@@ -183,6 +189,7 @@ fn build(
     let discrete_definitions = export_discrete_definitions(view, &mut ctx);
     let time_events = export_time_events(view, &mut ctx)?;
     let connections = export_connections(flat, &variables, &equations, &mut ctx);
+    let connection_sets = export_connection_sets(flat, &variables, &equations, &mut ctx);
 
     let sources = ctx
         .names
@@ -198,11 +205,16 @@ fn build(
         })
         .collect();
 
+    let discrete_real_equations = export_discrete_real_equations(view, &mut ctx, options)?;
+    let initial_discrete_values = export_initial_discrete_values(view, &mut ctx);
+
     let summary = summarize(
         &variables,
         &expressions,
         &equations,
         &initial_equations,
+        &equation_families,
+        &domains,
         &relations,
         &conditions,
         &roots,
@@ -210,10 +222,15 @@ fn build(
         &time_events,
         &discrete_definitions,
         &connections,
+        &connection_sets,
         &components,
+        &discrete_real_equations,
+        &initial_discrete_values,
     );
 
     Ok(RbcModel {
+        connector_types: Vec::new(),
+        connectors: Vec::new(),
         name: model_name.to_string(),
         sources,
         types,
@@ -221,6 +238,12 @@ fn build(
         expressions,
         equations,
         initial_equations,
+        domains,
+        functions: export_functions(view, &mut ctx),
+        discrete_real_equations,
+        initial_discrete_values,
+        equation_families,
+        initial_equation_families,
         relations,
         conditions,
         roots,
@@ -228,6 +251,7 @@ fn build(
         time_events,
         discrete_definitions,
         connections,
+        connection_sets,
         components,
         trace_points: Vec::new(),
         summary,
@@ -244,16 +268,42 @@ fn export_types(view: dae::DaeView<'_>, ctx: &mut Ctx<'_>) -> Vec<RbcType> {
                 id: TypeId(index as u32),
                 scalar: scalar_of(ty),
                 dimensions: ty.dimensions().to_vec(),
+                record: record_of(view, id, ty),
             })
         })
         .collect()
 }
 
+/// A record type's name and fields.
+///
+/// A record used to export as a field-free `String`, which made `Complex` and
+/// every model built on it unimportable: a `Record` node rebuilt against a
+/// type claiming zero fields was rejected for arity.
+fn record_of<'dae>(
+    view: dae::DaeView<'dae>,
+    id: dae::ValueTypeId<'dae>,
+    ty: &dae::ValueType,
+) -> Option<RbcRecord> {
+    if !ty.is_record() {
+        return None;
+    }
+    let mut fields = Vec::with_capacity(ty.record_field_count());
+    for ordinal in 0..ty.record_field_count() {
+        let (name, value_type) = view.record_field(id, ordinal)?;
+        fields.push(RbcRecordField {
+            name: name.to_string(),
+            value_type: TypeId(value_type.index()),
+        });
+    }
+    Some(RbcRecord {
+        name: ty.record_name()?.to_string(),
+        fields,
+    })
+}
+
 fn scalar_of(ty: &dae::ValueType) -> RbcScalar {
     if ty.is_record() {
-        // v1 has no record type; report the field-free shape rather than lie
-        // about the scalar kind.
-        return RbcScalar::String;
+        return RbcScalar::Record;
     }
     match ty.scalar_type() {
         dae::ScalarType::Real => RbcScalar::Real,
@@ -261,7 +311,7 @@ fn scalar_of(ty: &dae::ValueType) -> RbcScalar {
         dae::ScalarType::Boolean => RbcScalar::Boolean,
         dae::ScalarType::String => RbcScalar::String,
         dae::ScalarType::Enumeration => RbcScalar::Enumeration,
-        dae::ScalarType::Record => RbcScalar::String,
+        dae::ScalarType::Record => RbcScalar::Record,
     }
 }
 
@@ -269,7 +319,11 @@ fn scalar_of(ty: &dae::ValueType) -> RbcScalar {
 ///
 /// Name segmentation at a serialization boundary is explicitly permitted;
 /// compiler-internal identity elsewhere uses `DefId`/`VarName`.
-fn export_components(view: dae::DaeView<'_>) -> (Vec<RbcComponent>, BTreeMap<String, ComponentId>) {
+fn export_components(
+    view: dae::DaeView<'_>,
+    flat: Option<&flat::Model>,
+) -> (Vec<RbcComponent>, BTreeMap<String, ComponentId>) {
+    let classes = component_classes(flat);
     let mut paths = BTreeMap::new();
     for index in 0..view.variable_count() {
         let Some(id) = view.variable_id(index) else {
@@ -293,6 +347,7 @@ fn export_components(view: dae::DaeView<'_>) -> (Vec<RbcComponent>, BTreeMap<Str
         components.push(RbcComponent {
             id,
             path: path.clone(),
+            class_name: classes.get(path).cloned(),
         });
     }
     (components, map)
@@ -319,10 +374,14 @@ fn export_variables(
                 causality: causality_of(variable.causality()),
                 value_type: TypeId(variable.value_type_id().index()),
                 scalar_count: variable.scalar_count() as u32,
+                discrete_input: variable.role() == dae::VariableRole::Input
+                    && variable.variability() != dae::ExpressionVariability::Continuous,
                 declaration: ctx.provenance(variable.declaration()),
                 component,
                 unit: variable.unit().map(str::to_string),
                 physical_quantity: flat.and_then(|flat| physical_quantity(flat, &name)),
+                declaring_class: flat.and_then(|flat| declaring_class(flat, &name)),
+                contract: flat.and_then(|flat| contract(view, flat, &name, variable)),
                 description: variable.description().map(str::to_string),
                 binding: variable.binding().map(|e| ExprId(e.index())),
                 start: variable.start().map(|e| ExprId(e.index())),
@@ -341,6 +400,82 @@ fn export_variables(
 
 /// Recover connector semantics for one flattened variable from the Flat model.
 /// The declared `quantity` attribute, which the DAE does not carry but Flat does.
+/// What the declaration promises about `name`.
+///
+/// The prefixes come from Flat, because the DAE keeps the Appendix-B partition
+/// and discards them: `constant` and `parameter` are both role `parameter` by
+/// the time a coordinate exists, and an analysis that cannot tell them apart
+/// will offer to set `pi` to zero. The binding's value and dependencies come
+/// from the DAE, through the same projection every other incidence set uses.
+fn contract<'dae>(
+    view: dae::DaeView<'dae>,
+    flat: &flat::Model,
+    name: &str,
+    variable: dae::VariableView<'dae>,
+) -> Option<RbcSymbolContract> {
+    use rumoca_core::Variability;
+
+    let interned = rumoca_core::VarName::intern(name);
+    let declared = flat.variables.get(&interned)?;
+    let variability = match declared.variability {
+        Variability::Constant(_) => RbcVariability::Constant,
+        Variability::Parameter(_) => RbcVariability::Parameter,
+        Variability::Discrete(_) => RbcVariability::Discrete,
+        Variability::Continuous(_) | Variability::Empty => RbcVariability::Continuous,
+    };
+
+    let binding = variable.binding();
+    let (effective_value, depends_on) = match binding {
+        Some(expression) => (
+            literal_value(view, expression),
+            dependencies(view, expression)
+                .map(|reads| reads.take().0)
+                .unwrap_or_default(),
+        ),
+        None => (None, Vec::new()),
+    };
+
+    Some(RbcSymbolContract {
+        variability,
+        is_final: declared.is_final,
+        is_protected: declared.is_protected,
+        evaluate: declared.evaluate,
+        // MLS §18.3: a structural parameter is one the translation depends on.
+        structural: declared.evaluate
+            && matches!(variability,
+                        RbcVariability::Parameter | RbcVariability::Constant),
+        effective_value,
+        binding_depends_on: depends_on,
+        binding_from_modification: declared.binding_from_modification,
+        declared_in: flat.variable_declaring_classes.get(&interned).cloned(),
+    })
+}
+
+/// A binding that is a bare numeric literal, as a number.
+///
+/// Deliberately only the literal case. Anything else is what
+/// `binding_depends_on` is for: a consumer walks the chain rather than being
+/// handed a value the compiler guessed at.
+fn literal_value<'dae>(
+    view: dae::DaeView<'dae>,
+    expression: dae::ExprId<'dae>,
+) -> Option<f64> {
+    let node = view.expression(expression)?;
+    match node.operation() {
+        dae::ExpressionOperation::Literal(dae::DaeLiteral::Real(value)) => Some(*value),
+        dae::ExpressionOperation::Literal(dae::DaeLiteral::Integer(value)) => {
+            Some(*value as f64)
+        }
+        _ => None,
+    }
+}
+
+/// The class that declared `name`, which the DAE does not carry but Flat does.
+fn declaring_class(flat: &flat::Model, name: &str) -> Option<String> {
+    let interned = rumoca_core::VarName::intern(name);
+    flat.variable_declaring_classes.get(&interned).cloned()
+}
+
 fn physical_quantity(flat: &flat::Model, name: &str) -> Option<String> {
     let interned = rumoca_core::VarName::intern(name);
     flat.variables.get(&interned)?.quantity.clone()
@@ -429,14 +564,23 @@ fn expression_node(
         },
         dae::ExpressionOperation::Coordinate(coordinate) => match coordinate_of(coordinate) {
             Some(coordinate) => RbcExprNode::Coordinate { coordinate },
-            None => unsupported("coordinate kind not in bitcode v1", options)?,
+            // Naming the kind is the difference between a report a maintainer
+            // can act on and one that only says something is missing.
+            None => unsupported(
+                &format!("coordinate kind {} not in bitcode v1",
+                         coordinate_kind_name(coordinate)),
+                options,
+            )?,
         },
         dae::ExpressionOperation::Unary { operator, operand } => match unary_of(operator) {
             Some(op) => RbcExprNode::Unary {
                 op,
                 operand: check(operand)?,
             },
-            None => unsupported("unary operator not in bitcode v1", options)?,
+            None => unsupported(
+                "unary operator has no bitcode v1 encoding",
+                options,
+            )?,
         },
         dae::ExpressionOperation::Binary { operator, lhs, rhs } => match binary_of(operator) {
             Some(op) => RbcExprNode::Binary {
@@ -488,9 +632,164 @@ fn expression_node(
                 arguments: operands,
             }
         }
-        _ => unsupported("expression form not in bitcode v1", options)?,
+        dae::ExpressionOperation::Array(operands) => {
+            let mut elements = Vec::with_capacity(operands.len());
+            for position in 0..operands.len() {
+                let element = operands
+                    .get(position)
+                    .ok_or_else(|| ExportError::Projection("array element".into()))?;
+                elements.push(check(element)?);
+            }
+            // A zero-element array has no operand from which the importer
+            // could re-derive its element type, so the type travels with it.
+            let empty_type = elements
+                .is_empty()
+                .then(|| TypeId(expression.value_type_id().index()));
+            RbcExprNode::Array {
+                elements,
+                empty_type,
+            }
+        }
+        dae::ExpressionOperation::Record(operands) => {
+            let mut fields = Vec::with_capacity(operands.len());
+            for position in 0..operands.len() {
+                let field = operands
+                    .get(position)
+                    .ok_or_else(|| ExportError::Projection("record field".into()))?;
+                fields.push(check(field)?);
+            }
+            RbcExprNode::Record {
+                ty: TypeId(expression.value_type_id().index()),
+                fields,
+            }
+        }
+        dae::ExpressionOperation::Field { base, field } => RbcExprNode::Field {
+            base: check(base)?,
+            field,
+        },
+        dae::ExpressionOperation::Range(range) => RbcExprNode::Range {
+            start: check(range.start().expression())?,
+            step: range
+                .explicit_step()
+                .map(|step| check(step.expression()))
+                .transpose()?,
+            stop: check(range.stop().expression())?,
+        },
+        dae::ExpressionOperation::Comprehension { domain, body } => RbcExprNode::Comprehension {
+            domain: DomainId(domain.index()),
+            body: check(body)?,
+        },
+        dae::ExpressionOperation::Index { base, subscripts } => RbcExprNode::Index {
+            base: check(base)?,
+            subscripts: subscripts_of(subscripts, &check)?,
+        },
+        dae::ExpressionOperation::Call {
+            owner,
+            function,
+            output,
+            arguments,
+        } => {
+            let mut operands = Vec::with_capacity(arguments.len());
+            for position in 0..arguments.len() {
+                let argument = arguments
+                    .get(position)
+                    .ok_or_else(|| ExportError::Projection("call argument".into()))?;
+                operands.push(check(argument)?);
+            }
+            RbcExprNode::Call {
+                // A projection may be its own owner, so this is `<=`, not the
+                // strict earlier-operand check the others use.
+                owner: ExprId(owner.index()),
+                function: FunctionId(function.index()),
+                output,
+                arguments: operands,
+            }
+        }
+        dae::ExpressionOperation::ArrayUpdate {
+            base,
+            value,
+            subscripts,
+        } => RbcExprNode::ArrayUpdate {
+            base: check(base)?,
+            value: check(value)?,
+            subscripts: subscripts_of(subscripts, &check)?,
+        },
+        other => unsupported(
+            &format!("expression form {} not in bitcode v1", operation_name(&other)),
+            options,
+        )?,
     };
     Ok(node)
+}
+
+fn subscripts_of(
+    subscripts: dae::SubscriptsView<'_>,
+    check: &impl Fn(dae::ExprId<'_>) -> Result<ExprId, ExportError>,
+) -> Result<Vec<RbcSubscript>, ExportError> {
+    subscripts
+        .iter()
+        .map(|subscript| {
+            Ok(match subscript {
+                dae::SubscriptView::Index { expression, .. } => RbcSubscript::Index {
+                    expression: check(expression)?,
+                },
+                dae::SubscriptView::Whole { .. } => RbcSubscript::Whole,
+                dae::SubscriptView::Slice { expression, .. } => RbcSubscript::Slice {
+                    expression: check(expression)?,
+                },
+            })
+        })
+        .collect()
+}
+
+fn operation_name(operation: &dae::ExpressionOperation<'_>) -> &'static str {
+    use dae::ExpressionOperation as O;
+    match operation {
+        O::Literal(_) => "literal",
+        O::Coordinate(_) => "coordinate",
+        O::Unary { .. } => "unary",
+        O::Binary { .. } => "binary",
+        O::Conditional(_) => "conditional",
+        O::Array(_) => "array",
+        O::Record(_) => "record",
+        O::Field { .. } => "field",
+        O::Range(_) => "range",
+        O::Comprehension { .. } => "comprehension",
+        O::Index { .. } => "index",
+        O::ArrayUpdate { .. } => "array_update",
+        O::Builtin { .. } => "builtin",
+        O::Call { .. } => "call",
+        O::StringConversion { .. } => "string_conversion",
+        O::ClockTransfer { .. } => "clock_transfer",
+        O::FunctionValue { .. } => "function_value",
+        O::FunctionFoldParameter { .. } => "function_fold_parameter",
+        O::FunctionFoldOutput { .. } => "function_fold_output",
+    }
+}
+
+fn coordinate_kind_name(coordinate: dae::CoordinateView<'_>) -> &'static str {
+    use dae::CoordinateView as C;
+    match coordinate {
+        C::Parameter(_) => "parameter",
+        C::Input(_) => "input",
+        C::State(_) => "state",
+        C::Derivative(_) => "derivative",
+        C::Algebraic(_) => "algebraic",
+        C::DiscreteReal(_) => "discrete_real",
+        C::DiscreteValue(_) => "discrete_value",
+        C::PreDiscreteReal(_) => "pre_discrete_real",
+        C::PreDiscreteValue(_) => "pre_discrete_value",
+        C::PreState(_) => "pre_state",
+        C::PreAlgebraic(_) => "pre_algebraic",
+        C::Time => "time",
+        C::ClockInterval(_) => "clock_interval",
+        C::Condition(_) => "condition",
+        C::Delay(_) => "delay",
+        C::Previous(_) => "previous",
+        C::Terminal(_) => "terminal",
+        C::Binder(_) => "binder",
+        C::FunctionParameter(_) => "function_parameter",
+    }
 }
 
 fn unsupported(detail: &str, options: &ExportOptions) -> Result<RbcExprNode, ExportError> {
@@ -553,6 +852,17 @@ fn coordinate_of(coordinate: dae::CoordinateView<'_>) -> Option<RbcCoordinate> {
             variable: variable(id.index()),
         },
         C::Time => RbcCoordinate::Time,
+        C::Condition(id) => RbcCoordinate::Condition {
+            condition: ConditionId(id.index()),
+        },
+        C::FunctionParameter(parameter) => RbcCoordinate::FunctionParameter {
+            function: FunctionId(parameter.function().index()),
+            ordinal: parameter.ordinal(),
+        },
+        C::Binder(binder) => RbcCoordinate::Binder {
+            domain: DomainId(binder.domain().index()),
+            ordinal: binder.ordinal(),
+        },
         _ => return None,
     })
 }
@@ -615,7 +925,10 @@ fn unary_of(operator: dae::UnaryOperator) -> Option<RbcUnaryOp> {
     match operator {
         dae::UnaryOperator::Negate => Some(RbcUnaryOp::Negate),
         dae::UnaryOperator::Not => Some(RbcUnaryOp::Not),
-        _ => None,
+        // Constant folding usually consumes unary plus before export, which is
+        // how its absence went unnoticed: `parameter SI.Voltage Vps=+15`
+        // survives only when folding is off, and the export then failed.
+        dae::UnaryOperator::Plus => Some(RbcUnaryOp::Plus),
     }
 }
 
@@ -663,10 +976,10 @@ fn export_equations(
         };
         let Some(equation) = equation else { continue };
         let residual = equation.residual();
-        let (reads, reads_derivative) = if options.dependency_edges {
-            dependencies(view, residual)?
+        let (reads, reads_derivative, reads_previous) = if options.dependency_edges {
+            dependencies(view, residual)?.take()
         } else {
-            (Vec::new(), Vec::new())
+            Default::default()
         };
         out.push(RbcEquation {
             id: EquationId(index as u32),
@@ -674,9 +987,276 @@ fn export_equations(
             provenance: ctx.provenance(equation.provenance()),
             reads,
             reads_derivative,
+            reads_previous,
         });
     }
     Ok(out)
+}
+
+/// Export the iteration domains the families range over.
+///
+/// A family without its domain can be counted but not rebuilt, which is why
+/// import had to refuse one. `StructuredIndexDomain` is a binder list and
+/// serialises directly; the extents and scalar count are carried alongside
+/// because the DAE derives them and a consumer should not have to.
+/// Export the MLS Appendix B.1b partition.
+///
+/// A discrete-Real variable is determined here, not by a continuous residual,
+/// so omitting this partition made the artifact over-constrained by exactly
+/// the number of such variables.
+fn export_discrete_real_equations(
+    view: dae::DaeView<'_>,
+    ctx: &mut Ctx<'_>,
+    options: &ExportOptions,
+) -> Result<Vec<RbcDiscreteRealEquation>, ExportError> {
+    let mut out = Vec::with_capacity(view.discrete_real_equation_count());
+    for (index, equation) in view.discrete_real_equations().enumerate() {
+        let residual = equation.residual();
+        let (reads, reads_derivative, reads_previous) = if options.dependency_edges {
+            dependencies(view, residual)?.take()
+        } else {
+            Default::default()
+        };
+        out.push(RbcDiscreteRealEquation {
+            id: EquationId(index as u32),
+            residual: ExprId(residual.index()),
+            activation: match equation.activation() {
+                dae::DiscreteRealActivation::Always => RbcDiscreteRealActivation::Always,
+                dae::DiscreteRealActivation::When { trigger, guard } => {
+                    RbcDiscreteRealActivation::When {
+                        trigger: ConditionId(trigger.index()),
+                        guard: ConditionId(guard.index()),
+                    }
+                }
+            },
+            reads,
+            reads_derivative,
+            reads_previous,
+            provenance: ctx.provenance(equation.provenance()),
+        });
+    }
+    Ok(out)
+}
+
+fn export_initial_discrete_values(
+    view: dae::DaeView<'_>,
+    ctx: &mut Ctx<'_>,
+) -> Vec<RbcInitialDiscreteValue> {
+    view.initial_discrete_values()
+        .map(|entry| RbcInitialDiscreteValue {
+            target: VariableId(entry.target().index()),
+            value: ExprId(entry.value().index()),
+            provenance: ctx.provenance(entry.provenance()),
+        })
+        .collect()
+}
+
+/// Export function *declarations*: the signature a call site needs.
+///
+/// Not the bodies. A body is its own IR — SSA definitions, loop transitions,
+/// conditionals, external interfaces — and carrying it is a larger piece of
+/// work than the whole of the rest of this schema. Without the declarations a
+/// call could not be expressed at all, so every call in the model exported as
+/// `Unsupported` and every expression under it became unreachable: 3621 calls
+/// across 156 of 491 MSL models, whose arguments no consumer could see.
+fn export_functions(view: dae::DaeView<'_>, ctx: &mut Ctx<'_>) -> Vec<RbcFunction> {
+    (0..view.function_count())
+        .filter_map(|index| {
+            let id = view.function_id(index)?;
+            let function = view.function(id)?;
+            let parameters = function
+                .parameters()
+                .map(|parameter| RbcFunctionParameter {
+                    name: parameter.name().to_string(),
+                    value_type: TypeId(parameter.value_type().index()),
+                })
+                .collect();
+            let results = function
+                .result_types()
+                .iter()
+                .map(|ty| TypeId(ty.index()))
+                .collect();
+            let body = match function.external() {
+                Some(external) => RbcFunctionBody::External {
+                    language: format!("{:?}", external.language()).to_lowercase(),
+                    symbol: external.symbol().to_string(),
+                },
+                None => RbcFunctionBody::ElidedModelica,
+            };
+            Some(RbcFunction {
+                id: FunctionId(index as u32),
+                name: function.name().to_string(),
+                parameters,
+                results,
+                inline: match function.inline() {
+                    rumoca_core::InlineAnnotation::Unstated => RbcInline::Unstated,
+                    rumoca_core::InlineAnnotation::Requested => RbcInline::Requested,
+                    rumoca_core::InlineAnnotation::Never => RbcInline::Never,
+                },
+                body,
+                declaration: ctx.provenance(function.declaration()),
+            })
+        })
+        .collect()
+}
+
+fn export_domains(view: dae::DaeView<'_>, ctx: &mut Ctx<'_>) -> Vec<RbcDomain> {
+    // Reached from the families rather than enumerated: the DAE view exposes
+    // `domain(id)` but no index-based iterator, and the domains that matter are
+    // exactly the ones a family names. Parent chains are followed so a nested
+    // `for` keeps its enclosing domain.
+    let mut wanted: Vec<dae::DomainId<'_>> = Vec::new();
+    let mut seen: std::collections::BTreeSet<u32> = std::collections::BTreeSet::new();
+    let mut frontier: Vec<dae::DomainId<'_>> = Vec::new();
+
+    for index in 0..view.continuous_family_count() {
+        if let Some(family) = view.continuous_family(index) {
+            frontier.push(family.domain());
+        }
+    }
+    for index in 0..view.initialization_family_count() {
+        if let Some(family) = view.initialization_family(index) {
+            frontier.push(family.domain());
+        }
+    }
+    while let Some(id) = frontier.pop() {
+        if !seen.insert(id.index()) {
+            continue;
+        }
+        wanted.push(id);
+        if let Some(domain) = view.domain(id)
+            && let Some(parent) = domain.parent()
+        {
+            frontier.push(parent);
+        }
+    }
+
+    wanted.sort_by_key(|id| id.index());
+    let mut out = Vec::with_capacity(wanted.len());
+    for id in wanted {
+        let Some(domain) = view.domain(id) else { continue };
+        out.push(RbcDomain {
+            id: DomainId(id.index()),
+            binders: domain
+                .structured()
+                .binders
+                .iter()
+                .map(|binder| RbcBinder {
+                    id: binder.id as u32,
+                    display_name: binder.display_name.clone(),
+                    lower: binder.lower,
+                    upper: binder.upper,
+                    step: binder.step,
+                })
+                .collect(),
+            parent: domain.parent().map(|p| DomainId(p.index())),
+            extents: domain.extents().to_vec(),
+            scalar_count: domain.scalar_count(),
+            provenance: ctx.provenance(domain.provenance()),
+        });
+    }
+    out
+}
+
+/// Export the array/`for` equations, which `export_equations` does not carry.
+///
+/// These were omitted entirely, so the artifact described fewer equations than
+/// the model has and still validated — `Real x[3]` with a `for` equation
+/// exported three unknowns and zero equations. Any consumer reasoning about
+/// solvability read an incomplete system with no way to detect it
+/// (TOOLBUG-014).
+///
+/// Kept in the compact form the DAE holds rather than expanded: expanding
+/// multiplies the artifact by the array extent and loses the fact that the
+/// rows share one source equation. `scalar_rows` is what a balance or matching
+/// analysis needs, and it is carried explicitly.
+fn export_equation_families(
+    view: dae::DaeView<'_>,
+    ctx: &mut Ctx<'_>,
+    kind: EquationKind,
+    options: &ExportOptions,
+) -> Vec<RbcEquationFamily> {
+    let count = match kind {
+        EquationKind::Continuous => view.continuous_family_count(),
+        EquationKind::Initial => view.initialization_family_count(),
+    };
+    let mut out = Vec::with_capacity(count);
+    for index in 0..count {
+        let family = match kind {
+            EquationKind::Continuous => view.continuous_family(index),
+            EquationKind::Initial => view.initialization_family(index),
+        };
+        let Some(family) = family else { continue };
+        let extents = view
+            .domain(family.domain())
+            .map(|domain| domain.extents().to_vec())
+            .unwrap_or_default();
+        let (reads, reads_derivative, reads_previous) = if options.dependency_edges {
+            family_dependencies(view, family).unwrap_or_default()
+        } else {
+            Default::default()
+        };
+        out.push(RbcEquationFamily {
+            id: FamilyId(index as u32),
+            domain: DomainId(family.domain().index()),
+            bodies: family.bodies().iter().map(|b| ExprId(b.index())).collect(),
+            reads,
+            reads_derivative,
+            reads_previous,
+            scalar_rows: family.scalar_rows(),
+            extents,
+            scalar_view: match family.scalar_view() {
+                rumoca_core::ComprehensionScalarView::BinderSubstitution =>
+                    RbcScalarView::BinderSubstitution,
+                rumoca_core::ComprehensionScalarView::RowMajorProjection =>
+                    RbcScalarView::RowMajorProjection,
+                rumoca_core::ComprehensionScalarView::BinderPrefixProjection {
+                    binder_count,
+                } => RbcScalarView::BinderPrefixProjection { binder_count },
+            },
+            provenance: ctx.provenance(family.provenance()),
+        });
+    }
+    out
+}
+
+/// Compute the variables an equation *family* reads, over all of its rows.
+///
+/// A family body is symbolic: `x[i] = y[i]` mentions `x` and `y` once, and the
+/// projection has to be given the domain point to learn which scalar that is.
+/// Projecting the body once, without a point, reports only the coordinates of
+/// the first row: on `IMC_Transformer` that lost `pin[2]` and `pin[3]` from 38
+/// of 76 families, and the missing incidence edges turned into 23 phantom
+/// `STRUCTURAL_MATCH_FAILURE`s in a model the compiler had already proved
+/// balanced.
+///
+/// This walks the rows the same way `rumoca-phase-structural` does, because
+/// disagreeing with the compiler's own incidence is the bug being fixed.
+fn family_dependencies<'dae>(
+    view: dae::DaeView<'dae>,
+    family: dae::StructuredFamilyView<'dae>,
+) -> Option<(Vec<VariableId>, Vec<VariableId>, Vec<VariableId>)> {
+    let domain = view.domain(family.domain())?;
+    let mut reads = Reads::default();
+    let mut cache = rumoca_eval_dae::ScalarCoordinateProjectionCache::default();
+    for point in 0..domain.scalar_count() as usize {
+        let values = domain.structured().index_tuple_at(point).ok()??;
+        for body in family.bodies().iter() {
+            let scalar = family
+                .scalar_view()
+                .body_scalar(point, domain.extents())?;
+            rumoca_eval_dae::for_each_scalar_coordinate_cached(
+                view,
+                body,
+                scalar,
+                Some((family.domain(), &values)),
+                &mut cache,
+                |coordinate, _| reads.visit(coordinate),
+            )
+            .ok()?;
+        }
+    }
+    Some(reads.take())
 }
 
 /// Compute the variables one equation reads, using the compiler's own scalar
@@ -684,28 +1264,50 @@ fn export_equations(
 fn dependencies<'dae>(
     view: dae::DaeView<'dae>,
     residual: dae::ExprId<'dae>,
-) -> Result<(Vec<VariableId>, Vec<VariableId>), ExportError> {
-    use std::collections::BTreeSet;
-    let mut reads = BTreeSet::new();
-    let mut derivatives = BTreeSet::new();
+) -> Result<Reads, ExportError> {
+    let mut reads = Reads::default();
     rumoca_eval_dae::for_each_scalar_coordinate(view, residual, 0, None, |coordinate, _| {
-        use dae::CoordinateView as C;
-        match coordinate {
-            C::Derivative(id) => {
-                derivatives.insert(id.index());
-            }
-            other => {
-                if let Some(variable) = coordinate_of(other).and_then(RbcCoordinate::variable) {
-                    reads.insert(variable.0);
-                }
-            }
-        }
+        reads.visit(coordinate);
     })
     .map_err(|error| ExportError::Projection(error.to_string()))?;
-    Ok((
-        reads.into_iter().map(VariableId).collect(),
-        derivatives.into_iter().map(VariableId).collect(),
-    ))
+    Ok(reads)
+}
+
+/// What one residual reads, split by *how* it reads it.
+///
+/// Current value, derivative and left limit are three different relationships
+/// to a variable, and a consumer that flattens them gets the wrong answer: an
+/// equation reading `pre(x)` depends on `x` but cannot determine it.
+#[derive(Default)]
+struct Reads {
+    values: BTreeSet<u32>,
+    derivatives: BTreeSet<u32>,
+    previous: BTreeSet<u32>,
+}
+
+impl Reads {
+    fn visit(&mut self, coordinate: dae::CoordinateView<'_>) {
+        use dae::CoordinateView as C;
+        let (set, id) = match coordinate {
+            C::Derivative(id) => (&mut self.derivatives, id.index()),
+            C::PreState(id) => (&mut self.previous, id.index()),
+            C::PreAlgebraic(id) => (&mut self.previous, id.index()),
+            C::PreDiscreteReal(id) => (&mut self.previous, id.index()),
+            C::PreDiscreteValue(id) => (&mut self.previous, id.index()),
+            other => {
+                if let Some(variable) = coordinate_of(other).and_then(RbcCoordinate::variable) {
+                    self.values.insert(variable.0);
+                }
+                return;
+            }
+        };
+        set.insert(id);
+    }
+
+    fn take(self) -> (Vec<VariableId>, Vec<VariableId>, Vec<VariableId>) {
+        let ids = |set: BTreeSet<u32>| set.into_iter().map(VariableId).collect();
+        (ids(self.values), ids(self.derivatives), ids(self.previous))
+    }
 }
 
 fn export_relations(view: dae::DaeView<'_>, ctx: &mut Ctx<'_>) -> Vec<RbcRelation> {
@@ -948,6 +1550,15 @@ fn export_connections(
 
     let pairable = flat_connections.len() == dae_connection_equations.len();
 
+    // Numbered *after* filtering, not before. A connector endpoint that is not
+    // a DAE variable — a clocked signal removed during lowering — drops its
+    // entry, and taking the id from the pre-filter index then leaves a hole:
+    // `SubSample` exported connections `[0, 2]` and the artifact failed its own
+    // validator, which requires `position == id`. 28 of 35 Clocked models were
+    // unloadable for this reason.
+    //
+    // `equation` still pairs by the *original* index, because the DAE's
+    // connection equations are in the unfiltered order.
     flat_connections
         .into_iter()
         .enumerate()
@@ -960,6 +1571,7 @@ fn export_connections(
                 .map(|connector| connector.quantity)
                 .unwrap_or(RbcQuantityKind::Potential);
             Some(RbcConnection {
+                // Renumbered below; the original index is kept for pairing.
                 id: ConnectionId(index as u32),
                 left,
                 right,
@@ -977,12 +1589,324 @@ fn export_connections(
                 },
             })
         })
+        .enumerate()
+        .map(|(position, connection)| RbcConnection {
+            id: ConnectionId(position as u32),
+            ..connection
+        })
         .collect()
 }
 
 /// `"battery.pin.v"` → `"battery.pin"`. A serialization-boundary operation.
+/// The connection graph's nodes, from Flat's flow sums and connect equalities.
+///
+/// A `connect` is written pairwise and the object it creates is n-ary: three
+/// pins on one node share one potential and one conservation law. The
+/// potential side arrives as pairs and is closed transitively into sets here;
+/// the flow side arrives already n-ary, as `EquationOrigin::FlowSum`.
+///
+/// Both halves are needed and only the first was ever exported, so every
+/// consumer saw a graph with equalities and no conservation --- which is the
+/// half that makes an acausal model worth analysing as a network.
+fn export_connection_sets(
+    flat: Option<&flat::Model>,
+    variables: &[RbcVariable],
+    equations: &[RbcEquation],
+    ctx: &mut Ctx<'_>,
+) -> Vec<RbcConnectionSet> {
+    let Some(flat) = flat else {
+        return Vec::new();
+    };
+    let by_name: BTreeMap<&str, VariableId> = variables
+        .iter()
+        .map(|variable| (variable.name.as_str(), variable.id))
+        .collect();
+
+    // Flow sums and potential equalities are paired with their DAE equations
+    // the same way `export_connections` pairs its own: by position among the
+    // generated connection equations, and only when the counts agree.
+    let generated: Vec<EquationId> = equations
+        .iter()
+        .filter(|equation| {
+            matches!(
+                equation.provenance.origin,
+                RbcOrigin::Generated {
+                    generation: RbcGeneration::ConnectionEquation
+                }
+            )
+        })
+        .map(|equation| equation.id)
+        .collect();
+    let mut flat_generated = 0usize;
+    let mut equation_at: BTreeMap<usize, EquationId> = BTreeMap::new();
+    for equation in flat.equations.iter() {
+        if matches!(
+            equation.origin,
+            flat::EquationOrigin::Connection { .. }
+                | flat::EquationOrigin::FlowSum { .. }
+                | flat::EquationOrigin::UnconnectedFlow { .. }
+        ) {
+            if let Some(id) = generated.get(flat_generated) {
+                equation_at.insert(flat_generated, *id);
+            }
+            flat_generated += 1;
+        }
+    }
+    let pairable = flat_generated == generated.len();
+
+    // Union-find over connector instances, so `a.p -- b.n` and `b.n -- c.p`
+    // become one node rather than two edges.
+    let mut parent: BTreeMap<String, String> = BTreeMap::new();
+    fn root(parent: &mut BTreeMap<String, String>, of: &str) -> String {
+        let mut cursor = of.to_string();
+        while let Some(next) = parent.get(&cursor) {
+            if next == &cursor {
+                break;
+            }
+            cursor = next.clone();
+        }
+        cursor
+    }
+    let join = |parent: &mut BTreeMap<String, String>, left: &str, right: &str| {
+        parent.entry(left.to_string()).or_insert_with(|| left.to_string());
+        parent.entry(right.to_string()).or_insert_with(|| right.to_string());
+        let (a, b) = (root(parent, left), root(parent, right));
+        if a != b {
+            parent.insert(a, b);
+        }
+    };
+
+    struct Pending {
+        potentials: Vec<VariableId>,
+        potential_equations: Vec<EquationId>,
+        connectors: BTreeSet<String>,
+        span: rumoca_core::Span,
+    }
+    let mut pending: BTreeMap<String, Pending> = BTreeMap::new();
+    let mut index = 0usize;
+    for equation in flat.equations.iter() {
+        match &equation.origin {
+            flat::EquationOrigin::Connection { lhs, rhs } => {
+                join(&mut parent, connector_path(lhs), connector_path(rhs));
+                index += 1;
+            }
+            flat::EquationOrigin::FlowSum { .. }
+            | flat::EquationOrigin::UnconnectedFlow { .. } => {
+                index += 1;
+            }
+            _ => {}
+        }
+    }
+    let _ = index;
+
+    // Second pass, now that the sets are known: attach each equality to the
+    // node its endpoints landed in.
+    let mut position = 0usize;
+    for equation in flat.equations.iter() {
+        let flat::EquationOrigin::Connection { lhs, rhs } = &equation.origin else {
+            if matches!(
+                equation.origin,
+                flat::EquationOrigin::FlowSum { .. }
+                    | flat::EquationOrigin::UnconnectedFlow { .. }
+            ) {
+                position += 1;
+            }
+            continue;
+        };
+        let node = root(&mut parent, connector_path(lhs));
+        let entry = pending.entry(node).or_insert_with(|| Pending {
+            potentials: Vec::new(),
+            potential_equations: Vec::new(),
+            connectors: BTreeSet::new(),
+            span: equation.span,
+        });
+        for endpoint in [lhs.as_str(), rhs.as_str()] {
+            entry.connectors.insert(connector_path(endpoint).to_string());
+            if let Some(id) = by_name.get(endpoint) {
+                if !entry.potentials.contains(id) {
+                    entry.potentials.push(*id);
+                }
+            }
+        }
+        if pairable {
+            if let Some(id) = equation_at.get(&position) {
+                entry.potential_equations.push(*id);
+            }
+        }
+        position += 1;
+    }
+
+    // The flow side, accumulated **per node**. A connector may declare more
+    // than one flow member --- a MultiBody frame conserves a force and a
+    // torque --- and each balance is its own equation but the same node.
+    struct Node {
+        connectors: BTreeSet<String>,
+        balances: Vec<RbcFlowBalance>,
+        unconnected: bool,
+        span: rumoca_core::Span,
+    }
+    let mut nodes: BTreeMap<String, Node> = BTreeMap::new();
+    let mut order: Vec<String> = Vec::new();
+    let mut position = 0usize;
+    for equation in flat.equations.iter() {
+        let (members, unconnected) = match &equation.origin {
+            flat::EquationOrigin::Connection { .. } => {
+                position += 1;
+                continue;
+            }
+            flat::EquationOrigin::FlowSum { members, .. } => (members.clone(), false),
+            flat::EquationOrigin::UnconnectedFlow { variable } => (
+                vec![flat::FlowMember {
+                    variable: variable.clone(),
+                    negated: false,
+                }],
+                true,
+            ),
+            _ => continue,
+        };
+        let Some(first) = members.first() else {
+            position += 1;
+            continue;
+        };
+        let key = root(&mut parent, connector_path(&first.variable));
+        let node = nodes.entry(key.clone()).or_insert_with(|| {
+            order.push(key.clone());
+            Node {
+                connectors: BTreeSet::new(),
+                balances: Vec::new(),
+                unconnected,
+                span: equation.span,
+            }
+        });
+        // One unconnected member does not make a joined node unconnected.
+        node.unconnected = node.unconnected && unconnected;
+        let mut terms = Vec::new();
+        for member in members.iter() {
+            node.connectors
+                .insert(connector_path(&member.variable).to_string());
+            if let Some(id) = by_name.get(member.variable.as_str()) {
+                terms.push(RbcFlowTerm {
+                    variable: *id,
+                    negated: member.negated,
+                });
+            }
+        }
+        if !terms.is_empty() {
+            node.balances.push(RbcFlowBalance {
+                equation: pairable
+                    .then(|| equation_at.get(&position).copied())
+                    .flatten(),
+                terms,
+            });
+        }
+        position += 1;
+    }
+
+    let mut sets: Vec<RbcConnectionSet> = Vec::new();
+    let mut claimed: BTreeSet<String> = BTreeSet::new();
+    for key in order {
+        let Some(node) = nodes.remove(&key) else {
+            continue;
+        };
+        let mut connectors = node.connectors;
+        let mut potentials = Vec::new();
+        let mut potential_equations = Vec::new();
+        if let Some(entry) = pending.get(&key) {
+            potentials = entry.potentials.clone();
+            potential_equations = entry.potential_equations.clone();
+            connectors.extend(entry.connectors.iter().cloned());
+            claimed.insert(key.clone());
+        }
+        let span = ctx.span(node.span);
+        sets.push(RbcConnectionSet {
+            id: ConnectionSetId(sets.len() as u32),
+            connectors: connectors.into_iter().collect(),
+            potentials,
+            balances: node.balances,
+            potential_equations,
+            unconnected: node.unconnected,
+            provenance: RbcProvenance {
+                origin: RbcOrigin::Generated {
+                    generation: RbcGeneration::ConnectionEquation,
+                },
+                span,
+            },
+        });
+    }
+
+    // A node whose potentials were equated but whose flow sum did not survive
+    // lowering still exists, and dropping it would understate the graph.
+    let leftover: Vec<(String, Pending)> = pending
+        .into_iter()
+        .filter(|(node, _)| !claimed.contains(node))
+        .collect();
+    for (_, entry) in leftover {
+        let span = ctx.span(entry.span);
+        sets.push(RbcConnectionSet {
+            id: ConnectionSetId(sets.len() as u32),
+            connectors: entry.connectors.into_iter().collect(),
+            potentials: entry.potentials,
+            balances: Vec::new(),
+            potential_equations: entry.potential_equations,
+            unconnected: false,
+            provenance: RbcProvenance {
+                origin: RbcOrigin::Generated {
+                    generation: RbcGeneration::ConnectionEquation,
+                },
+                span,
+            },
+        });
+    }
+    sets
+}
+
+/// The class each top-level instance is of, from Flat's declaring-class map.
+///
+/// Taken from a variable the instance declares *directly*: `L.L` is declared
+/// by `Analog.Basic.Inductor`, where `L.n.v` is declared by `NegativePin`. A
+/// connector's own class is recovered the same way one level down.
+fn component_classes(flat: Option<&flat::Model>) -> BTreeMap<String, String> {
+    let mut found: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
+    let Some(flat) = flat else {
+        return BTreeMap::new();
+    };
+    for (name, class) in flat.variable_declaring_classes.iter() {
+        let text = name.as_str();
+        let Some((owner, leaf)) = split_owner(text) else {
+            continue;
+        };
+        if leaf.is_empty() || owner.is_empty() {
+            continue;
+        }
+        *found
+            .entry(owner.to_string())
+            .or_default()
+            .entry(class.clone())
+            .or_default() += 1;
+    }
+    found
+        .into_iter()
+        .filter_map(|(owner, classes)| {
+            // An instance's variables agree on their declaring class except
+            // where one is inherited from a base; the commonest wins, and ties
+            // break on the name so the artifact stays deterministic.
+            let best = classes
+                .into_iter()
+                .max_by(|left, right| left.1.cmp(&right.1).then(right.0.cmp(&left.0)))?;
+            Some((owner, best.0))
+        })
+        .collect()
+}
+
 fn connector_path(member: &str) -> &str {
-    member.rsplit_once('.').map_or(member, |(path, _)| path)
+    split_owner(member).map_or(member, |(path, _)| path)
+}
+
+/// `"battery.pin.v"` → `("battery.pin", "v")`. The one place this file takes a
+/// flattened path apart, so the boundary operation has a named owner rather
+/// than being open-coded wherever a prefix is wanted.
+fn split_owner(path: &str) -> Option<(&str, &str)> {
+    path.rsplit_once('.')
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -991,6 +1915,8 @@ fn summarize(
     expressions: &[RbcExpr],
     equations: &[RbcEquation],
     initial_equations: &[RbcEquation],
+    equation_families: &[RbcEquationFamily],
+    domains: &[RbcDomain],
     relations: &[RbcRelation],
     conditions: &[RbcCondition],
     roots: &[RbcRoot],
@@ -998,7 +1924,10 @@ fn summarize(
     time_events: &[RbcTimeEvent],
     discrete_definitions: &[RbcDiscreteDefinition],
     connections: &[RbcConnection],
+    connection_sets: &[RbcConnectionSet],
     components: &[RbcComponent],
+    discrete_real_equations: &[RbcDiscreteRealEquation],
+    initial_discrete_values: &[RbcInitialDiscreteValue],
 ) -> RbcSummary {
     let count = |role: RbcRole| {
         variables
@@ -1008,6 +1937,8 @@ fn summarize(
     };
     RbcSummary {
         discrete_definitions: discrete_definitions.len() as u32,
+        discrete_real_equations: discrete_real_equations.len() as u32,
+        initial_discrete_values: initial_discrete_values.len() as u32,
         variables: variables.len() as u32,
         states: count(RbcRole::State),
         parameters: count(RbcRole::Parameter),
@@ -1019,6 +1950,9 @@ fn summarize(
         discrete_values: count(RbcRole::DiscreteValue),
         equations: equations.len() as u32,
         initial_equations: initial_equations.len() as u32,
+        domains: domains.len() as u32,
+        equation_families: equation_families.len() as u32,
+        family_scalar_rows: equation_families.iter().map(|f| f.scalar_rows).sum(),
         expressions: expressions.len() as u32,
         relations: relations.len() as u32,
         conditions: conditions.len() as u32,
@@ -1026,6 +1960,7 @@ fn summarize(
         events: events.len() as u32,
         time_events: time_events.len() as u32,
         connections: connections.len() as u32,
+        connection_sets: connection_sets.len() as u32,
         components: components.len() as u32,
         trace_points: 0,
     }

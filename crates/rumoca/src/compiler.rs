@@ -292,6 +292,10 @@ pub struct Compiler {
     source_root_paths: Vec<String>,
     /// Enable verbose output.
     verbose: bool,
+    /// Keep a derived parameter's declaration binding as written instead of
+    /// replacing it with the constant it evaluates to. See
+    /// `SessionConfig::fold_parameter_declaration_bindings`.
+    no_fold_parameter_bindings: bool,
 }
 
 impl Compiler {
@@ -316,6 +320,21 @@ impl Compiler {
     pub fn verbose(mut self, verbose: bool) -> Self {
         self.verbose = verbose;
         self
+    }
+
+    /// Keep derived parameter bindings unfolded, so `parameter Real d = k * 10`
+    /// reaches the flat and DAE models as `k * 10` rather than as its value.
+    pub fn no_fold_parameter_bindings(mut self, no_fold: bool) -> Self {
+        self.no_fold_parameter_bindings = no_fold;
+        self
+    }
+
+    /// The session configuration these settings describe.
+    fn session_config(&self) -> SessionConfig {
+        SessionConfig {
+            fold_parameter_declaration_bindings: !self.no_fold_parameter_bindings,
+            ..SessionConfig::default()
+        }
     }
 
     /// Add a source-root path to load before compiling.
@@ -531,7 +550,7 @@ impl Compiler {
             eprintln!("[rumoca] Source file: {}", file_name);
         }
 
-        let mut session = Session::new(SessionConfig::default());
+        let mut session = Session::new(self.session_config());
         self.load_required_source_roots(&mut session, source)?;
 
         if self.verbose {
@@ -587,7 +606,7 @@ impl Compiler {
             eprintln!("[rumoca] Phase 1-2: Parsing and resolving...");
         }
 
-        let mut session = Session::new(SessionConfig::default());
+        let mut session = Session::new(self.session_config());
         self.load_required_source_roots(&mut session, source)?;
         self.load_local_compile_unit(&mut session, source, file_name)?;
         session
@@ -612,7 +631,7 @@ impl Compiler {
             eprintln!("[rumoca] Phase 1-5: Parsing, resolving, and flattening...");
         }
 
-        let mut session = Session::new(SessionConfig::default());
+        let mut session = Session::new(self.session_config());
         self.load_required_source_roots(&mut session, source)?;
         self.load_local_compile_unit(&mut session, source, file_name)?;
         let flat = session
@@ -638,7 +657,7 @@ impl Compiler {
             eprintln!("[rumoca] Source file: {}", file_name);
         }
 
-        let mut session = Session::new(SessionConfig::default());
+        let mut session = Session::new(self.session_config());
         self.load_required_source_roots(&mut session, source)?;
 
         if self.verbose {

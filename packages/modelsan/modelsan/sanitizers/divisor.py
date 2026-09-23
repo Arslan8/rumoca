@@ -1,95 +1,86 @@
-"""DivisorSan — a settable parameter that can drive a denominator to zero.
+"""DivisorSan — a denominator that a permitted configuration drives to zero.
 
-1. Bug class    a parameter the user configures, which reaches a division, and
-                which nothing prevents from being zero. Not "this expression
-                divides" — DomainSan says that — but "*this knob* zeroes that
-                divisor, and the declaration allows it."
-2. Overlap      DomainSan finds the division site and can hint at its operand
-                when the operand *is* a parameter. This traces backwards
-                through derived parameters and arithmetic, which is where the
-                interesting cases live: in BUG-014 `area` reaches a division
-                two steps later, in a base class, and nothing in the component
-                that declares it divides by anything at all.
-3. Signal       static: a reachability path from a settable parameter to a
-                denominator, with no declaration on that path excluding zero.
-4. Needs        the DAE and the parameter dependency graph. Nothing at runtime,
-                so it works on models no backend can execute.
+1. Bug class    a division whose *complete denominator* can be made zero by an
+                assignment the model permits. Not "a parameter that can be zero
+                appears under a `/`" — that is a different and much weaker
+                statement, and reporting it is what this pass used to do.
+2. Overlap      DomainSan finds the division site. This decides whether the
+                denominator can actually vanish, and exhibits the assignment.
+3. Signal       static: a verified witness, plus the path condition under which
+                the division executes.
+4. Needs        the DAE. Nothing at runtime, so it covers models no backend can
+                execute.
 5. Transform    no.
-6. Fuzzing      the strongest hints available: it names the exact parameter and
-                the exact value, and both are derived rather than guessed.
-7. Signature    the divisor expression plus the parameter that reaches it.
+6. Fuzzing      the strongest hints available: an exact assignment, already
+                checked against the declared bounds.
+7. Signature    the denominator's shape plus the witness.
 
-Four shapes are recognised, which between them cover every division defect
-filed in this project:
+**What changed, and why.** The previous implementation reported every parameter
+appearing anywhere in a denominator, on the theory that a parameter that can be
+zero can zero the expression containing it. That is false, and it was false
+often:
 
-    x / p               direct         BUG-003  SwitchedRLC.R
-    x / (a * b)         product        a factor of zero zeroes the product
-    p -> d, x / d       propagated     BUG-014  area -> A -> G_m -> 1/G_m
-    x / (a - b)         relational     BUG-016  Vps - Vns, zero when equal
+    1 + c_b*B_N + B_N^n     c_b = 0 leaves 1 + B_N^n
+    1 + alpha*(T - T_ref)   alpha = 0 leaves 1
+    2*pi*fsNominal          pi is a constant and cannot be set at all
 
-BUG-006 is deliberately *not* in that list. `k -> C -> C*der(v)` is a vanishing
-*coefficient*, not a divisor, and belongs to SingularitySan. The two families
-look alike and are not the same defect.
+Each of those was filed as a finding. The discipline that removes all three is
+the same one: **propose a concrete assignment, substitute it, and evaluate the
+denominator.** If the result is not zero there is no finding. A parameter's
+presence in an expression is not evidence about the expression's value.
 
-The relational case is the one no `min` can express, and is reported with that
-said explicitly.
+Four further conditions must hold before a site is reported as a defect, and
+each corresponds to a class of report this pass previously got wrong:
 
-**A limitation worth knowing before trusting the propagated case.** Rumoca
-constant-folds derived parameters whose inputs are all literal: `d = k * 10`
-with `k = 2` arrives in the DAE as `d = 20`, and the chain is simply gone. The
-propagated shape is therefore only visible when something on the path resists
-folding — a parameter declared with no default, or bound to a non-constant.
-`Der.mo` is the common case: `f` and `R` have no defaults, so the divisor
-`2*pi*f*R` survives and both are found.
+* **The assignment must be permitted.** Bounds, bounds inherited from the type,
+  assertions, and whether the value is settable at all. A constant is never a
+  witness.
+* **The division must be in the source.** `L*der(i) = v` contains no division;
+  the DAE contains `der(i) = v/L` because that is what a solver integrates. A
+  division the compiler introduced is reported separately and is not evidence
+  that the source contract is wrong.
+* **The division must still execute under the witness.** `Ramp` divides by
+  `duration`, and at `duration = 0` the model takes its step branch, so the
+  division is unreachable at exactly the value that would zero it.
+* **The denominator must not be asserted away from zero.** MSL writes
+  `assert(d >= eps)` immediately above the division it protects; the artifact
+  carries that relation, and matching it against the denominator is exact.
 
-Where the chain does fold, this sanitizer reports the *derived* parameter as a
-direct risk. That is not wrong — the derived parameter is still a divisor with
-no bound — but it names a value the user cannot set, so the fix it implies is
-in the wrong place. Reading the source, as BUG-006 and BUG-014 were found, is
-still required for those.
+Sites that fail one of the last three are reported under their own kinds rather
+than discarded, because "this division is guarded" is a useful thing for a
+reader to be told, and a guard that is later found insufficient is a finding.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 from ..analysis.context import AnalysisContext
-from ..dae import BinaryOp, ops
-from ..dae.traversal import walk_expressions
+from ..contracts import ContractSet, ZeroBehavior, resolve
+from ..divisor import (Environment, Site, Verdict, baseline, build, classify,
+                       collect, find, guard_excludes)
 from ..findings.finding import Finding, Severity, SourceLocation
+from ..findings.location import locate
 from ..fuzz.hints import FuzzHint
 from ..instrumentation.capability import Capability
 from ..runtime.anchors import CanonicalAnchor, EntityKind
 
-#: A denominator built only from these is still zeroable by its operands.
-TRANSPARENT = frozenset({ops.MULTIPLY, ops.ADD, ops.SUBTRACT})
+class _NoWitness:
+    """Stand-in for a site that needs no assignment to fail."""
+
+    assignment: dict = {}
 
 
-@dataclass(frozen=True)
-class DivisorRisk:
-    """One settable parameter that can zero one denominator."""
-
-    parameter: object
-    divisor_id: int
-    shape: str
-    """direct | product | propagated | relational"""
-
-    path: tuple[str, ...]
-    """Parameter names from the settable knob to the divisor, inclusive."""
-
-    partner: object = None
-    """For a relational risk, the other side of the difference."""
-
-    declared_min: float | None = None
-
-    @property
-    def zero_permitted(self) -> bool:
-        """Whether anything on the path actually prevents zero."""
-        return self.declared_min is None or self.declared_min <= 0.0
+_NO_WITNESS = _NoWitness()
 
 
-def _literal(expression):
-    return getattr(expression, "value", None) if expression is not None else None
+#: Reported, but not as a defect in the model.
+#: Reported as unresolved. Not a defect claim, and not a clean bill of health.
+UNRESOLVED_KIND = "divisor-zero-unresolved"
+
+GUARDED_KINDS = {
+    "asserted": "divisor-guarded-by-assertion",
+    "unreachable": "divisor-unreachable-under-witness",
+    "generated": "divisor-introduced-by-translation",
+}
 
 
 class DivisorSan:
@@ -100,158 +91,226 @@ class DivisorSan:
         "hints": frozenset({Capability.CANONICAL_MODEL}),
     }
 
-    # ── reachability ─────────────────────────────────────────────────────────
-
-    @staticmethod
-    def _settable_sources(variable, context: AnalysisContext,
-                          seen: set[int] | None = None) -> list[tuple[object, tuple[str, ...]]]:
-        """Parameters a user can set that determine this variable's value.
-
-        A derived parameter is not a knob — `C = k/(2*pi*f*R)` is set by moving
-        `k`, `f` or `R`. Walking the binding graph backwards is what makes the
-        propagated cases visible; without it a per-component check sees nothing
-        wrong in either component.
-        """
-        seen = seen or set()
-        if variable.id in seen or not variable.is_parameter:
-            return []
-        seen = seen | {variable.id}
-
-        sources = context.parameters.depends_on.get(variable.id, set())
-        if not sources:
-            return [(variable, (variable.name,))]  # a leaf: the user sets this
-
-        found = []
-        for source_id in sources:
-            upstream = context.variable(source_id)
-            if upstream is None:
-                continue
-            for parameter, path in DivisorSan._settable_sources(upstream, context, seen):
-                found.append((parameter, path + (variable.name,)))
-        return found or [(variable, (variable.name,))]
-
-    def _denominators(self, model):
-        """Every divisor expression, with the owner that evaluates it."""
-        for owner, node in walk_expressions(model):
-            if isinstance(node, BinaryOp) and node.op == ops.DIVIDE:
-                yield owner, node.rhs
-
-    def risks(self, model, context: AnalysisContext) -> list[DivisorRisk]:
-        found: list[DivisorRisk] = []
-        seen: set[tuple[int, int, str]] = set()
-
-        for _owner, divisor in self._denominators(model):
-            # A relational divisor is a different claim and is handled first,
-            # because `a - b` also reads two parameters and would otherwise be
-            # reported twice as two direct risks.
-            if isinstance(divisor, BinaryOp) and divisor.op == ops.SUBTRACT:
-                left, right = divisor.lhs.variables(), divisor.rhs.variables()
-                if (len(left) == 1 and len(right) == 1
-                        and left[0].is_parameter and right[0].is_parameter):
-                    key = (divisor.id, left[0].id, "relational")
-                    if key not in seen:
-                        seen.add(key)
-                        found.append(DivisorRisk(
-                            parameter=left[0], divisor_id=divisor.id,
-                            shape="relational", path=(left[0].name,),
-                            partner=right[0],
-                            declared_min=_literal(left[0].minimum)))
-                    continue
-
-            shape = "direct"
-            if isinstance(divisor, BinaryOp) and divisor.op in TRANSPARENT:
-                shape = "product" if divisor.op == ops.MULTIPLY else "sum"
-
-            for variable in divisor.variables():
-                if not variable.is_parameter:
-                    continue
-                for parameter, path in self._settable_sources(variable, context):
-                    kind = "propagated" if len(path) > 1 else shape
-                    key = (divisor.id, parameter.id, kind)
-                    if key in seen:
-                        continue
-                    seen.add(key)
-                    found.append(DivisorRisk(
-                        parameter=parameter, divisor_id=divisor.id, shape=kind,
-                        path=path, declared_min=_literal(parameter.minimum)))
-        return found
-
-    # ── reporting ────────────────────────────────────────────────────────────
-
     def analyze(self, model, context: AnalysisContext) -> list[Finding]:
-        # Grouped by parameter, not by divisor site. One parameter reaching
-        # three denominators is one thing to fix; reporting it three times
-        # would make a widely-used knob look like three defects.
-        grouped: dict[tuple[int, str], list[DivisorRisk]] = {}
-        for risk in self.risks(model, context):
-            if not risk.zero_permitted:
-                continue
-            grouped.setdefault((risk.parameter.id, risk.shape), []).append(risk)
-
-        findings = []
-        for group in grouped.values():
-            risk = group[0]  # the declaration already excludes zero
-            relational = risk.shape == "relational"
-            sites = sorted({r.divisor_id for r in group})
-            findings.append(Finding(
-                sanitizer=self.name,
-                kind=("divisor-zero-when-parameters-equal" if relational
-                      else "divisor-reachable-zero"),
-                severity=Severity.HIGH if risk.shape in ("direct", "relational")
-                         else Severity.MEDIUM,
-                canonical_anchors=[
-                    CanonicalAnchor(EntityKind.PARAMETER, risk.parameter.id,
-                                    risk.parameter.name),
-                    # The first site only: the parameter is the fix site, and
-                    # putting every divisor in the anchor list would make the
-                    # signature depend on how many places use it.
-                    CanonicalAnchor(EntityKind.EXPRESSION, sites[0]),
-                ],
-                source_locations=_location(risk.parameter),
-                evidence={
-                    "parameter": risk.parameter.name,
-                    "shape": risk.shape,
-                    "path": " -> ".join(risk.path),
-                    "declared_min": risk.declared_min,
-                    "divisor_sites": len(sites),
-                    **({"partner": risk.partner.name,
-                        "note": "zero when the two are equal; min/max cannot "
-                                "express a constraint between two parameters, "
-                                "so an assertion is the only mechanism"}
-                       if relational else
-                       {"note": "reaches a denominator and nothing excludes zero"}),
-                },
-            ))
+        environment = build(model)
+        contracts = resolve(model, environment,
+                            assumptions=getattr(context, "assumptions", None))
+        findings: list[Finding] = []
+        for site in collect(model, environment):
+            finding = self._judge(site, environment, contracts)
+            if finding is not None:
+                findings.append(finding)
         return findings
 
+    # ── one site ─────────────────────────────────────────────────────────────
+
+    def _judge(self, site: Site, environment: Environment,
+               contracts: ContractSet) -> Finding | None:
+        """Decide one division, three ways.
+
+        The question is `constraints AND path AND denominator == 0`. `SAT`
+        reports with the assignment, `UNSAT` records the proof, and `UNKNOWN`
+        reports as unresolved --- never as confirmed. Collapsing the third into
+        either of the others is what this pass used to do, in both directions.
+        """
+        at_declared = baseline(site.denominator, environment)
+        names = environment.names
+
+        # A denominator already zero needs no assignment, and asking for one
+        # first is how `constant Real c = 0; y = 1/c` came to be reported as
+        # nothing at all: there is no knob to turn.
+        if at_declared is not None and at_declared == 0.0:
+            closed = guard_excludes(site, {}, environment)
+            shared = self._evidence(site, environment, None, at_declared)
+            if closed is not None:
+                return self._finding(
+                    site, GUARDED_KINDS["unreachable"], Severity.LOW, _NO_WITNESS,
+                    {**shared, "verdict": "UNSAT",
+                     "guard_that_excludes_it": closed,
+                     "proof": f"the denominator is zero as declared, and {closed}",
+                     "note": "the branch containing the division is not taken "
+                             "where the denominator vanishes, so it is never "
+                             "evaluated there"})
+            return self._finding(
+                site, "divisor-zero-at-declared-values", Severity.HIGH,
+                _NO_WITNESS,
+                {**shared, "verdict": "SAT",
+                 "proof": "no assignment is needed: the denominator is zero at "
+                          "the model's own declared values",
+                 "note": "the division fails without anything being changed, so "
+                         "no parameter can be blamed and none needs to be"})
+
+        verdict = classify(site, environment)
+        shared = self._evidence(site, environment, verdict, at_declared)
+
+        if verdict.status == "UNSAT":
+            # Suppressed, per the acceptance criterion --- but not all silently.
+            # A denominator that simply cannot be zero (a constant, a sum of
+            # positives) is not worth a line: 2660 of them in this corpus, one
+            # per division in every model, which is noise rather than evidence.
+            # A denominator the model *actively guards* is worth a line, because
+            # the guard is a design decision a reader may want to challenge.
+            if "excludes zero" in verdict.proof:
+                return None
+            kind = (GUARDED_KINDS["asserted"] if "asserts" in verdict.proof
+                    else GUARDED_KINDS["unreachable"])
+            return self._finding(
+                site, kind, Severity.LOW, verdict.witness or _NO_WITNESS,
+                {**shared,
+                 "note": "reported so the guard can be seen and challenged, "
+                         "not as a defect; zero is outside the domain this "
+                         "division is evaluated in"})
+
+        if verdict.status == "UNKNOWN":
+            if verdict.witness is None:
+                # Nothing to show: no assignment, no proof. Silence is right.
+                return None
+            return self._finding(
+                site, "divisor-zero-unresolved", Severity.MEDIUM,
+                verdict.witness,
+                {**shared,
+                 "note": "an assignment drives the denominator to zero, but "
+                         "whether the division is evaluated there could not be "
+                         "decided from the artifact; this is unresolved, not "
+                         "confirmed"})
+
+        if site.generated:
+            return self._finding(
+                site, GUARDED_KINDS["generated"], Severity.LOW, verdict.witness,
+                {**shared, "generation": site.generation or "unknown",
+                 "note": "this division was introduced by the compiler, not "
+                         "written in the source; it is evidence about the "
+                         "translation, not about the model's contract"})
+
+        # The shared contract has the last word on what zero *means* for the
+        # symbols this witness moves. A parameter that multiplies a derivative
+        # gives an algebraic limit at zero, not an undefined quotient, and the
+        # division the DAE shows is the compiler's own solved form.
+        limited = self._supported_limit(verdict.witness, contracts)
+        if limited is not None:
+            return self._finding(
+                site, GUARDED_KINDS["generated"], Severity.LOW, verdict.witness,
+                {**shared, "contract": limited.explain(),
+                 "contract_confidence": limited.confidence.value,
+                 "note": "zero is a supported limit of this component rather "
+                         "than a division by zero; the quotient the DAE shows "
+                         "is the compiler's solved form, not the source"})
+
+        relational = "equal to" in (verdict.witness.rationale or "")
+        return self._finding(
+            site,
+            "divisor-zero-when-parameters-equal" if relational
+            else "divisor-reachable-zero",
+            Severity.HIGH, verdict.witness,
+            {**shared,
+             "note": ("the denominator is a difference, so it vanishes when the "
+                      "two sides are equal; no `min` on either can express a "
+                      "constraint between two parameters and an assertion is "
+                      "the only mechanism") if relational else
+                     ("a permitted assignment drives the complete denominator "
+                      "to zero and the division is still evaluated there")})
+
+    @staticmethod
+    def _supported_limit(witness, contracts: ContractSet):
+        """A contract saying zero is meaningful for every symbol moved.
+
+        Every symbol, not any: a witness that zeroes one parameter whose zero
+        is an ideal limit *and* another that genuinely divides is still a
+        divide-by-zero.
+        """
+        if witness is None or not getattr(witness, "assignment", None):
+            return None
+        chosen = None
+        for variable_id, value in witness.assignment.items():
+            if value != 0.0:
+                return None        # not a zero witness; the contract is silent
+            contract = contracts.zero_is_safe(variable_id)
+            if contract is None or contract.behavior in (
+                    ZeroBehavior.FORBIDDEN,):
+                return None
+            chosen = chosen or contract
+        return chosen
+
+    def _evidence(self, site: Site, environment: Environment,
+                  verdict: Verdict | None, at_declared: float | None) -> dict:
+        """Everything a reader needs to check the claim without rerunning it."""
+        witness = verdict.witness if verdict else None
+        return {
+            "denominator": repr(site.denominator)[:300],
+            "witness": (witness.rendered(environment.names) if witness
+                        else "none needed"),
+            "witness_rationale": (witness.rationale if witness
+                                  else "the denominator is zero as declared"),
+            "denominator_at_witness": witness.residual if witness else 0.0,
+            "denominator_at_declared_values": at_declared,
+            "denominator_range": verdict.denominator_range if verdict else "",
+            "path_condition": " and ".join(site.guards) or "always evaluated",
+            "verdict": verdict.status if verdict else "SAT",
+            "proof": verdict.proof if verdict else "",
+            "constraints": self._constraints(site, environment, witness),
+        }
+
+    # ── reporting helpers ────────────────────────────────────────────────────
+
+    @staticmethod
+    def _constraints(site: Site, environment: Environment, witness) -> str:
+        """What was consulted about each variable the witness moves."""
+        if witness is None:
+            return ""
+        parts = []
+        for variable_id in sorted(witness.assignment):
+            domain = environment.domain(variable_id)
+            name = environment.names.get(variable_id, str(variable_id))
+            bound = []
+            if domain.low != float("-inf"):
+                bound.append(f"min={domain.low:g}")
+            if domain.high != float("inf"):
+                bound.append(f"max={domain.high:g}")
+            if domain.reason:
+                bound.append(domain.reason)
+            parts.append(f"{name}: {', '.join(bound) or 'unbounded'}")
+        return "; ".join(parts)
+
+    def _finding(self, site: Site, kind: str, severity: Severity,
+                 witness, evidence: dict) -> Finding:
+        return Finding(
+            sanitizer=self.name, kind=kind, severity=severity,
+            canonical_anchors=[
+                CanonicalAnchor(EntityKind.EXPRESSION, site.division.id),
+                *[CanonicalAnchor(EntityKind.PARAMETER, i)
+                  for i in sorted(witness.assignment)],
+            ],
+            source_locations=_location(site),
+            evidence=evidence,
+        )
+
+    # ── fuzzing ──────────────────────────────────────────────────────────────
+
     def hints(self, model, context: AnalysisContext) -> list[FuzzHint]:
+        environment = build(model)
         found, emitted = [], set()
-        for risk in self.risks(model, context):
-            if not risk.zero_permitted or risk.parameter.id in emitted:
+        for site in collect(model, environment):
+            if site.asserted or site.generated:
                 continue
-            emitted.add(risk.parameter.id)
-            if risk.shape == "relational" and risk.partner is not None:
-                # Not zero — the value that makes the *difference* zero.
-                partner = _literal(risk.partner.binding)
-                if partner is None:
+            witness = find(site.denominator, environment)
+            if witness is None:
+                continue
+            if guard_excludes(site, witness.assignment, environment):
+                continue
+            for variable_id, value in witness.assignment.items():
+                if variable_id in emitted:
                     continue
+                if not environment.domain(variable_id).settable:
+                    continue
+                emitted.add(variable_id)
                 found.append(FuzzHint(
-                    target=risk.parameter.name, values=(partner,),
-                    reason=f"equals {risk.partner.name}, zeroing the divisor "
-                           f"{risk.parameter.name} - {risk.partner.name}",
-                    source=self.name, variable_ids=(risk.parameter.id,)))
-            else:
-                found.append(FuzzHint(
-                    target=risk.parameter.name, values=(0.0,),
-                    reason=f"reaches a denominator via {' -> '.join(risk.path)}",
-                    source=self.name, variable_ids=(risk.parameter.id,)))
+                    target=environment.names.get(variable_id, ""),
+                    values=(value,),
+                    reason=f"zeroes {repr(site.denominator)[:80]} "
+                           f"({witness.rationale})",
+                    source=self.name, variable_ids=(variable_id,)))
         return found
 
 
-def _location(variable) -> list[SourceLocation]:
-    source = getattr(variable, "source", None)
-    span = getattr(source, "span", None) if source else None
-    if span is None:
-        return []
-    return [SourceLocation(file=getattr(span, "source_name", "") or "?",
-                           line=getattr(span, "line", 0) or 0)]
+def _location(site: Site) -> list[SourceLocation]:
+    return locate(site.division.provenance)

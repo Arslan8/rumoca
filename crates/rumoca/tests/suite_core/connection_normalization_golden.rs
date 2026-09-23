@@ -61,7 +61,7 @@ end ConnectionGolden;
                 "rhs": rhs,
                 "scalar_count": eq.scalar_count,
             })),
-            EquationOrigin::FlowSum { description } => Some(serde_json::json!({
+            EquationOrigin::FlowSum { description, .. } => Some(serde_json::json!({
                 "kind": "flow_sum",
                 "description": description,
                 "scalar_count": eq.scalar_count,

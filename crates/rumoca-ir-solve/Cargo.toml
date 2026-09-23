@@ -19,11 +19,11 @@ pattern-fixtures = []
 rumoca-core = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
 serde = { workspace = true }
+serde_json = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
 bincode = { workspace = true }
-serde_json = { workspace = true }
 
 [lints]
 workspace = true

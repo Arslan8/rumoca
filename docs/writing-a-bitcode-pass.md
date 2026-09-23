@@ -223,6 +223,139 @@ The two torques are equal and opposite because they are *flow* quantities
 either side of one connection. Your pass asked for them by name; the solver
 reported them.
 
+## Adding computation, not just observation
+
+The objection to answer first, because it is a good one:
+
+> LLVM IR is Turing complete, so an instrumentation pass can insert arbitrary
+> code — a counter, a check, a call into a runtime. Rumoca Bitcode is
+> deliberately total ([§9a](SPEC_RUMOCA_BITCODE.md#9a-computational-power)):
+> no loops, no recursion, no statements at all. So an arbitrary pass cannot be
+> written against it.
+
+The premise is right and the conclusion does not follow. **An LLVM pass inserts
+instructions into a control-flow graph; a pass here inserts equations into a
+system.** The substrate is different, not weaker:
+
+| you want | you add |
+|---|---|
+| an accumulator | a state and a residual `der(E) - f(...) = 0` |
+| a register | a discrete variable and a `when` definition over `pre()` |
+| a branch | a relation and a root, so the solver locates the crossing |
+| a trap | an event action: `assert` or `terminate` |
+| a probe | a trace point |
+
+The computation that gets you is not limited in power. A hybrid DAE with
+discrete state *is* Turing complete —
+[`Minsky.mo`](../crates/rumoca-bitcode/examples/Minsky.mo) is a two-counter
+machine in six variables and one equation — so a monitor can be an arbitrary
+program. It is limited in *shape*: declarative, and evaluated on the solver's
+clock rather than at a program point.
+
+And the artifact stays total, which is the part worth keeping. Instrumenting an
+LLVM module can make it undecidable to analyse. Instrumenting one of these
+cannot: every static analysis in `modelsan` still terminates on the result.
+
+### The builder
+
+`rumoca_bitcode.Builder` enforces the invariants at the point of the mistake
+rather than at validation time. It lives in the SDK, not in the sanitizer:
+writing an artifact is part of the *format's* contract, and a consumer with no
+interest in sanitizers should not have to install one to produce a model.
+
+```python
+builder = model.builder("my_pass")
+
+current = builder.variable("R1.i")                  # an existing variable
+charge = builder.add_state("charge_R1", start=0.0)  # one the pass owns
+
+builder.add_derivative_equation(charge, builder.coordinate(current))
+builder.add_trace_point(charge, "charge through R1")
+
+builder.finish()          # refresh the typed views, recompute the summary
+model.save("instrumented.rbc")
+```
+
+`add_derivative_equation` is not a convenience. The runtime rejects a state
+equation that is not a *subtractive* derivative residual, so the algebraically
+identical `der(x) + k*x` fails at simulation with a message about a constraint
+nothing else states.
+
+### Starting from nothing
+
+The same builder produces an artifact where there was none, so a tool that is
+not the Rumoca compiler can emit one:
+
+```python
+import rumoca_bitcode as rb
+
+model = rb.Model.empty("Decay")
+builder = model.builder("my_generator")
+k = builder.add_parameter("k", 2.0)
+x = builder.add_state("x", start=1.0)
+builder.add_derivative_equation(
+    x, builder.unary("negate", builder.multiply(builder.coordinate(k),
+                                                builder.coordinate(x))))
+builder.add_trace_point(x, "x")
+builder.finish()
+model.save("decay.rbc")
+```
+
+```console
+$ rumoca bitcode check decay.rbc --strict
+decay.rbc: valid bitcode v1 (strict)
+$ rumoca compile-bitcode decay.rbc --simulate --trace-out decay.csv
+  x(0) = 1.000000   x(1) = 0.135337      # exp(-2) = 0.135335
+```
+
+In Rust, `rumoca_bitcode::build::Builder` does the same and is what this
+crate's own test fixtures are built from — a struct literal naming every field
+of `RbcModel` broke on every schema addition, four times in one week.
+
+`modelsan/passes/energy.py` is the worked version: it adds
+`der(E) = sum of port powers` for every component whose ports give a complete
+power expression, and the result validates, simulates and reports a quantity
+the model never contained.
+
+### Two rules that bite silently
+
+**The expression arena is topologically ordered.** A new node may reference
+earlier ones; nothing earlier may reference it. Appending is free; *splicing*
+into the middle of an existing tree is impossible in place, so
+`rewrite_operand` rebuilds the path from that tree's root and shares
+everything off the path. An equation is not in the arena, so
+`rewrite_equation` can point it at a node appended afterwards — which is how a
+fault-injection pass replaces a term.
+
+**Everything is dense and everything is counted.** Ids are positions, and
+`finish()` recomputes the summary the validator checks. Skip it and the
+artifact is rejected for a count that no longer matches.
+
+### What you genuinely cannot do
+
+- **Unbounded iteration within a step.** There is no `while`. A recurrence
+  across time steps is what `pre()` is for; a fixpoint inside one evaluation is
+  not expressible, and making it so would cost the termination property every
+  analysis here relies on.
+- **Call into a runtime.** There is no linkage. An external function can be
+  *named* (`RbcFunctionBody::External`), not written by a pass.
+- **Dynamic allocation.** Arrays have fixed extents; a monitor needing an
+  unbounded history has to encode it in state the way `Minsky.mo` does.
+
+### A finding from actually running one
+
+The energy pass on `ChuaCircuit` reports `energy_C1 = -1.06 J`: the capacitor
+delivers net energy over the window. That is correct — `C1` starts at 4 V and
+discharges — and it means the obvious runtime check, *a passive component must
+not source power*, fires on ordinary physics.
+
+A storage element obeys `E_in(t) = E_stored(t) - E_stored(0)`, which needs the
+constitutive law and not just the ports. A resistor stores nothing, so
+`E_in >= 0` holds unconditionally. `NetworkSan` therefore checks components a
+contract establishes as **dissipative**, and excludes storage explicitly. The
+distinction was not visible from reading the model; it came out of running the
+instrumented one.
+
 ## Your pass is untrusted, and that is fine
 
 Rumoca does not trust what you write. Import validates references, ids,

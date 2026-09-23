@@ -11,15 +11,19 @@ from .base import (
 from .determinism import DeterminismSan
 from .differential import DifferentialSan
 from .discontinuity import DiscontinuitySan
+from .dimension import DimensionSan
 from .divisor import DivisorSan
 from .event import EventSan
 from .domain import DomainSan
+from .init_static import InitStaticSan
 from .initialization import InitSan
 from .numeric import NumericSan
 from .physical import PhysicalSan
 from .range import RangeSan
 from .registry import SanitizerRegistry
 from .singularity import SingularitySan
+from .network import NetworkSan
+from .structure import StructureSan
 from .solver import SolverSan
 from .zeno import ZenoSan
 
@@ -35,7 +39,11 @@ COMPARATIVE = (DeterminismSan, DifferentialSan)
 
 __all__ = ["AssertSan", "COMPARATIVE", "DEFAULT", "DeterminismSan",
            "DifferentialSan", "DifferentialOracle", "DiscontinuitySan",
-           "DivisorSan", "DomainSan", "EventSan", "FuzzHintProvider", "InitSan",
+           "DimensionSan",
+    "InitStaticSan",
+    "NetworkSan",
+    "StructureSan",
+    "DivisorSan", "DomainSan", "EventSan", "FuzzHintProvider", "InitSan",
            "InstrumentationRequester",
            "NumericSan", "PhysicalSan", "RangeSan", "RuntimeObserver",
            "SanitizerRegistry",

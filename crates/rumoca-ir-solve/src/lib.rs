@@ -13,6 +13,7 @@ mod certificate_tests;
 mod compute_block_tests;
 mod feature_query;
 pub mod fmi;
+pub mod execution;
 mod layout;
 mod linear_op;
 mod model;

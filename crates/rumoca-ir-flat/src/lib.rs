@@ -123,6 +123,16 @@ pub struct Model {
     /// Keys match `variables` and values preserve resolved type identity for rendering.
     #[serde(default)]
     pub variable_type_names: VarNameIndexMap<String>,
+    /// Fully qualified class that *declares* each variable, keyed by flat name
+    /// (`"Modelica.Electrical.Analog.Basic.Resistor"` for `resistor.R`).
+    ///
+    /// The declared `quantity` says a variable measures a resistance; only the
+    /// declaring class says whether it is a *passive* resistor, whose value
+    /// must be positive, or an equivalent resistance that may legitimately be
+    /// negative. Nothing downstream can recover this: flattening reduces a
+    /// component to a path prefix on a name, and the class is gone.
+    #[serde(default)]
+    pub variable_declaring_classes: VarNameIndexMap<String>,
     /// Flat-output `final` qualifier flags keyed by variable name (MLS §7.2.6).
     ///
     /// When present and true, codegen should emit `final` before the declaration prefix.
@@ -768,7 +778,23 @@ pub struct Variable {
     /// True if this parameter has annotation(Evaluate=true) or is declared final.
     /// Structural parameters can be evaluated at compile time for if-equation
     /// branch selection (MLS §18.3).
+    ///
+    /// **Not the same as `is_final`.** `Evaluate=true` is a hint that a value
+    /// may be substituted at translation time; `final` forbids a *modifier*
+    /// from overriding the declaration. A consumer deciding whether a value can
+    /// change must read `is_final`, and a consumer deciding whether it is
+    /// constant must read neither — a `final parameter` may still be bound to
+    /// an expression over parameters a user can set.
     pub evaluate: bool,
+
+    /// True if the declaration carries the `final` prefix (MLS §7.2.6).
+    ///
+    /// Kept apart from `evaluate`, which subsumed it. An analysis asking "can
+    /// this value be changed" needs the distinction: `final` closes the
+    /// declaration to modification, and says nothing about what its binding
+    /// depends on.
+    #[serde(default)]
+    pub is_final: bool,
 
     /// True if this variable's base type is Integer or Boolean (MLS §4.5).
     /// Such variables are discrete by default even without explicit `discrete` prefix.
@@ -892,6 +918,7 @@ impl Variable {
             binding: None,
             binding_from_modification: false,
             evaluate: false,
+            is_final: false,
             is_discrete_type: false,
             is_primitive: false,
             from_expandable_connector: false,
@@ -1252,18 +1279,39 @@ mod variable_shape_contract_tests {
     }
 }
 
+/// One signed term of a connection set's flow balance.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FlowMember {
+    /// The flow variable this term reads.
+    pub variable: String,
+    /// Whether the balance subtracts it. An outside connector's flow leaves
+    /// the set where an inside connector's enters it, and the sign is what
+    /// makes the sum a conservation law rather than an accumulation.
+    pub negated: bool,
+}
+
 /// Typed origin for equations, replacing free-form string classification.
 ///
 /// Each variant represents a specific equation source, enabling
 /// pattern matching instead of `starts_with()` string checks.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum EquationOrigin {
     /// Equation from a component instance (e.g., `equation from resistor[1]`).
     ComponentEquation { component: String },
     /// Connection equality equation: `lhs = rhs` (MLS §9.2).
     Connection { lhs: String, rhs: String },
     /// Flow sum equation: `sum of signed flows = 0` (MLS §9.2).
-    FlowSum { description: String },
+    ///
+    /// `members` is the structured form and `description` the rendered one.
+    /// Both are kept because the description is what a golden test and a
+    /// human read, while a consumer that needs the endpoints must not have to
+    /// parse names back out of formatted text --- and for a while the only
+    /// form was the text, which name simplification then left stale.
+    FlowSum {
+        description: String,
+        #[serde(default)]
+        members: Vec<FlowMember>,
+    },
     /// Unconnected flow variable set to zero (MLS §9.2).
     UnconnectedFlow { variable: String },
     /// Algorithm section from a component.
@@ -1292,7 +1340,7 @@ impl std::fmt::Display for EquationOrigin {
             EquationOrigin::Connection { lhs, rhs } => {
                 write!(f, "connection equation: {} = {}", lhs, rhs)
             }
-            EquationOrigin::FlowSum { description } => {
+            EquationOrigin::FlowSum { description, .. } => {
                 write!(f, "flow sum equation: {}", description)
             }
             EquationOrigin::UnconnectedFlow { variable } => {

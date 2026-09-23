@@ -17,6 +17,19 @@ use crate::{
     timeline::sample_time_match_with_tol,
 };
 
+/// Native executable publication consumer. Receives only host-proved settled
+/// rows, never trial evaluations. One pending row permits same-time replacement.
+pub trait PublicationObserver {
+    fn publish(
+        &mut self,
+        time: f64,
+        phase: &str,
+        names: &[String],
+        values: &[f64],
+    ) -> Result<(), String>;
+    fn finish(&mut self) -> Result<(), String>;
+}
+
 /// What the master algorithm concluded an observation is.
 ///
 /// Deliberately host-private: public role construction would let a client mint
@@ -61,6 +74,8 @@ enum TraceDecision {
 /// violation onto the public host-contract category.
 #[derive(Debug, Clone, PartialEq, thiserror::Error)]
 pub(super) enum MeTraceViolation {
+    #[error("executable publication failed: {0}")]
+    Publication(String),
     #[error("trace channel names must be unique; '{name}' appears more than once")]
     DuplicateChannel { name: String },
 
@@ -142,6 +157,8 @@ pub(super) struct MeTraceRecorder {
     roles: Vec<TraceObservationRole>,
     columns: Vec<Vec<f64>>,
     state_count: usize,
+    observer: Option<Box<dyn PublicationObserver>>,
+    published_tail: bool,
 }
 
 impl MeTraceRecorder {
@@ -176,7 +193,50 @@ impl MeTraceRecorder {
             roles,
             columns,
             state_count,
+            observer: None,
+            published_tail: false,
         })
+    }
+
+    pub(super) fn set_observer(&mut self, observer: Option<Box<dyn PublicationObserver>>) {
+        self.observer = observer;
+    }
+
+    fn publish_tail(&mut self) -> Result<(), MeTraceViolation> {
+        if self.published_tail {
+            return Ok(());
+        }
+        let (Some(time), Some(role)) = (self.times.last(), self.roles.last()) else {
+            return Ok(());
+        };
+        if *role == TraceObservationRole::EventLeft {
+            return Ok(());
+        }
+        if let Some(observer) = &mut self.observer {
+            let values = self
+                .columns
+                .iter()
+                .filter_map(|c| c.last().copied())
+                .collect::<Vec<_>>();
+            let phase = match role {
+                TraceObservationRole::Initialization => "initial",
+                TraceObservationRole::Nominal => "sample",
+                _ => "settled",
+            };
+            observer
+                .publish(*time, phase, &self.names, &values)
+                .map_err(MeTraceViolation::Publication)?;
+        }
+        self.published_tail = true;
+        Ok(())
+    }
+
+    pub(super) fn finish_observer(&mut self) -> Result<(), MeTraceViolation> {
+        self.publish_tail()?;
+        if let Some(mut observer) = self.observer.take() {
+            observer.finish().map_err(MeTraceViolation::Publication)?;
+        }
+        Ok(())
     }
 
     /// The coordinate of the most recently retained row, if any.
@@ -320,6 +380,8 @@ impl MeTraceRecorder {
         time: f64,
         values: &[f64],
     ) -> Result<(), MeTraceViolation> {
+        self.publish_tail()?;
+        self.published_tail = false;
         let next = self.times.len() + 1;
         reserve_one(&mut self.times, next, "trace times")?;
         reserve_one(&mut self.roles, next, "trace roles")?;
@@ -388,6 +450,80 @@ fn reserve_one<T>(
 mod tests {
     use super::*;
     use std::cell::Cell;
+
+    #[test]
+    fn executable_publication_observes_only_settled_replacements() {
+        use std::{cell::RefCell, rc::Rc};
+        struct Observer(Rc<RefCell<Vec<(f64, String, f64)>>>);
+        impl PublicationObserver for Observer {
+            fn publish(
+                &mut self,
+                t: f64,
+                phase: &str,
+                _: &[String],
+                values: &[f64],
+            ) -> Result<(), String> {
+                self.0.borrow_mut().push((t, phase.into(), values[0]));
+                Ok(())
+            }
+            fn finish(&mut self) -> Result<(), String> {
+                Ok(())
+            }
+        }
+        let rows = Rc::new(RefCell::new(Vec::new()));
+        let mut trace = MeTraceRecorder::new(vec!["x".into()], vec![], 1, 4).unwrap();
+        trace.set_observer(Some(Box::new(Observer(rows.clone()))));
+        trace
+            .record_slice(TraceObservationRole::Initialization, 0.0, &[1.0])
+            .unwrap();
+        trace
+            .record_slice(TraceObservationRole::Settled, 0.0, &[2.0])
+            .unwrap();
+        trace
+            .record_slice(TraceObservationRole::EventLeft, 1.0, &[3.0])
+            .unwrap();
+        trace
+            .record_slice(TraceObservationRole::Settled, 1.0, &[4.0])
+            .unwrap();
+        trace
+            .record_slice(TraceObservationRole::Nominal, 2.0, &[5.0])
+            .unwrap();
+        trace
+            .record_slice(TraceObservationRole::Nominal, 2.0, &[99.0])
+            .unwrap();
+        trace.finish_observer().unwrap();
+        trace.finish_observer().unwrap();
+        assert_eq!(
+            *rows.borrow(),
+            vec![
+                (0.0, "settled".into(), 2.0),
+                (1.0, "settled".into(), 4.0),
+                (2.0, "sample".into(), 5.0)
+            ]
+        );
+    }
+
+    #[test]
+    fn executable_publication_errors_are_not_silenced() {
+        struct Fails;
+        impl PublicationObserver for Fails {
+            fn publish(&mut self, _: f64, _: &str, _: &[String], _: &[f64]) -> Result<(), String> {
+                Err("disk full".into())
+            }
+            fn finish(&mut self) -> Result<(), String> {
+                Ok(())
+            }
+        }
+        let mut trace = MeTraceRecorder::new(vec!["x".into()], vec![], 1, 2).unwrap();
+        trace.set_observer(Some(Box::new(Fails)));
+        trace
+            .record_slice(TraceObservationRole::Initialization, 0.0, &[1.0])
+            .unwrap();
+        assert!(matches!(
+            trace.finish_observer(),
+            Err(MeTraceViolation::Publication(_))
+        ));
+    }
 
     fn recorder() -> MeTraceRecorder {
         MeTraceRecorder::new(vec!["a".to_string(), "b".to_string()], Vec::new(), 0, 4)

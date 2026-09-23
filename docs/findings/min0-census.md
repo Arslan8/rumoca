@@ -53,7 +53,7 @@ This is the part that matters. Of the 13 survivors:
 
 | Verdict | Count | Examples |
 |---|---|---|
-| **Genuine** | 3 | `Rotor1D.J` ([BUG-005](BUG-005-multibody-rotor1d-zero-inertia.md)) ×2 decls, `OpAmpCircuits/Der.k` ([BUG-006](BUG-006-bound-propagated-into-a-different-component.md)) |
+| **Genuine** | 3 | `Rotor1D.J` ([BUG-005](../verified%20bugs/BUG-005-multibody-rotor1d-zero-inertia.md)) ×2 decls, `OpAmpCircuits/Der.k` ([BUG-006](../verified%20bugs/BUG-006-bound-propagated-into-a-different-component.md)) |
 | Division is unreachable at zero | 5 | `Blocks.Sources.Ramp.duration`, `Sources.Trapezoid.rising` — the division sits in a `time < start + duration` branch that is empty when the parameter is `0`, and the preceding branch already covers `time < start`. MSL documents the Ramp case: *"If parameter duration is set to 0.0, the limiting case of a Step signal is achieved."* |
 | Unknown is on the other side | 3 | `MultiBody.Forces.Damper.d` — `f = d*der(s)` determines `f`, not `der(s)`. At `d = 0` the damper exerts no force, which is exactly what `start = 0` intends. |
 | Parameter is the numerator | 1 | `Fluid/Pipes.m_flow_turbulent` |
@@ -85,7 +85,7 @@ only be decided from *structure*.
 - Unreachable-at-zero needs to know which branch is live.
 - "Unknown on the other side" needs to know which variable an equation
   determines — incidence, not syntax.
-- [BUG-006](BUG-006-bound-propagated-into-a-different-component.md) is the
+- [BUG-006](../verified%20bugs/BUG-006-bound-propagated-into-a-different-component.md) is the
   converse: the text-level check found it only by accident, because the chain
   `k → C → C*der(v)` crosses a component boundary and a `final` binding. A
   per-file scan should have missed it entirely.

@@ -23,10 +23,13 @@
 //! checked constructors, so a malformed artifact is rejected rather than
 //! producing an invalid model.
 
+pub mod build;
+mod connector_validation;
 pub mod codec;
 pub mod export;
 pub mod import;
 pub mod schema;
+pub mod text;
 pub mod validate;
 
 pub use codec::{

@@ -1,0 +1,11 @@
+; /tmp/tmp.dx54yyhMYh/decay.rbc (cbor)
+; bitcode v1, produced by rumoca 0.10.0
+; model Decay
+
+variables (3)
+  [  0] parameter  k                            from=Decay start=2.5 binding=2.5
+  [  1] parameter  tau                          from=Decay start=(1 / k) binding=(1 / k)
+  [  2] state      x                            from=Decay start=1
+
+equations (1)
+  [  0]  0 = (der(x) - -(x / tau))   ; Decay.mo:6

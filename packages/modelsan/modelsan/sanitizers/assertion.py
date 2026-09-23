@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from ..analysis.context import AnalysisContext
+from ..findings.location import locate
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.hints import FuzzHint
 from ..fuzz.testcase import TestCase
@@ -130,9 +131,4 @@ class AssertSan:
 
 
 def _location(event) -> list[SourceLocation]:
-    source = getattr(event, "source", None)
-    span = getattr(source, "span", None) if source else None
-    if span is None:
-        return []
-    return [SourceLocation(file=getattr(span, "source_name", "") or "?",
-                           line=getattr(span, "line", 0) or 0)]
+    return locate(event)

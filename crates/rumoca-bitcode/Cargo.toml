@@ -9,6 +9,7 @@ description = "Rumoca Bitcode: a public, versioned interchange format for compil
 [dependencies]
 rumoca-core = { workspace = true }
 rumoca-ir-dae = { workspace = true }
+rumoca-ir-solve = { workspace = true }
 rumoca-ir-flat = { workspace = true }
 rumoca-eval-dae = { workspace = true }
 serde = { workspace = true }

@@ -281,6 +281,21 @@ pub struct ModelOptions {
     /// explicit flag.
     #[arg(long = "source-root", value_name = "PATH", action = ArgAction::Append)]
     pub source_roots: Vec<String>,
+
+    /// Keep derived parameter bindings as written instead of replacing them
+    /// with the constant they evaluate to.
+    ///
+    /// By default `parameter Real d = k * 10` with `k = 2` is emitted as
+    /// `d = 20`, which is the value a solver wants but erases the fact that `d`
+    /// is derived from `k`. With this flag the binding reaches the flat and DAE
+    /// models as `k * 10`, so an analysis can follow the dependency back to the
+    /// parameter a user actually sets.
+    ///
+    /// Structural parameters (MLS §18.3 — array dimensions, for-loop ranges,
+    /// if-equation conditions) and discrete-typed bindings are still evaluated,
+    /// so the flattened model has the same shape either way.
+    #[arg(long)]
+    pub no_fold_parameter_bindings: bool,
 }
 
 /// `compile`/`check` model input: the required model-file positional plus the
@@ -997,6 +1012,7 @@ fn run_configured_simulation(args: SimCommandArgs) -> Result<()> {
                     .iter()
                     .map(|path| path.to_string_lossy().to_string())
                     .collect(),
+                no_fold_parameter_bindings: false,
             },
         };
         init_debug_tracing(&args.diagnostics)?;
@@ -1722,6 +1738,7 @@ fn compile_with_inferred_model(
     let compiler = Compiler::new()
         .model(&model)
         .verbose(verbose)
+        .no_fold_parameter_bindings(args.options.no_fold_parameter_bindings)
         .source_roots(&source_roots);
     let result = compiler.compile_file(&args.model_file)?;
     Ok((result, model))
@@ -1743,6 +1760,7 @@ fn compile_early_ir_with_inferred_model(
     let compiler = Compiler::new()
         .model(&model)
         .verbose(verbose)
+        .no_fold_parameter_bindings(args.options.no_fold_parameter_bindings)
         .source_roots(&source_roots);
     let artifact = match phase {
         CompilePhase::Ast => {
@@ -1773,6 +1791,7 @@ pub(crate) fn compile_dae_with_inferred_model(
     let compiler = Compiler::new()
         .model(&model)
         .verbose(verbose)
+        .no_fold_parameter_bindings(args.options.no_fold_parameter_bindings)
         .source_roots(&source_roots);
     let result = compiler.compile_file_dae(&args.model_file)?;
     Ok((result, model))

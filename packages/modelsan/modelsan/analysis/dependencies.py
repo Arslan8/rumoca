@@ -23,6 +23,9 @@ class DependencyGraph:
     equation_reads: dict[int, set[int]] = field(default_factory=lambda: defaultdict(set))
     equation_reads_derivative: dict[int, set[int]] = field(
         default_factory=lambda: defaultdict(set))
+    equation_reads_previous: dict[int, set[int]] = field(
+        default_factory=lambda: defaultdict(set))
+    """`pre(v)` reads: a dependency, but never a candidate to determine `v`."""
     variable_in: dict[int, set[int]] = field(default_factory=lambda: defaultdict(set))
 
     def equations(self) -> list[int]:
@@ -34,9 +37,39 @@ class DependencyGraph:
     def reads(self, equation_id: int) -> set[int]:
         return self.equation_reads.get(equation_id, set())
 
+    def reads_previous(self, equation_id: int) -> set[int]:
+        return self.equation_reads_previous.get(equation_id, set())
+
     def written_by(self, variable_id: int) -> set[int]:
         """Equations that mention this variable."""
         return self.variable_in.get(variable_id, set())
+
+
+#: Keys for the B.1b partition start here. Scalar equations are non-negative
+#: and families negative, so a third partition needs its own range rather than
+#: a third sign.
+_DISCRETE_BASE = 1 << 24
+
+
+def _owners(model):
+    """Every constraint, keyed, with the variables it reads.
+
+    A scalar equation is keyed by its id; an array or `for` equation is a
+    *family*, keyed negatively so it cannot collide with one
+    (`analysis.structure.family_key`). Families were absent from the artifact
+    entirely until TOOLBUG-014, so nothing here saw them.
+    """
+    for equation in model.equations:
+        yield (equation.id, equation.reads, equation.reads_derivative,
+               equation.reads_previous)
+    for family in getattr(model, "equation_families", ()) or ():
+        yield (-(family.id + 1), family.reads, family.reads_derivative,
+               family.reads_previous)
+    # MLS Appendix B.1b. A separate partition, so its key namespace is separate
+    # too (`analysis.structure.discrete_key`).
+    for equation in getattr(model, "discrete_real_equations", ()) or ():
+        yield (_DISCRETE_BASE + equation.id, equation.reads,
+               equation.reads_derivative, equation.reads_previous)
 
 
 def build(model) -> DependencyGraph:
@@ -48,15 +81,14 @@ def build(model) -> DependencyGraph:
     record coordinates that a naive expression walk gets wrong.
     """
     graph = DependencyGraph()
-    for equation in model.equations:
-        eid = equation.id
-        for variable in equation.residual.variables():
-            if variable.is_parameter:
-                continue
-            if getattr(variable, "is_derivative", False):
-                graph.equation_reads_derivative[eid].add(variable.id)
-            else:
-                graph.equation_reads[eid].add(variable.id)
-            graph.variable_in[variable.id].add(eid)
+    for eid, reads, derivatives, previous in _owners(model):
+        for sink, group in ((graph.equation_reads, reads),
+                            (graph.equation_reads_derivative, derivatives),
+                            (graph.equation_reads_previous, previous)):
+            for variable in group:
+                if variable.is_parameter:
+                    continue
+                sink[eid].add(variable.id)
+                graph.variable_in[variable.id].add(eid)
         graph.equation_reads.setdefault(eid, set())
     return graph

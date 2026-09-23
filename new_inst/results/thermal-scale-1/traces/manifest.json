@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "equation_digest": "sha1:702a718ba3a2a43fd8e6966c11627067ca38ed95",
+  "execution_revision": 2,
+  "sinks": [
+    {
+      "key": "connector-csv:0",
+      "filename": "connector-0000.csv",
+      "columns": [
+        "time_s",
+        "publish_id",
+        "phase",
+        "T",
+        "Q_flow"
+      ],
+      "column_types": [
+        "real",
+        "integer",
+        "string",
+        "real",
+        "real"
+      ],
+      "metadata": {
+        "connector_id": "0",
+        "connector_path": "hot.port",
+        "owner": 0,
+        "orientation": "outside",
+        "members": [
+          {
+            "name": "T",
+            "variable_id": "5",
+            "unit": "K",
+            "kind": "potential"
+          },
+          {
+            "name": "Q_flow",
+            "variable_id": "6",
+            "unit": "W",
+            "kind": "flow"
+          }
+        ]
+      }
+    },
+    {
+      "key": "connector-csv:1",
+      "filename": "connector-0001.csv",
+      "columns": [
+        "time_s",
+        "publish_id",
+        "phase",
+        "T",
+        "Q_flow"
+      ],
+      "column_types": [
+        "real",
+        "integer",
+        "string",
+        "real",
+        "real"
+      ],
+      "metadata": {
+        "connector_id": "1",
+        "connector_path": "link.a",
+        "owner": 1,
+        "orientation": "outside",
+        "members": [
+          {
+            "name": "T",
+            "variable_id": "7",
+            "unit": "K",
+            "kind": "potential"
+          },
+          {
+            "name": "Q_flow",
+            "variable_id": "8",
+            "unit": "W",
+            "kind": "flow"
+          }
+        ]
+      }
+    },
+    {
+      "key": "connector-csv:2",
+      "filename": "connector-0002.csv",
+      "columns": [
+        "time_s",
+        "publish_id",
+        "phase",
+        "T",
+        "Q_flow"
+      ],
+      "column_types": [
+        "real",
+        "integer",
+        "string",
+        "real",
+        "real"
+      ],
+      "metadata": {
+        "connector_id": "2",
+        "connector_path": "link.b",
+        "owner": 1,
+        "orientation": "outside",
+        "members": [
+          {
+            "name": "T",
+            "variable_id": "9",
+            "unit": "K",
+            "kind": "potential"
+          },
+          {
+            "name": "Q_flow",
+            "variable_id": "10",
+            "unit": "W",
+            "kind": "flow"
+          }
+        ]
+      }
+    },
+    {
+      "key": "connector-csv:3",
+      "filename": "connector-0003.csv",
+      "columns": [
+        "time_s",
+        "publish_id",
+        "phase",
+        "T",
+        "Q_flow"
+      ],
+      "column_types": [
+        "real",
+        "integer",
+        "string",
+        "real",
+        "real"
+      ],
+      "metadata": {
+        "connector_id": "3",
+        "connector_path": "cold.port",
+        "owner": 2,
+        "orientation": "outside",
+        "members": [
+          {
+            "name": "T",
+            "variable_id": "11",
+            "unit": "K",
+            "kind": "potential"
+          },
+          {
+            "name": "Q_flow",
+            "variable_id": "12",
+            "unit": "W",
+            "kind": "flow"
+          }
+        ]
+      }
+    }
+  ]
+}

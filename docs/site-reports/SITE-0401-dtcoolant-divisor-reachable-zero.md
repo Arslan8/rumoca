@@ -1,0 +1,48 @@
+# SITE-0401: `dTCoolant` — a settable parameter reaches a denominator with nothing excluding zero
+
+| | |
+|---|---|
+| **Declaration** | `DCPM_Cooling.mo:20` |
+| **Parameter** | `dTCoolant` |
+| **Reached as** | `dTCoolant` |
+| **Finding** | `divisor-reachable-zero` |
+| **Severity** | medium |
+| **Sanitizer** | `divisor` |
+| **Models reaching it** | 1 |
+| **Evidence** | static analysis of the canonical DAE |
+| **Status** | **candidate — not execution-confirmed** |
+
+## The claim
+
+a settable parameter reaches a denominator with nothing excluding zero
+
+reaches a denominator and nothing excludes zero
+
+## What this evidence is, and is not
+
+Static reachability only. Whether zero actually breaks this model depends on topology — a vanishing divisor in an unused branch is harmless — so execution is the oracle.
+
+A confirmed occurrence of this class would live in
+[`docs/verified bugs/`](../verified%20bugs/INSTANCES.md) with its own `BUG-` id
+and a two-tool reproduction. This file has neither; it records a site the
+analysis reached so the result is not lost between runs.
+
+## How it was matched
+- **parameter**: `dTCoolant`
+- **shape**: `propagated`
+- **path**: `dTCoolant -> dTArmature`
+- **declared_min**: `None`
+- **divisor_sites**: `4`
+
+## Models that reach it
+
+| Model |
+|---|
+| `Modelica.Electrical.Machines.Examples.DCMachines.DCPM_Cooling` |
+
+## Reproducing
+
+```bash
+python3 tools/sweep/static_eval.py --list tools/sweep/ALL.list \
+  --out results.jsonl --keep-parameter-chains
+```

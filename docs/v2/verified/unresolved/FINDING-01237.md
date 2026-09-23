@@ -1,0 +1,57 @@
+# FINDING-01237: `TP2.RDS` in `Nand`
+
+| Field | Value |
+|---|---|
+| Verdict | unresolved |
+| Review group | `divisor-reachable-zero` |
+| Original tier | Candidate |
+| Sanitizer result | `divisor-reachable-zero` |
+| Model | Modelica.Electrical.Analog.Examples.Utilities.Nand |
+| Target | `TP2.RDS` |
+| Declaration/site | `target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Semiconductors/PMOS.mo:42` |
+| Original report | [FINDING-nand-tp2-rds-divzero.md](../../bugs/FINDING-nand-tp2-rds-divzero.md) |
+| Original SHA-256 | `2c5a06080a067687393477e647bfda7ce990ee763d59b9a8209e9d433af41ee4` |
+
+## What remains unresolved
+
+The static denominator witness remains arithmetically valid, but independent OpenModelica did not establish the claimed differential failure. The paired execution outcome was `unresolved-baseline-fails`; a clean short run is not enough to prove the path can never execute later.
+
+## Evidence needed
+
+Use the generated wrapper as a regression, extend execution to the model's relevant experiment horizon, and obtain a clean baseline plus an attributed numerical failure before calling this a true positive.
+
+## Evidence basis
+
+Source-resolved Rumoca witness plus a conservative, non-confirming OpenModelica paired result.
+
+## OpenModelica paired execution
+
+- Outcome: `unresolved-baseline-fails`
+- Unmodified baseline: `failed`
+- Source-instantiated trigger: `failed`
+
+Generated test program:
+
+```modelica
+model V2OMC_3de59dee0161f13b
+  extends Modelica.Electrical.Analog.Examples.Utilities.Nand(TP2.RDS=0);
+end V2OMC_3de59dee0161f13b;
+```
+
+Relevant OMC diagnostic:
+
+```text
+messages = "Failed to build model: V2OMC_3de59dee0161f13b",
+"Error: An independent subset of the model has imbalanced number of equations (98) and variables (100).
+Error: pre-optimization module clockPartitioning (simulation) failed.
+```
+
+## Original claim
+
+A permitted assignment, given in full below, drives the **complete denominator** to zero, and nothing on the path excludes it. It does **not** claim that any model sets those values, or that the model fails when it does — a vanishing denominator in a quotient nothing reads is harmless.
+
+## Scope
+
+Confirmed means independently reproduced execution evidence survived the semantic controls. Candidate means useful static/source evidence exists but a false positive is still possible. Advisory means the analyzer explicitly asks about unknown intent and makes no defect claim. False-positive means the stated defect claim is refuted; it does not certify every connected topology. Unresolved entries are deliberately not called real or fake.
+
+[v2 verification index](../README.md)
