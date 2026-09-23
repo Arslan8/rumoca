@@ -1,5 +1,8 @@
 # Linking bitcode modules
 
+For a runnable two-model walkthrough covering open ports, the IR builders and
+pass ordering/replay, start with [Combining two models](combining-models.md).
+
 `rumoca bitcode link` is the equation-artifact counterpart of `llvm-link`:
 it combines independently produced artifacts into one namespaced artifact.
 It does **not** infer physical connections, resolve missing function bodies,

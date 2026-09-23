@@ -69,6 +69,10 @@ equation changes. Do not merely copy old register or variable IDs to a new model
 
 ## Bitcode linking
 
+Start with [Combining two models](../docs/combining-models.md) and its runnable
+`compose_models.py` example for a full linker → connector → equation pass →
+execution pass → native simulation workflow.
+
 Independent equation artifacts can now be combined with `rumoca bitcode link`
 or `Model.link`. See [the linking guide](../docs/bitcode-linking.md) for CLI/SDK
 examples, explicit connection handling, execution-discard rules, and tests.

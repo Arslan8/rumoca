@@ -1,5 +1,9 @@
 # Writing an external pass
 
+For an end-to-end composition example and the distinction between equation
+passes, execution passes and explicit replay, see
+[Combining two models](combining-models.md). This page focuses on equation IR.
+
 A pass is a program that reads Rumoca Bitcode. That is the whole contract.
 
 You do not need a Rumoca checkout, Rust, a matching compiler version, or any
