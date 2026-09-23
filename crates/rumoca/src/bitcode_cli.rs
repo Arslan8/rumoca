@@ -40,6 +40,8 @@ pub struct BitcodeArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum BitcodeCommand {
+    /// Link named equation modules into one artifact (no automatic wiring).
+    Link(crate::bitcode_link::LinkArgs),
     /// Lower equations into editable public Solve programs.
     LowerExecution(crate::bitcode_execution::LowerArgs),
     /// Validate executable structure, freshness and backend capabilities.
@@ -130,6 +132,10 @@ pub struct BitcodeCheckArgs {
     /// consumer actually has: can this be rebuilt into a model?
     #[arg(long)]
     pub strict: bool,
+    /// Require complete scalar-port contracts and verified connection equations.
+    /// Legacy connection annotations without port declarations are rejected.
+    #[arg(long)]
+    pub connections: bool,
 }
 
 #[derive(Args, Debug)]
@@ -221,12 +227,13 @@ pub fn emit_bitcode(
 
 pub fn run_bitcode(args: BitcodeArgs) -> Result<()> {
     match args.command {
+        BitcodeCommand::Link(args) => crate::bitcode_link::run(args),
         BitcodeCommand::LowerExecution(args) => crate::bitcode_execution::lower(args),
         BitcodeCommand::CheckExecution(args) => crate::bitcode_execution::check_path(&args.input),
         BitcodeCommand::Run(args) => crate::bitcode_execution::run(args),
         BitcodeCommand::Inspect(args) => run_inspect(&args.input),
         BitcodeCommand::Dump(args) => run_dump(&args.input, args.output.as_deref()),
-        BitcodeCommand::Check(args) => run_check(&args.input, args.strict),
+        BitcodeCommand::Check(args) => run_check(&args.input, args.strict, args.connections),
         BitcodeCommand::Convert(args) => run_convert(&args.input, &args.output, args.format),
         BitcodeCommand::RoundTrip(args) => run_round_trip(&args.input, args.output.as_deref()),
         BitcodeCommand::EmitText(args) =>
@@ -304,12 +311,17 @@ fn run_dump(path: &Path, output: Option<&Path>) -> Result<()> {
     Ok(())
 }
 
-fn run_check(path: &Path, strict: bool) -> Result<()> {
+fn run_check(path: &Path, strict: bool, connections: bool) -> Result<()> {
     let (file, _) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
     if file.execution.is_some() { crate::bitcode_execution::check(&file)?; }
     let mut options = rumoca_bitcode::validate::ValidateOptions::default();
     options.reject_unsupported = strict;
-    match rumoca_bitcode::validate(&file.model, &options) {
+    let checked = if connections {
+        rumoca_bitcode::validate::validate_connection_contracts(&file.model, &options)
+    } else {
+        rumoca_bitcode::validate(&file.model, &options)
+    };
+    match checked {
         Ok(()) => {
             println!(
                 "{}: valid bitcode v{}{}",
@@ -317,6 +329,12 @@ fn run_check(path: &Path, strict: bool) -> Result<()> {
                 file.bitcode_version,
                 if strict { " (strict)" } else { "" }
             );
+            if !file.model.connectors.is_empty() {
+                println!("  declared scalar connector contracts and connection laws checked");
+            } else if !file.model.connection_sets.is_empty() || !file.model.connections.is_empty()
+                || file.model.variables.iter().any(|v| v.connector.is_some()) {
+                println!("  connection laws NOT certified: missing complete port declarations (use --connections to require them)");
+            }
             Ok(())
         }
         Err(errors) => {

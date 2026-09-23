@@ -369,10 +369,15 @@ fn restore_programs(
     {
         return Err("residual output/target outside the scalar equation profile".into());
     }
-    let count = y;
     let continuous = &mut model.problem.continuous;
     continuous.implicit_rhs = block(&public.residual, y, p, span)?;
     continuous.residual = continuous.implicit_rhs.clone();
+    // Row ownership follows the checked block's output space, not Y storage.
+    // A pure explicit ODE has states but zero implicit residual outputs.
+    let count = continuous
+        .implicit_rhs
+        .output_count("execution.implicit_rhs")
+        .map_err(|e| e.to_string())?;
     continuous.implicit_row_targets = targets(&public.residual, count, y)?;
     continuous.derivative_rhs = block(&public.derivatives, y, p, span)?;
     continuous.algebraic_projection_plan.blocks = public

@@ -277,14 +277,25 @@ class Model:
 
         return Builder(model=self, pass_name=pass_name, generation=generation)
 
+    @classmethod
+    def link(cls, modules, *, name="LinkedModel", discard_execution=False):
+        """Link namespace -> Model/path inputs without mutating or wiring them.
+
+        Uses the installed native linker (RUMOCA selects the executable).
+        Executable inputs require explicit discard_execution=True; lower and
+        instrument the combined equations again afterwards.
+        """
+        from .linker import link
+        return link(modules, name=name, discard_execution=discard_execution)
+
     @property
     def connectors(self):
         from .connectors import Connector
         return [Connector(raw, self) for raw in self._raw.get("connectors", [])]
 
-    def validate(self, strict: bool = True) -> None:
+    def validate(self, strict: bool = True, *, connections: bool = False) -> None:
         from .compiler import check_model
-        check_model(self, strict=strict)
+        check_model(self, strict=strict, connections=connections)
 
     def refresh(self) -> None:
         """Rebuild the typed views from the document, and the summary.

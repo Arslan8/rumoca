@@ -21,10 +21,11 @@ def invoke(*args):
     return result.stdout
 
 
-def check_model(model, *, strict=True):
+def check_model(model, *, strict=True, connections=False):
     with tempfile.TemporaryDirectory(prefix="rbc-check-") as directory:
         path = Path(directory) / "model.rbc"
         model.save(path)
-        invoke("bitcode", "check", path, *(["--strict"] if strict else []))
+        invoke("bitcode", "check", path, *(["--strict"] if strict else []),
+               *(["--connections"] if connections else []))
         if strict and model._document.get("execution") is None:
             invoke("compile-bitcode", path)

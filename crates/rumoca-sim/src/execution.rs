@@ -1,7 +1,9 @@
 //! Native execution of checked public RBC programs on the existing ME/RK45 host.
 use rumoca_ir_solve as solve;
+#[cfg(feature = "solver-rk45")]
 use rumoca_solver::fmi_me::{MeModelArtifact, PublicationObserver, session::MeRetainedComponent};
 use solve::execution as ir;
+#[cfg(feature = "solver-rk45")]
 use std::path::Path;
 
 pub fn lower(
@@ -61,7 +63,9 @@ pub fn run(
     Ok(session.finish())
 }
 
+#[cfg(feature = "solver-rk45")]
 struct NativePublication(rumoca_eval_solve::execution::CsvExecution);
+#[cfg(feature = "solver-rk45")]
 impl PublicationObserver for NativePublication {
     fn publish(
         &mut self,

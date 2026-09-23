@@ -67,6 +67,14 @@ instructions. Those helpers also accept numerical instruction lists under
 Register the transformation as a replay implementation if it must survive
 equation changes. Do not merely copy old register or variable IDs to a new model.
 
+## Bitcode linking
+
+Independent equation artifacts can now be combined with `rumoca bitcode link`
+or `Model.link`. See [the linking guide](../docs/bitcode-linking.md) for CLI/SDK
+examples, explicit connection handling, execution-discard rules, and tests.
+The [linker verification record](LINK_VERIFICATION.md) records focused results
+and the broader validation boundaries.
+
 ## Acceptance tests
 
 ```bash

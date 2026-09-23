@@ -41,6 +41,8 @@ pub mod cli;
 // Rumoca Bitcode CLI: the external compiler interface.
 #[cfg(feature = "scheduled-sim")]
 pub mod bitcode_cli;
+#[cfg(feature = "scheduled-sim")]
+pub mod bitcode_link;
 pub mod bitcode_execution;
 pub mod bitcode_disasm;
 

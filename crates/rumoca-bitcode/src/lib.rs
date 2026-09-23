@@ -28,6 +28,7 @@ mod connector_validation;
 pub mod codec;
 pub mod export;
 pub mod import;
+pub mod link;
 pub mod schema;
 pub mod text;
 pub mod validate;

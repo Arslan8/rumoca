@@ -82,6 +82,22 @@ pub struct ValidateOptions {
     pub reject_unsupported: bool,
 }
 
+/// Require complete scalar-port contracts, in addition to ordinary validation.
+/// Legacy compiler-exported connection provenance is descriptive and may lack
+/// member declarations/equation pairing. It cannot authorize new wiring.
+pub fn validate_connection_contracts(
+    model: &RbcModel, options: &ValidateOptions,
+) -> Result<(), Vec<ValidationError>> {
+    validate(model, options)?;
+    if model.connectors.is_empty() && (!model.connection_sets.is_empty()
+        || !model.connections.is_empty() || model.variables.iter().any(|v| v.connector.is_some())) {
+        return Err(vec![ValidationError::Connector(
+            "complete port declarations required; legacy connection annotations are not certified for wiring".into(),
+        )]);
+    }
+    Ok(())
+}
+
 /// Validate an artifact's internal consistency. Returns every problem found,
 /// not just the first, so a pass author fixes one round of errors at a time.
 pub fn validate(model: &RbcModel, options: &ValidateOptions) -> Result<(), Vec<ValidationError>> {
@@ -91,6 +107,7 @@ pub fn validate(model: &RbcModel, options: &ValidateOptions) -> Result<(), Vec<V
     }
 
     check_discrete_real(&mut errors, model, &Counts::of(model));
+    check_additional_table_ids(&mut errors, model);
     check_dense(&mut errors, "sources", model.sources.iter().map(|s| s.id.0));
     check_dense(&mut errors, "types", model.types.iter().map(|t| t.id.0));
     check_dense(
@@ -147,6 +164,20 @@ pub fn validate(model: &RbcModel, options: &ValidateOptions) -> Result<(), Vec<V
     } else {
         Err(errors)
     }
+}
+
+// These tables also have independent dense ID spaces. In particular an initial
+// equation's ID is not an index into continuous equations during relocation.
+fn check_additional_table_ids(errors: &mut Vec<ValidationError>, model: &RbcModel) {
+    macro_rules! table {
+        ($($name:ident),+ $(,)?) => {$(
+            check_dense(errors, stringify!($name), model.$name.iter().map(|v| v.id.0));
+        )+};
+    }
+    table!(
+        initial_equations, domains, functions, equation_families,
+        initial_equation_families, events, time_events, trace_points
+    );
 }
 
 struct Counts {

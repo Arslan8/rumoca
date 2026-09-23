@@ -47,6 +47,29 @@ A reader **must** reject a file whose `magic` differs, and **must** reject a
 `bitcode_version` it does not implement. Both checks happen before any other
 field is interpreted.
 
+### Equation-artifact linking
+
+`rumoca-bitcode::link` owns namespaced linking of this public projection;
+the CLI and Python SDK delegate to it. This is not internal DAE structural
+lowering (SPEC_0007) or runtime execution (SPEC_0029). See
+[bitcode linking](bitcode-linking.md) for commands and the supported boundary.
+
+A link must preserve each module's equations and explicit boundary conditions,
+remap every typed identity/reference in its own table's ID space, namespace
+module-local symbols, retain diagnostic provenance, and validate the result.
+It must not infer wiring from names, merge equal-looking variables, or interpret
+literal numbers/ordinals as IDs. Inputs remain unchanged. Existing executable
+projections must be rejected unless the caller explicitly authorizes discarding
+them; linking equations cannot preserve arbitrary numerical/execution edits.
+
+Artifacts with explicit scalar connector declarations must validate complete
+member/set coverage, compatible contracts, exclusive equation ownership and
+the actual potential/flow equations at the native boundary (MLS §9.2;
+SPEC_0022 CONN-001/002/003/005/008/026). Authoring-helper checks alone are not
+sufficient. Complete-contract checking must reject legacy annotations that
+lack the information needed for this proof. The bounded proof profile and its
+explicit refusal conditions are documented in [connector validation](connector-validation.md).
+
 `producer` is informational. A consumer must not change behaviour based on it.
 
 ## 3. Encodings
