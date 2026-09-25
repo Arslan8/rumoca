@@ -71,3 +71,20 @@ crates/*/proptest-regressions/
 
 # LaTeX paper draft — deliberately not tracked.
 /paper/
+
+# Bulk evaluation data. The reports, censuses and assessments in
+# docs/evaluations/ stay in the repository -- they are the findings, and other
+# documents link to them. These five are the raw machine-generated outputs
+# behind them, 69 MB that git would carry forever. They are archived beside the
+# checkout instead; regenerate with the tools named in each evaluation README.
+/docs/evaluations/msl-issues-2026-09-24/corpus-results.json
+/docs/evaluations/msl-issues-2026-09-24/model-results.json
+/docs/evaluations/msl-issues-2026-09-24/runtime-results.json
+/docs/evaluations/msl-issues-2026-09-24/all-reports.csv
+/docs/evaluations/msl-upstream-open-issues-2026-09-24/comments.json
+
+# Temporary analysis outputs, written beside the checkout by a sweep or census.
+/tmp_*.json
+/*.rbc
+/*-sweep.json
+/*-census.json
