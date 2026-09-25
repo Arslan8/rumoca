@@ -19,6 +19,8 @@ use crate::schema::*;
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum ValidationError {
+    #[error("invalid clock metadata: {0}")]
+    Clock(String),
     #[error("invalid semantic connector metadata: {0}")]
     Connector(String),
     #[error(
@@ -86,11 +88,15 @@ pub struct ValidateOptions {
 /// Legacy compiler-exported connection provenance is descriptive and may lack
 /// member declarations/equation pairing. It cannot authorize new wiring.
 pub fn validate_connection_contracts(
-    model: &RbcModel, options: &ValidateOptions,
+    model: &RbcModel,
+    options: &ValidateOptions,
 ) -> Result<(), Vec<ValidationError>> {
     validate(model, options)?;
-    if model.connectors.is_empty() && (!model.connection_sets.is_empty()
-        || !model.connections.is_empty() || model.variables.iter().any(|v| v.connector.is_some())) {
+    if model.connectors.is_empty()
+        && (!model.connection_sets.is_empty()
+            || !model.connections.is_empty()
+            || model.variables.iter().any(|v| v.connector.is_some()))
+    {
         return Err(vec![ValidationError::Connector(
             "complete port declarations required; legacy connection annotations are not certified for wiring".into(),
         )]);
@@ -154,6 +160,7 @@ pub fn validate(model: &RbcModel, options: &ValidateOptions) -> Result<(), Vec<V
     check_expressions(&mut errors, model, &counts, options);
     check_equations(&mut errors, model, &counts);
     check_events(&mut errors, model, &counts);
+    check_clocks(&mut errors, model, &counts);
     check_connections(&mut errors, model, &counts);
     check_trace_points(&mut errors, model, &counts);
     check_discrete_definitions(&mut errors, model, &counts);
@@ -175,8 +182,15 @@ fn check_additional_table_ids(errors: &mut Vec<ValidationError>, model: &RbcMode
         )+};
     }
     table!(
-        initial_equations, domains, functions, equation_families,
-        initial_equation_families, events, time_events, trace_points
+        initial_equations,
+        domains,
+        functions,
+        equation_families,
+        initial_equation_families,
+        events,
+        time_events,
+        trace_points,
+        clocks
     );
 }
 
@@ -215,32 +229,68 @@ impl Counts {
 }
 
 /// The B.1b partition and the initialization-instant discrete values.
-fn check_discrete_real(
-    errors: &mut Vec<ValidationError>,
-    model: &RbcModel,
-    counts: &Counts,
-) {
-    check_dense(errors, "discrete_real_equations",
-                model.discrete_real_equations.iter().map(|e| e.id.0));
+fn check_discrete_real(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    check_dense(
+        errors,
+        "discrete_real_equations",
+        model.discrete_real_equations.iter().map(|e| e.id.0),
+    );
     for equation in &model.discrete_real_equations {
         let owner = format!("discrete real equation {}", equation.id.0);
-        reference(errors, owner.clone(), "expression",
-                  equation.residual.0, counts.expressions);
+        reference(
+            errors,
+            owner.clone(),
+            "expression",
+            equation.residual.0,
+            counts.expressions,
+        );
         if let RbcDiscreteRealActivation::When { trigger, guard } = equation.activation {
-            reference(errors, owner.clone(), "condition", trigger.0, counts.conditions);
-            reference(errors, owner.clone(), "condition", guard.0, counts.conditions);
+            reference(
+                errors,
+                owner.clone(),
+                "condition",
+                trigger.0,
+                counts.conditions,
+            );
+            reference(
+                errors,
+                owner.clone(),
+                "condition",
+                guard.0,
+                counts.conditions,
+            );
         }
-        for variable in equation.reads.iter()
+        for variable in equation
+            .reads
+            .iter()
             .chain(&equation.reads_derivative)
             .chain(&equation.reads_previous)
         {
-            reference(errors, owner.clone(), "variable", variable.0, counts.variables);
+            reference(
+                errors,
+                owner.clone(),
+                "variable",
+                variable.0,
+                counts.variables,
+            );
         }
     }
     for (index, entry) in model.initial_discrete_values.iter().enumerate() {
         let owner = format!("initial discrete value {index}");
-        reference(errors, owner.clone(), "variable", entry.target.0, counts.variables);
-        reference(errors, owner, "expression", entry.value.0, counts.expressions);
+        reference(
+            errors,
+            owner.clone(),
+            "variable",
+            entry.target.0,
+            counts.variables,
+        );
+        reference(
+            errors,
+            owner,
+            "expression",
+            entry.value.0,
+            counts.expressions,
+        );
     }
 }
 
@@ -364,18 +414,36 @@ fn check_expressions(
             }
         };
         match &expression.node {
+            RbcExprNode::StringConversion { value, format } => {
+                operand(*value);
+                for value in format.operands() {
+                    operand(value);
+                }
+            }
             RbcExprNode::Literal { .. } => {}
             RbcExprNode::Coordinate { coordinate } => {
                 match coordinate {
                     RbcCoordinate::Binder { domain, .. } => reference(
-                        errors, format!("expression {index}"), "domain",
-                        domain.0, counts.domains),
+                        errors,
+                        format!("expression {index}"),
+                        "domain",
+                        domain.0,
+                        counts.domains,
+                    ),
                     RbcCoordinate::Condition { condition } => reference(
-                        errors, format!("expression {index}"), "condition",
-                        condition.0, counts.conditions),
+                        errors,
+                        format!("expression {index}"),
+                        "condition",
+                        condition.0,
+                        counts.conditions,
+                    ),
                     RbcCoordinate::FunctionParameter { function, .. } => reference(
-                        errors, format!("expression {index}"), "function",
-                        function.0, counts.functions),
+                        errors,
+                        format!("expression {index}"),
+                        "function",
+                        function.0,
+                        counts.functions,
+                    ),
                     _ => {}
                 }
                 if let Some(variable) = coordinate.variable() {
@@ -575,8 +643,14 @@ fn check_conditions(errors: &mut Vec<ValidationError>, model: &RbcModel, counts:
         match &condition.node {
             RbcConditionNode::Initial
             | RbcConditionNode::Always
-            | RbcConditionNode::Clock
             | RbcConditionNode::Unsupported { .. } => {}
+            RbcConditionNode::ClockActivation { clock } => reference(
+                errors,
+                format!("condition {index}"),
+                "clock",
+                clock.0,
+                model.clocks.len() as u32,
+            ),
             RbcConditionNode::Relation { relation } => reference(
                 errors,
                 format!("condition {index}"),
@@ -599,6 +673,43 @@ fn check_conditions(errors: &mut Vec<ValidationError>, model: &RbcModel, counts:
                 inner(*rhs);
             }
         }
+    }
+}
+
+fn check_clocks(errors: &mut Vec<ValidationError>, model: &RbcModel, counts: &Counts) {
+    for clock in &model.clocks {
+        if let RbcClockNode::Triggered { condition } = clock.node {
+            reference(
+                errors,
+                format!("clock {}", clock.id),
+                "condition",
+                condition.0,
+                counts.conditions,
+            );
+        }
+    }
+    let mut owned = BTreeSet::new();
+    for (index, owner) in model.clock_ownerships.iter().enumerate() {
+        if !owned.insert(owner.variable.0) {
+            errors.push(ValidationError::Clock(format!(
+                "variable {} has multiple clock ownership records",
+                owner.variable
+            )));
+        }
+        reference(
+            errors,
+            format!("clock ownership {index}"),
+            "clock",
+            owner.clock.0,
+            model.clocks.len() as u32,
+        );
+        reference(
+            errors,
+            format!("clock ownership {index}"),
+            "variable",
+            owner.variable.0,
+            counts.variables,
+        );
     }
 }
 
@@ -718,25 +829,50 @@ fn check_connections(errors: &mut Vec<ValidationError>, model: &RbcModel, counts
             );
         }
     }
-    check_dense(errors, "connection_sets",
-                model.connection_sets.iter().map(|set| set.id.0));
+    check_dense(
+        errors,
+        "connection_sets",
+        model.connection_sets.iter().map(|set| set.id.0),
+    );
     for set in &model.connection_sets {
         let owner = format!("connection set {}", set.id);
         for potential in &set.potentials {
-            reference(errors, owner.clone(), "variable", potential.0, counts.variables);
+            reference(
+                errors,
+                owner.clone(),
+                "variable",
+                potential.0,
+                counts.variables,
+            );
         }
         for balance in &set.balances {
             for term in &balance.terms {
-                reference(errors, owner.clone(), "variable", term.variable.0,
-                          counts.variables);
+                reference(
+                    errors,
+                    owner.clone(),
+                    "variable",
+                    term.variable.0,
+                    counts.variables,
+                );
             }
             if let Some(equation) = balance.equation {
-                reference(errors, owner.clone(), "equation", equation.0,
-                          counts.equations);
+                reference(
+                    errors,
+                    owner.clone(),
+                    "equation",
+                    equation.0,
+                    counts.equations,
+                );
             }
         }
         for equation in &set.potential_equations {
-            reference(errors, owner.clone(), "equation", equation.0, counts.equations);
+            reference(
+                errors,
+                owner.clone(),
+                "equation",
+                equation.0,
+                counts.equations,
+            );
         }
     }
 }
@@ -870,11 +1006,21 @@ fn check_summary(errors: &mut Vec<ValidationError>, model: &RbcModel) {
     check("expressions", summary.expressions, model.expressions.len());
     check("relations", summary.relations, model.relations.len());
     check("conditions", summary.conditions, model.conditions.len());
+    check("clocks", summary.clocks, model.clocks.len());
+    check(
+        "clock_ownerships",
+        summary.clock_ownerships,
+        model.clock_ownerships.len(),
+    );
     check("roots", summary.roots, model.roots.len());
     check("events", summary.events, model.events.len());
     check("time_events", summary.time_events, model.time_events.len());
     check("connections", summary.connections, model.connections.len());
-    check("connection_sets", summary.connection_sets, model.connection_sets.len());
+    check(
+        "connection_sets",
+        summary.connection_sets,
+        model.connection_sets.len(),
+    );
     check("components", summary.components, model.components.len());
     check(
         "trace_points",
@@ -912,6 +1058,8 @@ pub fn recompute_summary(model: &mut RbcModel) {
         expressions: model.expressions.len() as u32,
         relations: model.relations.len() as u32,
         conditions: model.conditions.len() as u32,
+        clocks: model.clocks.len() as u32,
+        clock_ownerships: model.clock_ownerships.len() as u32,
         roots: model.roots.len() as u32,
         events: model.events.len() as u32,
         time_events: model.time_events.len() as u32,

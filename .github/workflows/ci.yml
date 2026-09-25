@@ -450,6 +450,24 @@ jobs:
       - name: Build all binaries
         run: cargo xtask verify binaries
 
+      - name: ModelSan known-issue detection and control gate (Linux)
+        if: runner.os == 'Linux' && !cancelled()
+        timeout-minutes: 10
+        shell: bash
+        env:
+          MODELSAN_MSL_TESTS: "1"
+          PYTHONPATH: packages/rumoca-bitcode:packages/modelsan
+          CARGO_BUILD_JOBS: "4"
+          RUST_TEST_THREADS: "4"
+          RAYON_NUM_THREADS: "4"
+        run: |
+          set -euo pipefail
+          export RUMOCA="$PWD/target/debug/rumoca"
+          test -x "$RUMOCA"
+          test -f 'target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/package.mo'
+          python3 -m unittest discover -s packages/modelsan/tests \
+            -p test_known_msl_issues.py -k test_native -v
+
       - name: Run tensor compile-scaling ratchet
         if: runner.os == 'Linux'
         run: |

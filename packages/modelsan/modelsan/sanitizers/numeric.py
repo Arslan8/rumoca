@@ -33,7 +33,9 @@ from ..findings.location import locate
 from ..findings.finding import Finding, Severity, SourceLocation
 from ..fuzz.testcase import TestCase
 from ..instrumentation.capability import Capability
-from ..runtime.observations import ObservationStream, VariableObservation
+from ..runtime.observations import (
+    ObservationStream, UnorderedVariableObservation, VariableObservation,
+)
 
 # A magnitude no physical MSL quantity reaches, chosen well above any plausible
 # unit-scale so that a merely large value is not mistaken for a broken one.
@@ -43,7 +45,7 @@ EXTREME = 1e30
 class NumericSan:
     name = "numeric"
 
-    #: Needs a trajectory. Declared, so the planner can report that this
+    #: Needs variable values. Declared, so the planner can report that this
     #: sanitizer was inactive rather than letting silence read as "clean".
     requires = {"runtime": frozenset({Capability.OBSERVE_VARIABLE})}
 
@@ -55,7 +57,7 @@ class NumericSan:
         findings: list[Finding] = []
         seen: set[tuple[str, int | str]] = set()
 
-        for observation in stream.of(VariableObservation):
+        for observation in stream.of(VariableObservation, UnorderedVariableObservation):
             kind = self._classify(observation.value)
             if kind is None:
                 continue
@@ -63,6 +65,9 @@ class NumericSan:
             if key in seen:
                 continue
             seen.add(key)
+            provenance = (dict(sample_order="unordered", reported_time=observation.reported_time,
+                               row_index=observation.row_index)
+                          if isinstance(observation, UnorderedVariableObservation) else {})
             findings.append(Finding(
                 sanitizer=self.name,
                 kind=kind,
@@ -79,6 +84,7 @@ class NumericSan:
                     "variable": observation.label,
                     "value": observation.value,
                     "anchor_quality": observation.anchor_quality.value,
+                    **provenance,
                 },
             ))
         return self._first_only(findings)
@@ -94,11 +100,12 @@ class NumericSan:
 
     @staticmethod
     def _first_only(findings: list[Finding]) -> list[Finding]:
-        """Keep the earliest occurrence of each kind.
+        """Keep the earliest timed or first received untimed occurrence per kind.
 
         A NaN contaminates every variable that reads it within one step, so the
         set of affected variables measures fan-out, not severity. The earliest
-        one is the closest thing available to the source.
+        one is the closest thing available to the source. Untimed samples only
+        establish the value's presence, never which event came first.
         """
         earliest: dict[str, Finding] = {}
         for finding in findings:
@@ -109,6 +116,6 @@ class NumericSan:
 
     @staticmethod
     def _location(context: AnalysisContext, anchor) -> list[SourceLocation]:
-        if anchor is None:
+        if anchor is None or context is None or context.model is None:
             return []
         return locate(context.variable(anchor.dae_id))

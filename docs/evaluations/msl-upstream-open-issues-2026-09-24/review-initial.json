@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "review_date": "2026-09-24",
+  "repository": "modelica/ModelicaStandardLibrary",
+  "scope": "Bounded upstream review of four assigned issues, not an exhaustive inventory or a detection experiment",
+  "local_rumoca_head": "b38af3a38b0224bf22129cb1148ebf70e2492aa7",
+  "local_msl_version": "4.1.0",
+  "local_msl_version_date": "2025-05-23",
+  "local_msl_root": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0",
+  "evidence_limits": [
+    "GitHub pages were cached; observed open states are not a live authenticated snapshot.",
+    "No complete issue discussion was available; absence of comments in extracted pages does not prove absence of comments upstream.",
+    "No reproducer was executed; detected=false means no demonstrated detection, not an executed miss.",
+    "Source presence confirms only an implementation mechanism, not runtime failure or applicability to an unpinned upstream revision."
+  ],
+  "source_files": [
+    {
+      "path": "Resources/C-Sources/ModelicaInternal.c",
+      "sha256": "3c52c631291bd75f4216fdb24d87e4c1f36b6c0418e2c1557eb24c07a01ad47e"
+    },
+    {
+      "path": "Mechanics/Translational/Components/SupportFriction.mo",
+      "sha256": "0b624bf5f3d43ff31998a6e9118040e58eca717180f06de73590884d3fd8114f"
+    },
+    {
+      "path": "Blocks/Tables.mo",
+      "sha256": "82358f927754b3d5af057182b15255a15763953e9516e53bed1f44b0cf6f369a"
+    },
+    {
+      "path": "Blocks/Types.mo",
+      "sha256": "8c80b50b829613bea454511060d6acdfc4d6fe52c0614c54a9753348a3650211"
+    }
+  ],
+  "issues": [
+    {
+      "number": 4801,
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/issues/4801",
+      "title": "smoothness in interpolation of Modelica.Mechanics.Translational.Components.SupportFriction",
+      "state_observed": "open",
+      "state_source": "https://github.com/modelica/ModelicaStandardLibrary/issues",
+      "opened_date": "2026-08-25",
+      "body_read": false,
+      "discussion_read": false,
+      "fetch_attempts": ["direct issue URL: cache miss", "click from issues listing: cache miss", "issue URL with query variant: cache miss"],
+      "classification": "unclassified-evidence-unavailable",
+      "confirmed_defect": null,
+      "numerical_sanitizer_scope": "unknown-until-body-read",
+      "local_version_applicability": "Named component exists, but reported trigger and intended behavior are unknown.",
+      "local_evidence": [
+        {"path": "Mechanics/Translational/Components/SupportFriction.mo", "lines": [11, 24, 29, 41, 42, 43, 65, 66, 67, 68], "observation": "The component exposes smoothness, passes it to ExternalCombiTable1D, and dispatches derivative-capable table functions by mode."}
+      ],
+      "capability_assessment": "DiscontinuitySan is threshold guidance, not a general interpolation smoothness oracle; this does not classify the unread report.",
+      "required_next_step": "Retrieve full body, discussion, exact version, and reproducer.",
+      "conditional_test_proposal": "If an unintended smoothness loss is established, test mode-specific continuity around table knots separately from intended stick/slip transitions.",
+      "false_positive_control": "Do not flag every Coulomb-friction discontinuity or infer a defect from the title.",
+      "test_status": "not-executed",
+      "detected": false,
+      "detection_status": "not-evaluated",
+      "recall_eligible": false
+    },
+    {
+      "number": 4794,
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/issues/4794",
+      "title": "`ModelicaInternal_temporaryFileName`: Replace `tmpnam` with `mkstemp`",
+      "state_observed": "open",
+      "opened_date": "2026-07-21",
+      "body_read": true,
+      "discussion_read": false,
+      "attachment_or_related_access": {"url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4795", "status": "cache-miss-not-read"},
+      "classification": "reported-security-and-api-hardening",
+      "confirmed_defect": null,
+      "numerical_sanitizer_scope": "outside-numerical-oracles",
+      "body_summary": "Requests atomic temporary-file creation instead of temporary-name generation and raises compatibility of creating a file with an API that currently returns a nonexistent path.",
+      "local_version_applicability": "Reported tmpnam mechanism exists in local MSL 4.1.0; no security exploit or external-library execution verified.",
+      "local_evidence": [
+        {"path": "Resources/C-Sources/ModelicaInternal.c", "lines": [747, 748, 751, 756, 759], "observation": "Function documents a nonexistent temporary path, calls tmpnam(NULL), copies the string, and returns it."}
+      ],
+      "capability_assessment": "Scalar numerical observers cannot establish filesystem atomicity, permissions, or race safety.",
+      "missing_features": ["External C API/security audit", "Isolated filesystem concurrency and exclusive-creation harness", "Explicit API lifetime and compatibility contract"],
+      "oracle": "Under an agreed creation API, concurrent benign callers get unique exclusively created files with intended permissions and directory semantics; retain a control for old nonexistent-path behavior.",
+      "false_positive_control": "A linker warning or an unavailable external function is not an executed sanitizer detection; do not silently change API semantics.",
+      "test_status": "not-executed",
+      "detected": false,
+      "detection_status": "not-evaluated-outside-numerical-scope",
+      "recall_eligible": false
+    },
+    {
+      "number": 4773,
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/issues/4773",
+      "title": "External functions working with file paths on Windows lack encoding conversions",
+      "state_observed": "open",
+      "opened_date": "2026-04-13",
+      "labels_observed": ["L: C-Sources", "L: Utilities"],
+      "body_read": true,
+      "discussion_read": false,
+      "classification": "reported-platform-interface-defect",
+      "confirmed_defect": null,
+      "numerical_sanitizer_scope": "outside-numerical-oracles",
+      "body_summary": "Reports inconsistent Windows pathname encoding at the UTF-8 external-C boundary for producing and consuming paths, with vendor loadResource behavior separately implicated.",
+      "local_version_applicability": "Direct narrow-character path operations and directory-byte copies exist locally; exact behavior depends on Windows runtime/code page and vendor external-library build. No Windows test performed.",
+      "local_evidence": [
+        {"path": "Resources/C-Sources/ModelicaInternal.c", "lines": [486, 488, 555, 568, 588, 603], "observation": "remove(file), opendir(directory), and directory-entry byte copying occur without an explicit conversion in these functions."}
+      ],
+      "capability_assessment": "Numerical domain/range checks cannot validate Unicode filesystem roundtrips; Linux-only execution cannot establish the Windows behavior.",
+      "missing_features": ["Windows CI and code-page matrix", "External-C input/output string tracing", "Filesystem identity and UTF-8 roundtrip oracle"],
+      "oracle": "Create, list, open, rename, and delete identical non-ASCII paths outside the legacy code page, with ASCII controls, while checking UTF-8 bytes and filesystem identity.",
+      "false_positive_control": "Separate MSL external-C encoding from tool/vendor loadResource conversions; a Linux pass does not refute the Windows issue.",
+      "test_status": "not-executed",
+      "detected": false,
+      "detection_status": "not-evaluated-platform-specific",
+      "recall_eligible": false
+    },
+    {
+      "number": 4770,
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/issues/4770",
+      "title": "Spline interpolation of Blocks.Tables",
+      "state_observed": "open",
+      "opened_date": "2026-04-03",
+      "type_observed": "Feature",
+      "labels_observed": ["L: Blocks", "worksforme"],
+      "milestone_observed": "maintenance",
+      "body_read": true,
+      "discussion_read": false,
+      "attachment_or_related_access": {"url": "https://github.com/user-attachments/files/26467671/Splines.zip", "status": "cache-miss-not-read"},
+      "classification": "feature-or-clarified-question-not-established-defect",
+      "confirmed_defect": null,
+      "numerical_sanitizer_scope": "potential-derivative-correctness-extension-if-defect-established",
+      "body_summary": "Compares derivatives of CombiTable1Ds interpolation with derivatives from MATLAB-exported spline coefficients; metadata marks the open issue Feature and worksforme.",
+      "local_version_applicability": "Local MSL 4.1.0 implements table derivative bindings and distinct smoothness modes; attachment and actual interpolation choices are unavailable.",
+      "local_evidence": [
+        {"path": "Blocks/Tables.mo", "lines": [144, 145, 146, 147, 1148, 1154, 1156, 1182, 1190, 1192, 1207, 1216], "observation": "Constant modes have no derivative support, linear modes have no second-derivative support, and smooth modes bind first/second derivatives to external-C functions."},
+        {"path": "Blocks/Types.mo", "lines": [6, 7, 8, 9, 10, 12, 14, 16, 18], "observation": "Enumerates different interpolation algorithms with mode-specific continuity promises."}
+      ],
+      "capability_assessment": "DomainSan does not detect finite wrong derivatives; DiscontinuitySan does not verify continuity. DifferentialSan provides disagreements, not attribution, and trace samples must be time-aligned before comparison.",
+      "missing_features": ["Recovered exact input data, version, modes, and reproducer", "Interpolation identity and derivative-order contracts", "Same-interpolant analytic/finite-difference derivative oracle", "Knot-aware continuity checks and time-aligned differential traces"],
+      "oracle": "Test the derivative of the same interpolation algorithm away from knots, then test only the continuity order promised at knots.",
+      "false_positive_control": "Different spline algorithms can legitimately produce different derivatives. Preserve intentional linear slope changes and constant jumps. Feature/worksforme alone neither proves a bug nor proves every underlying claim false.",
+      "test_status": "not-executed",
+      "detected": false,
+      "detection_status": "not-evaluated-groundtruth-unestablished",
+      "recall_eligible": false
+    }
+  ]
+}

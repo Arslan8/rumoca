@@ -60,7 +60,9 @@ end aliasA;
 model UsesUniqueAlias
   Real x;
 equation
-  x = aliasA(1.0);
+  // `time` keeps the call in the final Flat model; a literal argument folds
+  // to a result and there is then no call whose selection identity to check.
+  x = aliasA(time);
 end UsesUniqueAlias;
 "#;
 

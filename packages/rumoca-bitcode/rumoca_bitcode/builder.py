@@ -610,6 +610,7 @@ def _variability(role: str) -> str:
 #: Which fields of each node kind are operands. Kept in one place so a caller
 #: never has to know the shape of every node to walk or rewrite one.
 _OPERAND_FIELDS = {
+    "string_conversion": ("value",),
     "unary": ("operand",),
     "binary": ("lhs", "rhs"),
     "field": ("base",),
@@ -631,6 +632,9 @@ def operands_of(node: dict) -> list[int]:
     """Every expression id this node references."""
     kind = node.get("kind", "")
     found: list[int] = []
+    if kind == "string_conversion":
+        found.extend(value for key, value in node["format"].items()
+                     if key != "kind" and isinstance(value, int))
     for name in _OPERAND_FIELDS.get(kind, ()):
         value = node.get(name)
         if isinstance(value, int):
@@ -651,6 +655,9 @@ def with_operands(node: dict, mapping: dict[int, int]) -> dict:
     """A copy of `node` with its operands remapped."""
     out = dict(node)
     kind = node.get("kind", "")
+    if kind == "string_conversion":
+        out["format"] = {key: mapping.get(value, value) if key != "kind" and isinstance(value, int) else value
+                         for key, value in node["format"].items()}
     for name in _OPERAND_FIELDS.get(kind, ()):
         value = out.get(name)
         if isinstance(value, int):

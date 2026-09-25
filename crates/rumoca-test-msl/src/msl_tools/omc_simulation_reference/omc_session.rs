@@ -282,7 +282,7 @@ fn unquote_omc_string(text: &str) -> String {
     inner.replace("\\n", "\n").replace("\\\"", "\"")
 }
 
-fn parse_sim_record(record: &str, error: String) -> OmcSimOutcome {
+pub(super) fn parse_sim_record(record: &str, error: String) -> OmcSimOutcome {
     OmcSimOutcome {
         result_file: extract_record_string(record, "resultFile").filter(|value| !value.is_empty()),
         messages: extract_record_string(record, "messages").unwrap_or_default(),

@@ -37,6 +37,7 @@ use constant_substituter::{
     substitute_known_constants_expr_with_options, substitute_known_constants_statement,
 };
 use function_shape_constants::materialize_function_shape_constants;
+pub(crate) use function_shape_constants::materialize_literal_parameter_shape;
 // `field_access` resolves declared extents through the same compile-time bound.
 use indexed_dimension_recovery::constant_integer_bound;
 use record_alias::*;

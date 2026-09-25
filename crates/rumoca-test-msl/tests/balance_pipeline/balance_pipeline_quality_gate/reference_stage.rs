@@ -53,6 +53,12 @@ fn run_simulation_parity_reference_command(
     if parity_config().all_omc_targets != Some(true) {
         args.push("--rumoca-sim-ok-only".to_string());
     }
+    if parity_config().omc_script_mode == Some(true) {
+        args.push("--script-mode".to_string());
+    }
+    if parity_config().no_plots == Some(true) {
+        args.push("--no-plots".to_string());
+    }
     // The tool reuses cached OMC results by default (keyed on OMC + MSL source).
     // On a parity cache miss we want a fresh OMC run, so force it; on a cache hit
     // (`resume`) we let the default cache reuse stand.

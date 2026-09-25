@@ -16,6 +16,7 @@ pub mod value;
 mod builtin_dispatch;
 mod context;
 mod expr_eval;
+mod indexing;
 mod matrix_ops;
 mod operators;
 mod range_eval;

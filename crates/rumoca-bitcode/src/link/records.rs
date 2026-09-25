@@ -2,6 +2,25 @@
 use super::{Map, Result, Shift, fields};
 use crate::schema::*;
 
+impl Shift for RbcClock {
+    fn shift(&mut self, m: &Map<'_>) -> Result<()> {
+        self.id.shift(m)?;
+        self.provenance.shift(m)?;
+        if let RbcClockNode::Triggered { condition } = &mut self.node {
+            condition.shift(m)?;
+        }
+        Ok(())
+    }
+}
+
+impl Shift for RbcClockOwnership {
+    fn shift(&mut self, m: &Map<'_>) -> Result<()> {
+        self.variable.shift(m)?;
+        self.clock.shift(m)?;
+        self.provenance.shift(m)
+    }
+}
+
 macro_rules! record {
     ($ty:ident: $($field:ident),+ $(,)?) => {
         impl Shift for $ty {

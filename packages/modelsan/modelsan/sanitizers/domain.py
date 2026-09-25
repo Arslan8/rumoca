@@ -30,7 +30,7 @@ from ..instrumentation.capability import Capability
 from .base import is_cosmetic
 from ..instrumentation.request import InstrumentationRequest
 from ..runtime.anchors import CanonicalAnchor, EntityKind
-from ..runtime.observations import ExpressionObservation, ObservationStream
+from ..runtime.observations import ExpressionObservation, ObservationStream, SimulationEnd
 
 from ..dae import ops
 
@@ -98,13 +98,13 @@ class DomainSan:
     name = "domain"
 
     #: The split matters. Hints need nothing and always work; the runtime check
-    #: needs an observed sub-expression, which no current backend provides. The
-    #: planner reports the runtime half as skipped rather than letting it look
-    #: like a clean result.
+    #: needs canonical sub-expression values. Native reached-operation failures
+    #: are a separate capability with execution identities and partial coverage.
     requires = {
         "hints": frozenset({Capability.CANONICAL_MODEL}),
         "runtime": frozenset({Capability.OBSERVE_EXPRESSION,
                               Capability.CANONICAL_MODEL}),
+        "failure": frozenset({Capability.OBSERVE_DOMAIN_FAILURE}),
     }
 
     def requests(self, model, context: AnalysisContext) -> list[InstrumentationRequest]:
@@ -160,7 +160,7 @@ class DomainSan:
         # instrumentation request names a DAE expression, so anything answering
         # one knows which.
         reported: set[int] = set()
-        findings = []
+        findings = _executed_faults(stream, testcase)
 
         for observation in stream.of(ExpressionObservation):
             if observation.canonical is None:
@@ -189,6 +189,36 @@ class DomainSan:
                 },
             ))
         return findings
+
+
+def _executed_faults(stream, testcase):
+    """Reached scalar operations, including failure before the first publication.
+
+    The coordinate can be an internal solver trial. It is not evidence that
+    this value occurred on the accepted physical trajectory or in source code.
+    """
+    findings, seen = [], set()
+    completed = any(end.completed for end in stream.of(SimulationEnd))
+    for observation in stream.of(ExpressionObservation):
+        if observation.backend is None or not observation.role.startswith("executed:"):
+            continue
+        parts = observation.role.split(":")
+        if len(parts) != 3:
+            continue
+        _, operation, requirement = parts
+        site = DomainSite(operation, None, None, requirement)
+        if site.admits(observation.value) or observation.backend in seen:
+            continue
+        seen.add(observation.backend)
+        findings.append(Finding(sanitizer="domain", kind=(f"{operation}-domain-trial" if completed
+                                                         else f"{operation}-out-of-domain"),
+            severity=Severity.INFO if completed else Severity.HIGH, backend_anchors=[observation.backend],
+            phase=observation.phase, time=observation.time, test_case=testcase,
+            evidence={"operation": operation, "requirement": requirement,
+                      "operand_value": observation.value, "coordinates": "internal-evaluation",
+                      "run_completed": completed,
+                      "claim": "native operation domain violation; not a source-model verdict"}))
+    return findings
 
 
 def _location(expression: Expression) -> list[SourceLocation]:

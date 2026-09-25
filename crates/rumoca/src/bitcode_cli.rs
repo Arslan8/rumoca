@@ -184,6 +184,9 @@ pub struct CompileBitcodeArgs {
     /// Override a tunable parameter: `--param name=value`. Repeatable.
     #[arg(long = "param", value_name = "NAME=VALUE")]
     pub params: Vec<String>,
+    /// Write reached scalar-domain evidence using the native interpreter.
+    #[arg(long, requires = "simulate")]
+    pub domain_diagnostics: Option<PathBuf>,
     /// Report runtime violations (non-finite values, declared min/max breaches)
     /// as machine-readable JSON, and exit non-zero when any is found.
     #[arg(long, requires = "simulate")]
@@ -236,10 +239,10 @@ pub fn run_bitcode(args: BitcodeArgs) -> Result<()> {
         BitcodeCommand::Check(args) => run_check(&args.input, args.strict, args.connections),
         BitcodeCommand::Convert(args) => run_convert(&args.input, &args.output, args.format),
         BitcodeCommand::RoundTrip(args) => run_round_trip(&args.input, args.output.as_deref()),
-        BitcodeCommand::EmitText(args) =>
-            run_emit_text(&args.input, args.output.as_deref(), args.sources),
-        BitcodeCommand::Assemble(args) =>
-            run_assemble(&args.input, &args.output, args.format),
+        BitcodeCommand::EmitText(args) => {
+            run_emit_text(&args.input, args.output.as_deref(), args.sources)
+        }
+        BitcodeCommand::Assemble(args) => run_assemble(&args.input, &args.output, args.format),
         BitcodeCommand::Disasm(args) => crate::bitcode_disasm::run_disasm(
             &args.input,
             crate::bitcode_disasm::DisasmOptions {
@@ -313,7 +316,9 @@ fn run_dump(path: &Path, output: Option<&Path>) -> Result<()> {
 
 fn run_check(path: &Path, strict: bool, connections: bool) -> Result<()> {
     let (file, _) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
-    if file.execution.is_some() { crate::bitcode_execution::check(&file)?; }
+    if file.execution.is_some() {
+        crate::bitcode_execution::check(&file)?;
+    }
     let mut options = rumoca_bitcode::validate::ValidateOptions::default();
     options.reject_unsupported = strict;
     let checked = if connections {
@@ -331,9 +336,13 @@ fn run_check(path: &Path, strict: bool, connections: bool) -> Result<()> {
             );
             if !file.model.connectors.is_empty() {
                 println!("  declared scalar connector contracts and connection laws checked");
-            } else if !file.model.connection_sets.is_empty() || !file.model.connections.is_empty()
-                || file.model.variables.iter().any(|v| v.connector.is_some()) {
-                println!("  connection laws NOT certified: missing complete port declarations (use --connections to require them)");
+            } else if !file.model.connection_sets.is_empty()
+                || !file.model.connections.is_empty()
+                || file.model.variables.iter().any(|v| v.connector.is_some())
+            {
+                println!(
+                    "  connection laws NOT certified: missing complete port declarations (use --connections to require them)"
+                );
             }
             Ok(())
         }
@@ -348,21 +357,26 @@ fn run_check(path: &Path, strict: bool, connections: bool) -> Result<()> {
 
 fn run_emit_text(input: &Path, output: Option<&Path>, sources: bool) -> Result<()> {
     let (file, _) = rumoca_bitcode::read_file(input).map_err(anyhow::Error::from)?;
-    if file.execution.is_some() || !file.model.connectors.is_empty() { bail!("text profile does not carry execution/connector declarations; use bitcode dump or convert"); }
-    let text = rumoca_bitcode::text::print_text_with(
-        &file,
-        rumoca_bitcode::text::TextOptions { sources },
-    )
-    .map_err(anyhow::Error::from)?;
+    if file.execution.is_some() || !file.model.connectors.is_empty() {
+        bail!(
+            "text profile does not carry execution/connector declarations; use bitcode dump or convert"
+        );
+    }
+    let text =
+        rumoca_bitcode::text::print_text_with(&file, rumoca_bitcode::text::TextOptions { sources })
+            .map_err(anyhow::Error::from)?;
     match output {
         Some(path) => {
             if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
                 std::fs::create_dir_all(parent)?;
             }
-            std::fs::write(path, &text)
-                .with_context(|| format!("write {}", path.display()))?;
-            eprintln!("wrote {} ({} bytes){}", path.display(), text.len(),
-                      if sources { "" } else { ", source text omitted" });
+            std::fs::write(path, &text).with_context(|| format!("write {}", path.display()))?;
+            eprintln!(
+                "wrote {} ({} bytes){}",
+                path.display(),
+                text.len(),
+                if sources { "" } else { ", source text omitted" }
+            );
         }
         None => print!("{text}"),
     }
@@ -370,8 +384,8 @@ fn run_emit_text(input: &Path, output: Option<&Path>, sources: bool) -> Result<(
 }
 
 fn run_assemble(input: &Path, output: &Path, format: BitcodeFormat) -> Result<()> {
-    let text = std::fs::read_to_string(input)
-        .with_context(|| format!("read {}", input.display()))?;
+    let text =
+        std::fs::read_to_string(input).with_context(|| format!("read {}", input.display()))?;
     let file = rumoca_bitcode::text::parse_text(&text).map_err(anyhow::Error::from)?;
 
     // Validated before it is written. The textual form is the one a person
@@ -379,19 +393,28 @@ fn run_assemble(input: &Path, output: &Path, format: BitcodeFormat) -> Result<()
     // inconsistent — a dangling expression id, an equation reading a variable
     // that is not declared — and catching that here names the problem instead
     // of deferring it to whatever loads the artifact next.
-    rumoca_bitcode::validate::validate(&file.model, &Default::default())
-        .map_err(|errors| anyhow::anyhow!(
+    rumoca_bitcode::validate::validate(&file.model, &Default::default()).map_err(|errors| {
+        anyhow::anyhow!(
             "assembled artifact is not valid:\n{}",
-            errors.iter().map(|e| format!("  - {e}")).collect::<Vec<_>>().join("\n")
-        ))?;
+            errors
+                .iter()
+                .map(|e| format!("  - {e}"))
+                .collect::<Vec<_>>()
+                .join("\n")
+        )
+    })?;
 
     let bytes = rumoca_bitcode::encode(&file, format.into()).map_err(anyhow::Error::from)?;
     if let Some(parent) = output.parent().filter(|p| !p.as_os_str().is_empty()) {
         std::fs::create_dir_all(parent)?;
     }
     std::fs::write(output, bytes).with_context(|| format!("write {}", output.display()))?;
-    eprintln!("assembled {} -> {} ({})", input.display(), output.display(),
-              Encoding::from(format).as_str());
+    eprintln!(
+        "assembled {} -> {} ({})",
+        input.display(),
+        output.display(),
+        Encoding::from(format).as_str()
+    );
     Ok(())
 }
 
@@ -425,7 +448,11 @@ fn run_convert(input: &Path, output: &Path, format: BitcodeFormat) -> Result<()>
 /// difference names the exact field that moved.
 fn run_round_trip(path: &Path, output: Option<&Path>) -> Result<()> {
     let (original, _) = rumoca_bitcode::read_file(path).map_err(anyhow::Error::from)?;
-    if original.execution.is_some() || !original.model.connectors.is_empty() { bail!("DAE re-export would discard execution/connector declarations; use bitcode convert for a lossless container round-trip"); }
+    if original.execution.is_some() || !original.model.connectors.is_empty() {
+        bail!(
+            "DAE re-export would discard execution/connector declarations; use bitcode convert for a lossless container round-trip"
+        );
+    }
     let dae = rumoca_bitcode::import(&original).map_err(anyhow::Error::from)?;
     let again = rumoca_bitcode::export(&dae, None, &original.model.name, &ExportOptions::default())
         .map_err(anyhow::Error::from)?;
@@ -532,7 +559,11 @@ fn compare(left: &RbcModel, right: &RbcModel) -> Vec<String> {
 /// Read bitcode back into a checked DAE and continue compilation.
 pub fn run_compile_bitcode(args: CompileBitcodeArgs) -> Result<()> {
     let (file, encoding) = rumoca_bitcode::read_file(&args.input).map_err(anyhow::Error::from)?;
-    if file.execution.is_some() { bail!("compile-bitcode would discard executable edits; use bitcode run --execution=require"); }
+    if file.execution.is_some() {
+        bail!(
+            "compile-bitcode would discard executable edits; use bitcode run --execution=require"
+        );
+    }
     eprintln!(
         "reading {} (bitcode v{}, {})",
         args.input.display(),
@@ -675,7 +706,13 @@ fn run_trace(
             model.trace_points.len()
         );
     }
-    let sim = match simulate_with_diagnostics(dae, &options) {
+    let execution = match args.domain_diagnostics.as_deref() {
+        Some(path) => {
+            rumoca_sim::execution::simulate_equations_with_domain_diagnostics(dae, &options, path)
+        }
+        None => simulate_with_diagnostics(dae, &options).map_err(|e| e.to_string()),
+    };
+    let sim = match execution {
         Ok(sim) => sim,
         Err(error) if args.check => {
             // For a search driver, a solve that refuses to run *is* the
@@ -830,7 +867,9 @@ fn declared_bounds(model: &RbcModel) -> std::collections::BTreeMap<&str, Declare
             rumoca_bitcode::schema::RbcExprNode::Literal { value } => match value {
                 rumoca_bitcode::schema::RbcLiteral::Real { value } => Some(*value),
                 rumoca_bitcode::schema::RbcLiteral::Integer { value } => Some(*value as f64),
-                rumoca_bitcode::schema::RbcLiteral::Enumeration { ordinal } => Some(*ordinal as f64),
+                rumoca_bitcode::schema::RbcLiteral::Enumeration { ordinal } => {
+                    Some(*ordinal as f64)
+                }
                 _ => None,
             },
             _ => None,

@@ -38,7 +38,7 @@ ADDED_BY = "modelsan.instrumentation.connector"
 class PortObservation:
     """One connector member to observe, and the node it belongs to."""
 
-    node: int
+    node: int | None
     connector: str
     variable: object
     role: str

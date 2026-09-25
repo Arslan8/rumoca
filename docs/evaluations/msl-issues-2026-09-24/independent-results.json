@@ -1,0 +1,2230 @@
+{
+  "run_started": "2026-09-24T11:05:25Z",
+  "head": "b38af3a38b0224bf22129cb1148ebf70e2492aa7",
+  "dirty_tree": true,
+  "binary_sha256": "6d50c5ababb18c68b367a7b353599d7ce2b595c61f65187f98abfb38b625aa06",
+  "version": "rumoca 0.10.0",
+  "sanitizers": [
+    "assert",
+    "dimension",
+    "discontinuity",
+    "divisor",
+    "domain",
+    "event",
+    "init",
+    "init-static",
+    "network",
+    "numeric",
+    "physical",
+    "range",
+    "singularity",
+    "solver",
+    "structure",
+    "zeno"
+  ],
+  "evidence_file": "target/msl-issue-evaluation-20260924/independent/run-01/results.json",
+  "evidence_sha256": "17668eff4aeb977bdd36cd4f4383f9e8307a8d801846cf634d2998ff71a18775",
+  "scope": "7 exact witness variants in 5 existing independent LLM root-cause reports; not all MSL",
+  "counts": {
+    "variants": 7,
+    "reports": 5,
+    "nominal_compiles": 7,
+    "static_exact_witness_detected": 5,
+    "static_roots_detected": 4,
+    "exact_witness_hint_present": 7,
+    "clean_nominal_runtime": 3,
+    "paired_runtime_failure": 3,
+    "paired_runtime_exact_domain": 1,
+    "exact_source_trigger_rejected_by_compiler": 6,
+    "omc_pairs_confirmed": 7
+  },
+  "cases": [
+    {
+      "report": "LLM-BUG-001",
+      "variant": "firstorder",
+      "nominal_model": "LLM_FirstOrderNominal",
+      "trigger_model": "LLM_FirstOrderZero",
+      "witness": "dut.T = 0",
+      "nominal_compile_ok": true,
+      "static_detected_exact_witness": true,
+      "matching_static_findings": [
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 23,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 5,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Continuous.mo",
+              "line": 370,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.T",
+            "witness": "dut.T = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 1.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "dut.T: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        }
+      ],
+      "exact_witness_hints": [
+        {
+          "target": "dut.T",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            22
+          ],
+          "variable_ids": [
+            5
+          ]
+        },
+        {
+          "target": "dut.T",
+          "values": [
+            0.0
+          ],
+          "reason": "zeroes dut.T (set to zero)",
+          "source": "divisor",
+          "expression_ids": [],
+          "variable_ids": [
+            5
+          ]
+        }
+      ],
+      "nominal_runtime_status": "success",
+      "nominal_runtime_failure": null,
+      "runtime_witness_status": "failed",
+      "runtime_witness_failure": {
+        "kind": "non-finite-value",
+        "phase": "simulation",
+        "message": "e v1, cbor) Simulating LLM_FirstOrderNominal to t=0.1 with 3 trace point(s)... \u001b[31m\u001b[0m simulation failed: solve-IR evaluation failed: non-finite derivative \u001b[31m\u2502\u001b[0m evaluation for state 'source.y'",
+        "raw": "reading /tmp/tmpnwrl1nik/traced.rbc (bitcode v1, cbor) Simulating LLM_FirstOrderNominal to t=0.1 with 3 trace point(s)... \u001b[31m\u001b[0m simulation failed: solve-IR evaluation failed: non-finite derivative \u001b[31m\u2502\u001b[0m evaluation for state 'source.y'",
+        "time": null
+      },
+      "runtime_paired_failure": true,
+      "runtime_paired_exact_domain_evidence": true,
+      "runtime_findings": [
+        {
+          "sanitizer": "domain",
+          "kind": "division-out-of-domain",
+          "severity": "high",
+          "canonical_anchors": [],
+          "backend_anchors": [
+            {
+              "backend": "rumoca",
+              "name": "solve:eaf84ed572580b403e6224ddb76fd9a7fe8ff4f5/op:6",
+              "kind": "expression"
+            }
+          ],
+          "source_locations": [],
+          "phase": "simulation",
+          "time": 0.0,
+          "test_case": {
+            "parameters": {
+              "dut.T": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "operation": "division",
+            "requirement": "nonzero",
+            "operand_value": 0.0,
+            "coordinates": "internal-evaluation",
+            "run_completed": false,
+            "claim": "native operation domain violation; not a source-model verdict"
+          },
+          "signature": "domain:division-out-of-domain:rumoca/solve:eaf84ed572580b403e6224ddb76fd9a7fe8ff4f5/op:6:5a333e7e",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "solver",
+          "kind": "simulation-failure",
+          "severity": "high",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": "simulation",
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.T": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "failure_kind": "non-finite-value",
+            "reason": "e v1, cbor) Simulating LLM_FirstOrderNominal to t=0.1 with 3 trace point(s)... \u001b[31m\u001b[0m simulation failed: solve-IR evaluation failed: non-finite derivative \u001b[31m\u2502\u001b[0m evaluation for state 'source.y'",
+            "raw": "reading /tmp/tmpnwrl1nik/traced.rbc (bitcode v1, cbor) Simulating LLM_FirstOrderNominal to t=0.1 with 3 trace point(s)... \u001b[31m\u001b[0m simulation failed: solve-IR evaluation failed: non-finite derivative \u001b[31m\u2502\u001b[0m evaluation for state 'source.y'",
+            "tool_side": false
+          },
+          "signature": "solver:simulation-failure:exec:6f0dae6a",
+          "sequence": 1
+        },
+        {
+          "sanitizer": "network",
+          "kind": "network-observation-incomplete",
+          "severity": "info",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": null,
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.T": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "reason": "missing or unsynchronized connector member observations",
+            "note": "coverage gap, not a model defect"
+          },
+          "signature": "network:network-observation-incomplete:exec:28637473",
+          "sequence": 2
+        }
+      ],
+      "native_domain_diagnostics": {
+        "schema_version": 1,
+        "kind": "solve-domain-diagnostics",
+        "coordinates": "internal-evaluation",
+        "execution_policy": "interpreter",
+        "coverage": "scalar-output-rows",
+        "faults": [
+          {
+            "program_sha1": "eaf84ed572580b403e6224ddb76fd9a7fe8ff4f5",
+            "instruction_index": 6,
+            "operation": "division",
+            "requirement": "nonzero",
+            "operand_value": 0.0,
+            "time": 0.0
+          }
+        ],
+        "unobserved_evaluations": 2,
+        "truncated": false
+      },
+      "target_variable": [
+        {
+          "id": 5,
+          "name": "dut.T",
+          "role": "parameter",
+          "causality": "parameter",
+          "value_type": 3,
+          "scalar_count": 1,
+          "contract": {
+            "variability": "parameter",
+            "effective_value": 1.0,
+            "binding_from_modification": true,
+            "declared_in": "Modelica.Blocks.Continuous.FirstOrder"
+          },
+          "declaration": {
+            "origin": {
+              "kind": "source"
+            },
+            "span": {
+              "source": 3,
+              "start": 13917,
+              "end": 13926,
+              "line": 354,
+              "column": 15
+            }
+          },
+          "component": 0,
+          "unit": "s",
+          "physical_quantity": "Time",
+          "declaring_class": "Modelica.Blocks.Continuous.FirstOrder",
+          "description": "Time Constant",
+          "binding": 6,
+          "start": 7,
+          "tunable": true,
+          "from_source": true
+        }
+      ],
+      "source_trigger_compile_ok": true,
+      "source_trigger_compiler_stderr": "[rumoca] warning[WR006]: annotation Evaluate has no effect on function local 'm': only components declared with the parameter prefix are evaluated (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/SpacePhasors/Functions/ToSpacePhasor.mo:10:54)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:105:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:138:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:151:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:178:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:191:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:215:14)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicExactClock.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'period' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicRealClock.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SubSample.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SuperSample.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/InductorDC.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/PartialAirGapDC.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ElectricalExcited.mo:54:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_PermanentMagnet.mo:56:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ReluctanceRotor.mo:48:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMEE.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMPM.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMR.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMEE.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMPM.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMR.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_n.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_p.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4469:28)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4684:29)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4892:30)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5082:65)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcarddiode' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5224:31)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:19:18)\n[rumoca] warning[WR005]: Evaluate=true on 'orientation' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:21:22)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/QuasiStatic/FundamentalWave/Components/QuasiStaticAnalogElectroMagneticConverter.mo:22:18)\n[rumoca] warning[WR005]: Evaluate=true on 'useFixedTemperature' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/HeatTransfer/Sensors/ConditionalFixedHeatFlowSensor.mo:5:21)\n[rumoca] warning[WR001]: external function 'readTimeTableData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:211:18)\n[rumoca] warning[WR001]: external function 'readTable1DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:225:18)\n[rumoca] warning[WR001]: external function 'readTable2DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:239:18)\n[rumoca] warning[WR001]: external function 'dgegv' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1724:18)\n[rumoca] warning[WR001]: external function 'dgelsx' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1970:18)\n[rumoca] warning[WR001]: external function 'dgelsx_vec' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2104:18)\n[rumoca] warning[WR001]: external function 'dgeqpf' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2238:18)\nwrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/firstorder/trigger.rbc\n",
+      "omc_successful_nominal_failed_trigger": true,
+      "omc_stdout_file": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/firstorder/omc-pair.stdout",
+      "analysis_errors": [],
+      "full_evidence": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/firstorder/result.json"
+    },
+    {
+      "report": "LLM-BUG-002",
+      "variant": "critical-blocks",
+      "nominal_model": "LLM_BlocksCriticalDampingOrderTwo",
+      "trigger_model": "LLM_BlocksCriticalDampingOrderZero",
+      "witness": "dut.n = 0",
+      "nominal_compile_ok": true,
+      "static_detected_exact_witness": false,
+      "matching_static_findings": [
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-zero-unresolved",
+          "severity": "medium",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 24,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Continuous.mo",
+              "line": 1521,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.n",
+            "witness": "dut.n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "(dut.normalized)",
+            "verdict": "UNKNOWN",
+            "proof": "the path depends on quantities the artifact does not determine: dut.normalized",
+            "constraints": "dut.n: unbounded",
+            "note": "an assignment drives the denominator to zero, but whether the division is evaluated there could not be decided from the artifact; this is unresolved, not confirmed"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-zero-unresolved",
+          "severity": "medium",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 35,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Continuous.mo",
+              "line": 1521,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.n",
+            "witness": "dut.n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "(dut.normalized)",
+            "verdict": "UNKNOWN",
+            "proof": "the path depends on quantities the artifact does not determine: dut.normalized",
+            "constraints": "dut.n: unbounded",
+            "note": "an assignment drives the denominator to zero, but whether the division is evaluated there could not be decided from the artifact; this is unresolved, not confirmed"
+          },
+          "signature": "",
+          "sequence": 0
+        }
+      ],
+      "exact_witness_hints": [
+        {
+          "target": "dut.n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            23
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "dut.n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            34
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "dut.n",
+          "values": [
+            0.0
+          ],
+          "reason": "zeroes dut.n (set to zero)",
+          "source": "divisor",
+          "expression_ids": [],
+          "variable_ids": [
+            4
+          ]
+        }
+      ],
+      "nominal_runtime_status": "backend-error",
+      "nominal_runtime_failure": {
+        "kind": "build-error",
+        "phase": "compilation",
+        "message": "invalid observations: missing requested columns: ['dut.x']",
+        "raw": "invalid observations: missing requested columns: ['dut.x']",
+        "time": null
+      },
+      "runtime_witness_status": "failed",
+      "runtime_witness_failure": {
+        "kind": "non-finite-value",
+        "phase": "simulation",
+        "message": "mp/tmp4pdg4lgd/traced.rbc (bitcode v1, cbor) Simulating LLM_BlocksCriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "raw": "reading /tmp/tmp4pdg4lgd/traced.rbc (bitcode v1, cbor) Simulating LLM_BlocksCriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "time": null
+      },
+      "runtime_paired_failure": false,
+      "runtime_paired_exact_domain_evidence": false,
+      "runtime_findings": [
+        {
+          "sanitizer": "solver",
+          "kind": "simulation-failure",
+          "severity": "high",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": "simulation",
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.n": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "failure_kind": "non-finite-value",
+            "reason": "mp/tmp4pdg4lgd/traced.rbc (bitcode v1, cbor) Simulating LLM_BlocksCriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "raw": "reading /tmp/tmp4pdg4lgd/traced.rbc (bitcode v1, cbor) Simulating LLM_BlocksCriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "tool_side": false
+          },
+          "signature": "solver:simulation-failure:exec:6f0dae6a",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "network",
+          "kind": "network-observation-incomplete",
+          "severity": "info",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": null,
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.n": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "reason": "missing or unsynchronized connector member observations",
+            "note": "coverage gap, not a model defect"
+          },
+          "signature": "network:network-observation-incomplete:exec:28637473",
+          "sequence": 1
+        }
+      ],
+      "native_domain_diagnostics": {
+        "schema_version": 1,
+        "kind": "solve-domain-diagnostics",
+        "coordinates": "internal-evaluation",
+        "execution_policy": "interpreter",
+        "coverage": "scalar-output-rows",
+        "faults": [],
+        "unobserved_evaluations": 0,
+        "truncated": false
+      },
+      "target_variable": [
+        {
+          "id": 4,
+          "name": "dut.n",
+          "role": "parameter",
+          "causality": "parameter",
+          "value_type": 3,
+          "scalar_count": 1,
+          "contract": {
+            "variability": "parameter",
+            "effective_value": 2.0,
+            "binding_from_modification": true,
+            "declared_in": "Modelica.Blocks.Continuous.CriticalDamping"
+          },
+          "declaration": {
+            "origin": {
+              "kind": "source"
+            },
+            "span": {
+              "source": 3,
+              "start": 61733,
+              "end": 61742,
+              "line": 1504,
+              "column": 15
+            }
+          },
+          "component": 0,
+          "declaring_class": "Modelica.Blocks.Continuous.CriticalDamping",
+          "description": "Order of filter",
+          "binding": 5,
+          "start": 6,
+          "tunable": true,
+          "from_source": true
+        }
+      ],
+      "source_trigger_compile_ok": false,
+      "source_trigger_compiler_stderr": "   [ET009] subscript 1 for `x` is out of bounds for dimension of size 0 (MLS\n  \u2502 \u00a710.5.1)\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Continuous.mo:1534:9]\n 1533 \u2502   equation\n 1534 \u2502     der(x[1]) = (u - x[1])*w;\n      \u00b7         \u252c\n      \u00b7         \u2570\u2500\u2500 subscripted reference here\n 1535 \u2502     for i in 2:n loop\n      \u2570\u2500\u2500\u2500\u2500\n\n\n   [ET009] subscript 1 for `x` is out of bounds for dimension of size 0 (MLS\n  \u2502 \u00a710.5.1)\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Continuous.mo:1534:22]\n 1533 \u2502   equation\n 1534 \u2502     der(x[1]) = (u - x[1])*w;\n      \u00b7                      \u252c\n      \u00b7                      \u2570\u2500\u2500 subscripted reference here\n 1535 \u2502     for i in 2:n loop\n      \u2570\u2500\u2500\u2500\u2500\n\n",
+      "omc_successful_nominal_failed_trigger": true,
+      "omc_stdout_file": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/critical-blocks/omc-pair.stdout",
+      "analysis_errors": [],
+      "full_evidence": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/critical-blocks/result.json"
+    },
+    {
+      "report": "LLM-BUG-002",
+      "variant": "critical-clocked",
+      "nominal_model": "LLM_CriticalDampingOrderTwo",
+      "trigger_model": "LLM_CriticalDampingOrderZero",
+      "witness": "dut.n = 0",
+      "nominal_compile_ok": true,
+      "static_detected_exact_witness": false,
+      "matching_static_findings": [
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-zero-unresolved",
+          "severity": "medium",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 17,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/Examples/Systems/Utilities/ComponentsMixingUnit/CriticalDamping.mo",
+              "line": 14,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.n",
+            "witness": "dut.n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "(dut.normalized)",
+            "verdict": "UNKNOWN",
+            "proof": "the path depends on quantities the artifact does not determine: dut.normalized",
+            "constraints": "dut.n: unbounded",
+            "note": "an assignment drives the denominator to zero, but whether the division is evaluated there could not be decided from the artifact; this is unresolved, not confirmed"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-zero-unresolved",
+          "severity": "medium",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 28,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/Examples/Systems/Utilities/ComponentsMixingUnit/CriticalDamping.mo",
+              "line": 14,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.n",
+            "witness": "dut.n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "(dut.normalized)",
+            "verdict": "UNKNOWN",
+            "proof": "the path depends on quantities the artifact does not determine: dut.normalized",
+            "constraints": "dut.n: unbounded",
+            "note": "an assignment drives the denominator to zero, but whether the division is evaluated there could not be decided from the artifact; this is unresolved, not confirmed"
+          },
+          "signature": "",
+          "sequence": 0
+        }
+      ],
+      "exact_witness_hints": [
+        {
+          "target": "dut.n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            16
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "dut.n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            27
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "dut.n",
+          "values": [
+            0.0
+          ],
+          "reason": "zeroes dut.n (set to zero)",
+          "source": "divisor",
+          "expression_ids": [],
+          "variable_ids": [
+            4
+          ]
+        }
+      ],
+      "nominal_runtime_status": "backend-error",
+      "nominal_runtime_failure": {
+        "kind": "build-error",
+        "phase": "compilation",
+        "message": "invalid observations: missing requested columns: ['dut.x']",
+        "raw": "invalid observations: missing requested columns: ['dut.x']",
+        "time": null
+      },
+      "runtime_witness_status": "failed",
+      "runtime_witness_failure": {
+        "kind": "non-finite-value",
+        "phase": "simulation",
+        "message": "ing /tmp/tmpe951krrq/traced.rbc (bitcode v1, cbor) Simulating LLM_CriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "raw": "reading /tmp/tmpe951krrq/traced.rbc (bitcode v1, cbor) Simulating LLM_CriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "time": null
+      },
+      "runtime_paired_failure": false,
+      "runtime_paired_exact_domain_evidence": false,
+      "runtime_findings": [
+        {
+          "sanitizer": "solver",
+          "kind": "simulation-failure",
+          "severity": "high",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": "simulation",
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.n": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "failure_kind": "non-finite-value",
+            "reason": "ing /tmp/tmpe951krrq/traced.rbc (bitcode v1, cbor) Simulating LLM_CriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "raw": "reading /tmp/tmpe951krrq/traced.rbc (bitcode v1, cbor) Simulating LLM_CriticalDampingOrderTwo to t=0.1 with 4 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "tool_side": false
+          },
+          "signature": "solver:simulation-failure:exec:6f0dae6a",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "network",
+          "kind": "network-observation-incomplete",
+          "severity": "info",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": null,
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.n": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "reason": "missing or unsynchronized connector member observations",
+            "note": "coverage gap, not a model defect"
+          },
+          "signature": "network:network-observation-incomplete:exec:28637473",
+          "sequence": 1
+        }
+      ],
+      "native_domain_diagnostics": {
+        "schema_version": 1,
+        "kind": "solve-domain-diagnostics",
+        "coordinates": "internal-evaluation",
+        "execution_policy": "interpreter",
+        "coverage": "scalar-output-rows",
+        "faults": [],
+        "unobserved_evaluations": 0,
+        "truncated": false
+      },
+      "target_variable": [
+        {
+          "id": 4,
+          "name": "dut.n",
+          "role": "parameter",
+          "causality": "parameter",
+          "value_type": 3,
+          "scalar_count": 1,
+          "contract": {
+            "variability": "parameter",
+            "effective_value": 2.0,
+            "binding_from_modification": true,
+            "declared_in": "Modelica.Clocked.Examples.Systems.Utilities.ComponentsMixingUnit.CriticalDamping"
+          },
+          "declaration": {
+            "origin": {
+              "kind": "source"
+            },
+            "span": {
+              "source": 3,
+              "start": 274,
+              "end": 283,
+              "line": 8,
+              "column": 13
+            }
+          },
+          "component": 0,
+          "declaring_class": "Modelica.Clocked.Examples.Systems.Utilities.ComponentsMixingUnit.CriticalDamping",
+          "description": "Order of filter",
+          "binding": 5,
+          "start": 6,
+          "tunable": true,
+          "from_source": true
+        }
+      ],
+      "source_trigger_compile_ok": false,
+      "source_trigger_compiler_stderr": "   [ET009] subscript 1 for `x` is out of bounds for dimension of size 0 (MLS\n  \u2502 \u00a710.5.1)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/Examples/Systems/Utilities/ComponentsMixingUnit/CriticalDamping.mo:18:7]\n 17 \u2502 equation\n 18 \u2502   der(x[1]) = (u - x[1])*w;\n    \u00b7       \u252c\n    \u00b7       \u2570\u2500\u2500 subscripted reference here\n 19 \u2502   for i in 2:n loop\n    \u2570\u2500\u2500\u2500\u2500\n\n\n   [ET009] subscript 1 for `x` is out of bounds for dimension of size 0 (MLS\n  \u2502 \u00a710.5.1)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/Examples/Systems/Utilities/ComponentsMixingUnit/CriticalDamping.mo:18:20]\n 17 \u2502 equation\n 18 \u2502   der(x[1]) = (u - x[1])*w;\n    \u00b7                    \u252c\n    \u00b7                    \u2570\u2500\u2500 subscripted reference here\n 19 \u2502   for i in 2:n loop\n    \u2570\u2500\u2500\u2500\u2500\n\n",
+      "omc_successful_nominal_failed_trigger": true,
+      "omc_stdout_file": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/critical-clocked/omc-pair.stdout",
+      "analysis_errors": [],
+      "full_evidence": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/critical-clocked/result.json"
+    },
+    {
+      "report": "LLM-BUG-003",
+      "variant": "thyristor-itm",
+      "nominal_model": "LLM_ThyristorITMNominal",
+      "trigger_model": "LLM_ThyristorITMZero",
+      "witness": "dut.ITM = 0",
+      "nominal_compile_ok": true,
+      "static_detected_exact_witness": true,
+      "matching_static_findings": [
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 57,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 9,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Semiconductors/Thyristor.mo",
+              "line": 38,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.ITM",
+            "witness": "dut.ITM = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 25.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "dut.ITM: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 62,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 9,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Semiconductors/Thyristor.mo",
+              "line": 38,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.ITM",
+            "witness": "dut.ITM = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 25.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "dut.ITM: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        }
+      ],
+      "exact_witness_hints": [
+        {
+          "target": "dut.ITM",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            56
+          ],
+          "variable_ids": [
+            9
+          ]
+        },
+        {
+          "target": "dut.ITM",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            61
+          ],
+          "variable_ids": [
+            9
+          ]
+        },
+        {
+          "target": "dut.ITM",
+          "values": [
+            0.0
+          ],
+          "reason": "zeroes dut.ITM (set to zero)",
+          "source": "divisor",
+          "expression_ids": [],
+          "variable_ids": [
+            9
+          ]
+        }
+      ],
+      "nominal_runtime_status": "success",
+      "nominal_runtime_failure": null,
+      "runtime_witness_status": "failed",
+      "runtime_witness_failure": {
+        "kind": "non-finite-value",
+        "phase": "simulation",
+        "message": "ding /tmp/tmp2x0fb0j9/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "raw": "reading /tmp/tmp2x0fb0j9/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "time": null
+      },
+      "runtime_paired_failure": true,
+      "runtime_paired_exact_domain_evidence": false,
+      "runtime_findings": [
+        {
+          "sanitizer": "solver",
+          "kind": "simulation-failure",
+          "severity": "high",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": "simulation",
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.ITM": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "failure_kind": "non-finite-value",
+            "reason": "ding /tmp/tmp2x0fb0j9/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "raw": "reading /tmp/tmp2x0fb0j9/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "tool_side": false
+          },
+          "signature": "solver:simulation-failure:exec:6f0dae6a",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "network",
+          "kind": "network-observation-incomplete",
+          "severity": "info",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": null,
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.ITM": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "reason": "missing or unsynchronized connector member observations",
+            "note": "coverage gap, not a model defect"
+          },
+          "signature": "network:network-observation-incomplete:exec:28637473",
+          "sequence": 1
+        }
+      ],
+      "native_domain_diagnostics": {
+        "schema_version": 1,
+        "kind": "solve-domain-diagnostics",
+        "coordinates": "internal-evaluation",
+        "execution_policy": "interpreter",
+        "coverage": "scalar-output-rows",
+        "faults": [],
+        "unobserved_evaluations": 0,
+        "truncated": false
+      },
+      "target_variable": [
+        {
+          "id": 9,
+          "name": "dut.ITM",
+          "role": "parameter",
+          "causality": "parameter",
+          "value_type": 4,
+          "scalar_count": 1,
+          "contract": {
+            "variability": "parameter",
+            "effective_value": 25.0,
+            "binding_from_modification": true,
+            "declared_in": "Modelica.Electrical.Analog.Semiconductors.Thyristor"
+          },
+          "declaration": {
+            "origin": {
+              "kind": "source"
+            },
+            "span": {
+              "source": 2,
+              "start": 427,
+              "end": 441,
+              "line": 10,
+              "column": 13
+            }
+          },
+          "component": 0,
+          "unit": "A",
+          "physical_quantity": "ElectricCurrent",
+          "declaring_class": "Modelica.Electrical.Analog.Semiconductors.Thyristor",
+          "description": "Conducting current",
+          "binding": 22,
+          "tunable": true,
+          "from_source": true
+        }
+      ],
+      "source_trigger_compile_ok": false,
+      "source_trigger_compiler_stderr": "   [ED019] unsupported Flat semantic owner `parameter binding`: `dut.Ron`\n  \u2502 cannot be evaluated: division by zero\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Semiconductors/Thyristor.mo:38:32]\n 37 \u2502   parameter SI.Voltage Voff= 1.5;\n 38 \u2502   parameter SI.Resistance Ron=(VTM-0.7)/ITM\n    \u00b7                                \u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\n    \u00b7                                      \u2570\u2500\u2500 unsupported semantic owner\n 39 \u2502     \"Forward conducting mode resistance\";\n    \u2570\u2500\u2500\u2500\u2500\n  help: this construct is rejected before simulation until its checked DAE\n        representation is implemented\n\n",
+      "omc_successful_nominal_failed_trigger": true,
+      "omc_stdout_file": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/thyristor-itm/omc-pair.stdout",
+      "analysis_errors": [],
+      "full_evidence": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/thyristor-itm/result.json"
+    },
+    {
+      "report": "LLM-BUG-003",
+      "variant": "thyristor-ih",
+      "nominal_model": "LLM_ThyristorITMNominal",
+      "trigger_model": "LLM_ThyristorIHZero",
+      "witness": "dut.IH = 0",
+      "nominal_compile_ok": true,
+      "static_detected_exact_witness": true,
+      "matching_static_findings": [
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 69,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 8,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Semiconductors/Thyristor.mo",
+              "line": 40,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.IH",
+            "witness": "dut.IH = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 0.006,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "dut.IH: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 76,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 8,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Semiconductors/Thyristor.mo",
+              "line": 40,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.IH",
+            "witness": "dut.IH = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 0.006,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "dut.IH: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        }
+      ],
+      "exact_witness_hints": [
+        {
+          "target": "dut.IH",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            68
+          ],
+          "variable_ids": [
+            8
+          ]
+        },
+        {
+          "target": "dut.IH",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            75
+          ],
+          "variable_ids": [
+            8
+          ]
+        },
+        {
+          "target": "dut.IH",
+          "values": [
+            0.0
+          ],
+          "reason": "zeroes dut.IH (set to zero)",
+          "source": "divisor",
+          "expression_ids": [],
+          "variable_ids": [
+            8
+          ]
+        }
+      ],
+      "nominal_runtime_status": "success",
+      "nominal_runtime_failure": null,
+      "runtime_witness_status": "failed",
+      "runtime_witness_failure": {
+        "kind": "non-finite-value",
+        "phase": "simulation",
+        "message": "ding /tmp/tmpa8et4xm4/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "raw": "reading /tmp/tmpa8et4xm4/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+        "time": null
+      },
+      "runtime_paired_failure": true,
+      "runtime_paired_exact_domain_evidence": false,
+      "runtime_findings": [
+        {
+          "sanitizer": "solver",
+          "kind": "simulation-failure",
+          "severity": "high",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": "simulation",
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.IH": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "failure_kind": "non-finite-value",
+            "reason": "ding /tmp/tmpa8et4xm4/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "raw": "reading /tmp/tmpa8et4xm4/traced.rbc (bitcode v1, cbor) Simulating LLM_ThyristorITMNominal to t=0.001 with 16 trace point(s)... \u001b[31m\u001b[0m simulation failed: numeric evaluation produced a non-finite result",
+            "tool_side": false
+          },
+          "signature": "solver:simulation-failure:exec:6f0dae6a",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "network",
+          "kind": "network-observation-incomplete",
+          "severity": "info",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": null,
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "dut.IH": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "reason": "missing or unsynchronized connector member observations",
+            "note": "coverage gap, not a model defect"
+          },
+          "signature": "network:network-observation-incomplete:exec:28637473",
+          "sequence": 1
+        }
+      ],
+      "native_domain_diagnostics": {
+        "schema_version": 1,
+        "kind": "solve-domain-diagnostics",
+        "coordinates": "internal-evaluation",
+        "execution_policy": "interpreter",
+        "coverage": "scalar-output-rows",
+        "faults": [],
+        "unobserved_evaluations": 0,
+        "truncated": false
+      },
+      "target_variable": [
+        {
+          "id": 8,
+          "name": "dut.IH",
+          "role": "parameter",
+          "causality": "parameter",
+          "value_type": 4,
+          "scalar_count": 1,
+          "contract": {
+            "variability": "parameter",
+            "effective_value": 0.006,
+            "declared_in": "Modelica.Electrical.Analog.Semiconductors.Thyristor"
+          },
+          "declaration": {
+            "origin": {
+              "kind": "source"
+            },
+            "span": {
+              "source": 2,
+              "start": 377,
+              "end": 390,
+              "line": 9,
+              "column": 13
+            }
+          },
+          "component": 0,
+          "unit": "A",
+          "physical_quantity": "ElectricCurrent",
+          "declaring_class": "Modelica.Electrical.Analog.Semiconductors.Thyristor",
+          "description": "Holding current",
+          "binding": 20,
+          "start": 21,
+          "tunable": true,
+          "from_source": true
+        }
+      ],
+      "source_trigger_compile_ok": false,
+      "source_trigger_compiler_stderr": "   [ED019] unsupported Flat semantic owner `parameter binding`: `dut.Roff`\n  \u2502 cannot be evaluated: division by zero\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Semiconductors/Thyristor.mo:40:33]\n 39 \u2502     \"Forward conducting mode resistance\";\n 40 \u2502   parameter SI.Resistance Roff=(VDRM^2)/VTM/IH\n    \u00b7                                 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\n    \u00b7                                        \u2570\u2500\u2500 unsupported semantic owner\n 41 \u2502     \"Blocking mode resistance\";\n    \u2570\u2500\u2500\u2500\u2500\n  help: this construct is rejected before simulation until its checked DAE\n        representation is implemented\n\n",
+      "omc_successful_nominal_failed_trigger": true,
+      "omc_stdout_file": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/thyristor-ih/omc-pair.stdout",
+      "analysis_errors": [],
+      "full_evidence": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/thyristor-ih/result.json"
+    },
+    {
+      "report": "LLM-BUG-004",
+      "variant": "pwm",
+      "nominal_model": "LLM_SignalPWMFrequencyNominal",
+      "trigger_model": "LLM_SignalPWMFrequencyZero",
+      "witness": "dut.f = 0",
+      "nominal_compile_ok": true,
+      "static_detected_exact_witness": true,
+      "matching_static_findings": [
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 31,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 2,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/PowerConverters/DCDC/Control/SignalPWM.mo",
+              "line": 38,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.f",
+            "witness": "dut.f = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 1000.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "dut.f: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 48,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 2,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/PowerConverters/DCDC/Control/SignalPWM.mo",
+              "line": 41,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "dut.f",
+            "witness": "dut.f = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 1000.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "dut.f: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        }
+      ],
+      "exact_witness_hints": [
+        {
+          "target": "dut.f",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            30
+          ],
+          "variable_ids": [
+            2
+          ]
+        },
+        {
+          "target": "dut.f",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            47
+          ],
+          "variable_ids": [
+            2
+          ]
+        },
+        {
+          "target": "dut.f",
+          "values": [
+            0.0
+          ],
+          "reason": "zeroes dut.f (set to zero)",
+          "source": "divisor",
+          "expression_ids": [],
+          "variable_ids": [
+            2
+          ]
+        }
+      ],
+      "nominal_runtime_status": "backend-error",
+      "nominal_runtime_failure": {
+        "kind": "build-error",
+        "phase": "compilation",
+        "message": "cannot save: - expression 172 is an unsupported node: expression form string_conversion not in bitcode v1\n  - expression 177 is an unsupported node: expression form string_conversion not in bitcode v1",
+        "raw": "cannot save: - expression 172 is an unsupported node: expression form string_conversion not in bitcode v1\n  - expression 177 is an unsupported node: expression form string_conversion not in bitcode v1\n  \u001b[31m\u001b[0m /tmp/tmpw5elfnko/traced.rbc: 2 validation error(s)",
+        "time": null
+      },
+      "runtime_witness_status": "not-run",
+      "runtime_witness_failure": null,
+      "runtime_paired_failure": false,
+      "runtime_paired_exact_domain_evidence": false,
+      "runtime_findings": [],
+      "native_domain_diagnostics": {},
+      "target_variable": [
+        {
+          "id": 2,
+          "name": "dut.f",
+          "role": "parameter",
+          "causality": "parameter",
+          "value_type": 2,
+          "scalar_count": 1,
+          "contract": {
+            "variability": "parameter",
+            "effective_value": 1000.0,
+            "binding_from_modification": true,
+            "declared_in": "Modelica.Electrical.PowerConverters.DCDC.Control.SignalPWM"
+          },
+          "declaration": {
+            "origin": {
+              "kind": "source"
+            },
+            "span": {
+              "source": 1,
+              "start": 440,
+              "end": 454,
+              "line": 10,
+              "column": 13
+            }
+          },
+          "component": 0,
+          "unit": "Hz",
+          "physical_quantity": "Frequency",
+          "declaring_class": "Modelica.Electrical.PowerConverters.DCDC.Control.SignalPWM",
+          "description": "Switching frequency",
+          "binding": 4,
+          "tunable": true,
+          "from_source": true
+        }
+      ],
+      "source_trigger_compile_ok": false,
+      "source_trigger_compiler_stderr": "   [ED019] unsupported Flat semantic owner `parameter binding`:\n  \u2502 `dut.zeroOrderHold.samplePeriod` cannot be evaluated: division by zero\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/PowerConverters/DCDC/Control/SignalPWM.mo:38:39]\n 37 \u2502   Modelica.Blocks.Discrete.ZeroOrderHold zeroOrderHold(final startTime=\n 38 \u2502         startTime, final samplePeriod=1/f)\n    \u00b7                                       \u2500\u252c\u2500\n    \u00b7                                        \u2570\u2500\u2500 unsupported semantic owner\n 39 \u2502     annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));\n    \u2570\u2500\u2500\u2500\u2500\n  help: this construct is rejected before simulation until its checked DAE\n        representation is implemented\n\n",
+      "omc_successful_nominal_failed_trigger": true,
+      "omc_stdout_file": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/pwm/omc-pair.stdout",
+      "analysis_errors": [],
+      "full_evidence": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/pwm/result.json"
+    },
+    {
+      "report": "LLM-BUG-005",
+      "variant": "transformer",
+      "nominal_model": "LLM_CompareTransformersRatioNominal",
+      "trigger_model": "LLM_CompareTransformersRatioZero",
+      "witness": "n = 0",
+      "nominal_compile_ok": true,
+      "static_detected_exact_witness": true,
+      "matching_static_findings": [
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 75,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 17,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "(n ^ 2)",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 4.0,
+            "denominator_range": "[0, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 89,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 17,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "(n ^ 2)",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 4.0,
+            "denominator_range": "[0, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 94,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 19,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "(n ^ 2)",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 4.0,
+            "denominator_range": "[0, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 99,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 19,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "(n ^ 2)",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 4.0,
+            "denominator_range": "[0, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 104,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 21,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "(n ^ 2)",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 4.0,
+            "denominator_range": "[0, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 109,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 21,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "(n ^ 2)",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 4.0,
+            "denominator_range": "[0, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 372,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 24,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "n",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 377,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 24,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "n",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 112,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 26,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "n",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "divisor",
+          "kind": "divisor-reachable-zero",
+          "severity": "high",
+          "canonical_anchors": [
+            {
+              "kind": "expression",
+              "dae_id": 115,
+              "name": ""
+            },
+            {
+              "kind": "parameter",
+              "dae_id": 4,
+              "name": ""
+            }
+          ],
+          "backend_anchors": [],
+          "source_locations": [
+            {
+              "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo",
+              "line": 26,
+              "column": 0
+            }
+          ],
+          "phase": null,
+          "time": null,
+          "test_case": null,
+          "evidence": {
+            "denominator": "n",
+            "witness": "n = 0",
+            "witness_rationale": "set to zero",
+            "denominator_at_witness": 0.0,
+            "denominator_at_declared_values": 2.0,
+            "denominator_range": "[-inf, inf]",
+            "path_condition": "always evaluated",
+            "verdict": "SAT",
+            "proof": "the division is not inside any branch",
+            "constraints": "n: unbounded",
+            "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+          },
+          "signature": "",
+          "sequence": 0
+        }
+      ],
+      "exact_witness_hints": [
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            74
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            88
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            93
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            98
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            103
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            108
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            371
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            376
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            111
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "operand of division, which requires nonzero",
+          "source": "domain",
+          "expression_ids": [
+            114
+          ],
+          "variable_ids": [
+            4
+          ]
+        },
+        {
+          "target": "n",
+          "values": [
+            0.0
+          ],
+          "reason": "zeroes (n ^ 2) (set to zero)",
+          "source": "divisor",
+          "expression_ids": [],
+          "variable_ids": [
+            4
+          ]
+        }
+      ],
+      "nominal_runtime_status": "failed",
+      "nominal_runtime_failure": {
+        "kind": "unknown",
+        "phase": "simulation",
+        "message": "reading /tmp/tmp15ec_r4d/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m coordinate names an unknown variable",
+        "raw": "reading /tmp/tmp15ec_r4d/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m coordinate names an unknown variable",
+        "time": null
+      },
+      "runtime_witness_status": "failed",
+      "runtime_witness_failure": {
+        "kind": "unknown",
+        "phase": "simulation",
+        "message": "reading /tmp/tmp15ec_r4d/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m coordinate names an unknown variable",
+        "raw": "reading /tmp/tmp15ec_r4d/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m coordinate names an unknown variable",
+        "time": null
+      },
+      "runtime_paired_failure": false,
+      "runtime_paired_exact_domain_evidence": false,
+      "runtime_findings": [
+        {
+          "sanitizer": "solver",
+          "kind": "simulation-failure",
+          "severity": "high",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": "simulation",
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "n": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "failure_kind": "unknown",
+            "reason": "reading /tmp/tmp15ec_r4d/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m coordinate names an unknown variable",
+            "raw": "reading /tmp/tmp15ec_r4d/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m coordinate names an unknown variable",
+            "tool_side": false
+          },
+          "signature": "solver:simulation-failure:exec:c1ac9a29",
+          "sequence": 0
+        },
+        {
+          "sanitizer": "network",
+          "kind": "network-observation-incomplete",
+          "severity": "info",
+          "canonical_anchors": [],
+          "backend_anchors": [],
+          "source_locations": [],
+          "phase": null,
+          "time": null,
+          "test_case": {
+            "parameters": {
+              "n": 0.0
+            },
+            "initial_values": {},
+            "input_trajectory": null,
+            "solver_options": {},
+            "origin": ""
+          },
+          "evidence": {
+            "reason": "missing or unsynchronized connector member observations",
+            "note": "coverage gap, not a model defect"
+          },
+          "signature": "network:network-observation-incomplete:exec:28637473",
+          "sequence": 1
+        }
+      ],
+      "native_domain_diagnostics": {
+        "available": false
+      },
+      "target_variable": [
+        {
+          "id": 4,
+          "name": "n",
+          "role": "parameter",
+          "causality": "parameter",
+          "value_type": 3,
+          "scalar_count": 1,
+          "contract": {
+            "variability": "parameter",
+            "effective_value": 2.0,
+            "declared_in": "LLM_CompareTransformersRatioNominal"
+          },
+          "declaration": {
+            "origin": {
+              "kind": "source"
+            },
+            "span": {
+              "source": 0,
+              "start": 457,
+              "end": 463,
+              "line": 10,
+              "column": 13
+            }
+          },
+          "declaring_class": "LLM_CompareTransformersRatioNominal",
+          "description": "Turns ratio primary:secondary voltage",
+          "binding": 18,
+          "start": 19,
+          "tunable": true,
+          "from_source": true
+        }
+      ],
+      "source_trigger_compile_ok": false,
+      "source_trigger_compiler_stderr": "   [ED019] unsupported Flat semantic owner `parameter binding`: `L2sigma`\n  \u2502 cannot be evaluated: division by zero\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Analog/Examples/CompareTransformers.mo:17:35]\n 16 \u2502     \"Magnetizing inductance w.r.t. primary side\";\n 17 \u2502   parameter SI.Inductance L2sigma=0.05/(2*pi*f)/n^2\n    \u00b7                                   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n    \u00b7                                           \u2570\u2500\u2500 unsupported semantic owner\n 18 \u2502     \"Secondary leakage inductance w.r.t. secondary side\";\n    \u2570\u2500\u2500\u2500\u2500\n  help: this construct is rejected before simulation until its checked DAE\n        representation is implemented\n\n",
+      "omc_successful_nominal_failed_trigger": true,
+      "omc_stdout_file": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/transformer/omc-pair.stdout",
+      "analysis_errors": [],
+      "full_evidence": "/data/mrumoca/rumoca/target/msl-issue-evaluation-20260924/independent/run-01/transformer/result.json"
+    }
+  ]
+}

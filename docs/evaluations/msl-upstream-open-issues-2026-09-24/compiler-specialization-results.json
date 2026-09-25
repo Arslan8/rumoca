@@ -1,0 +1,1063 @@
+{
+  "schema_version": 1,
+  "git_commit": "b38af3a38b0224bf22129cb1148ebf70e2492aa7",
+  "worktree_dirty": true,
+  "baseline_isolation": "Current dirty worktree with only package_constants hook/module disabled and function_metadata restored to HEAD; all other pre-existing changes preserved.",
+  "compiler_binary_sha256": {
+    "before": "2042532fe48d98dbb7e12bbeb2591e2b5ac4838a4a62e6643d9955bf3282ac36",
+    "after": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a"
+  },
+  "source_sha256": {
+    "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo": "bed84288635118d82d866012fb611f041c0b8504a43a2e927c6cf5ccf58a1282",
+    "crates/rumoca-phase-flatten/src/functions.rs": "52e592ab95f7b674b64a0dd400c34b9cf38d59bb03bf81dc5f574da25ed58185",
+    "crates/rumoca-phase-flatten/src/functions/function_metadata.rs": "be49b540490f988586295917d61837bcc18395ae3d0215b5b0ece2f488700b96",
+    "crates/rumoca-phase-flatten/src/functions/package_constants.rs": "7acc8d1f28bc71b2fd51933e9701e5828c8fa2bd3fd9160fbb0cd81f2828db84",
+    "crates/rumoca-phase-flatten/src/functions/tests.rs": "a580b863165d73c2c158765d6306ed4ec467afed53daeec7e457eafc586dc065",
+    "crates/rumoca-phase-flatten/tests/inherited_package_constants.rs": "f518fa50745ba8d74f75021d3875323ec46ba5b571afe8b46337a0dcdaa04312",
+    "infra/verification/msl-canary-20.json": "536004933ce502f7a8a4317e5dd6de2b700a6b176e84d2d6e7bbe0dcdf61eafa"
+  },
+  "commands": [
+    {
+      "label": "before-build",
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "rumoca",
+        "--bin",
+        "rumoca"
+      ],
+      "exit_code": 0,
+      "elapsed": 79.06034064292908,
+      "log": "target/modelsan-media-specialization-20260924/before-build.log",
+      "sha256": "8d4d28c2ef3967910a655a7fdb16400e034ab44aff5c2ade6f76a84e1da5f603"
+    },
+    {
+      "label": "before-GasControl-flat",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasControl",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit",
+        "flat-json",
+        "--output",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/before-GasControl-flat.json"
+      ],
+      "exit_code": 0,
+      "elapsed": 8.8820641040802,
+      "log": "target/modelsan-media-specialization-20260924/before-GasControl-flat.log",
+      "sha256": "7635cb6a4b4334f2c049831e45b7ed103b686754b4fdde84f66b096738eedacc"
+    },
+    {
+      "label": "before-GasControl-rbc",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasControl",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit-bitcode",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/before-GasControl.rbc"
+      ],
+      "exit_code": 1,
+      "elapsed": 4.072577953338623,
+      "log": "target/modelsan-media-specialization-20260924/before-GasControl-rbc.log",
+      "sha256": "bb79c26834fc3365ee55b17b5c1cd42524556d773724e8f56344062267b4a33d"
+    },
+    {
+      "label": "before-GasRoundTrip-flat",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit",
+        "flat-json",
+        "--output",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/before-GasRoundTrip-flat.json"
+      ],
+      "exit_code": 0,
+      "elapsed": 5.075701951980591,
+      "log": "target/modelsan-media-specialization-20260924/before-GasRoundTrip-flat.log",
+      "sha256": "5168d61f03c92d819b7c2b09feca39e6194a90f2d1a9f785ecb098d46e7f4531"
+    },
+    {
+      "label": "before-GasRoundTrip-rbc",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit-bitcode",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/before-GasRoundTrip.rbc"
+      ],
+      "exit_code": 1,
+      "elapsed": 3.272190809249878,
+      "log": "target/modelsan-media-specialization-20260924/before-GasRoundTrip-rbc.log",
+      "sha256": "bb79c26834fc3365ee55b17b5c1cd42524556d773724e8f56344062267b4a33d"
+    },
+    {
+      "label": "before-WaterRoundTrip-flat",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.WaterRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit",
+        "flat-json",
+        "--output",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/before-WaterRoundTrip-flat.json"
+      ],
+      "exit_code": 0,
+      "elapsed": 6.630259990692139,
+      "log": "target/modelsan-media-specialization-20260924/before-WaterRoundTrip-flat.log",
+      "sha256": "b3466678dc9d0cea4db1ede2209a5fc7be63c9f178cac8d274e6c51366393510"
+    },
+    {
+      "label": "before-WaterRoundTrip-rbc",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.WaterRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit-bitcode",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/before-WaterRoundTrip.rbc"
+      ],
+      "exit_code": 1,
+      "elapsed": 2.4195191860198975,
+      "log": "target/modelsan-media-specialization-20260924/before-WaterRoundTrip-rbc.log",
+      "sha256": "4ac2ff8e4c362b86626e39d3f76545a55d5011ecd1c5d067715aae3eb7546f60"
+    },
+    {
+      "label": "before-canary",
+      "command": [
+        "cargo",
+        "xtask",
+        "verify",
+        "msl-parity",
+        "--sim-targets-file",
+        "infra/verification/msl-canary-20.json",
+        "--results-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/before-canary",
+        "--omc-script-mode",
+        "--no-plots",
+        "--no-remote-quality-baseline",
+        "--stage-parallelism",
+        "4",
+        "--sim-parallelism",
+        "4"
+      ],
+      "exit_code": 0,
+      "elapsed": 64.01245498657227,
+      "log": "target/modelsan-media-specialization-20260924/before-canary.log",
+      "sha256": "18a088bddd120b51e34f1fb1ca640ce5a81a10798cf544b081f2c9a7a08e86c8"
+    },
+    {
+      "label": "after-build",
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "rumoca",
+        "--bin",
+        "rumoca"
+      ],
+      "exit_code": 0,
+      "elapsed": 63.16117453575134,
+      "log": "target/modelsan-media-specialization-20260924/after-build.log",
+      "sha256": "6e8db93ccc28bf13c2501cfee780f8585655eae7664cd53512d6fa312dd8921a"
+    },
+    {
+      "label": "after-GasControl-flat",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasControl",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit",
+        "flat-json",
+        "--output",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/after-GasControl-flat.json"
+      ],
+      "exit_code": 0,
+      "elapsed": 8.784464836120605,
+      "log": "target/modelsan-media-specialization-20260924/after-GasControl-flat.log",
+      "sha256": "8478dd8ca505d5cdcbdab081b60444894e5ec81a131df514c55ace065ff39cf8"
+    },
+    {
+      "label": "after-GasControl-rbc",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasControl",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit-bitcode",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/after-GasControl.rbc"
+      ],
+      "exit_code": 0,
+      "elapsed": 5.979841947555542,
+      "log": "target/modelsan-media-specialization-20260924/after-GasControl-rbc.log",
+      "sha256": "88398ca7e768b771babab3733a150680e4558ab8a88aaf42bdbf9c153fc854c0"
+    },
+    {
+      "label": "after-GasRoundTrip-flat",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit",
+        "flat-json",
+        "--output",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/after-GasRoundTrip-flat.json"
+      ],
+      "exit_code": 0,
+      "elapsed": 5.5280420780181885,
+      "log": "target/modelsan-media-specialization-20260924/after-GasRoundTrip-flat.log",
+      "sha256": "d6274df01217b204b8bd78dc1db05668bf42b7945f6d2ed38187947bee58f8f0"
+    },
+    {
+      "label": "after-GasRoundTrip-rbc",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.GasRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit-bitcode",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/after-GasRoundTrip.rbc"
+      ],
+      "exit_code": 0,
+      "elapsed": 5.576340913772583,
+      "log": "target/modelsan-media-specialization-20260924/after-GasRoundTrip-rbc.log",
+      "sha256": "3b6a835b3e7016f2050f7baceaac6a2811a84f3be5a8a0c519894f82ff8533c9"
+    },
+    {
+      "label": "after-WaterRoundTrip-flat",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.WaterRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit",
+        "flat-json",
+        "--output",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/after-WaterRoundTrip-flat.json"
+      ],
+      "exit_code": 0,
+      "elapsed": 4.4749932289123535,
+      "log": "target/modelsan-media-specialization-20260924/after-WaterRoundTrip-flat.log",
+      "sha256": "ae33ecae81ac87767292c25e862354192b143cb03e5ff7d99e8df8da60994776"
+    },
+    {
+      "label": "after-WaterRoundTrip-rbc",
+      "command": [
+        "/data/mrumoca/rumoca/target/debug/rumoca",
+        "compile",
+        "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+        "--model",
+        "SemanticProbes.WaterRoundTrip",
+        "--no-fold-parameter-bindings",
+        "--source-root",
+        "target/msl/ModelicaStandardLibrary-4.1.0",
+        "--cache-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/cache",
+        "--emit-bitcode",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/after-WaterRoundTrip.rbc"
+      ],
+      "exit_code": 0,
+      "elapsed": 4.623642683029175,
+      "log": "target/modelsan-media-specialization-20260924/after-WaterRoundTrip-rbc.log",
+      "sha256": "4853b6e41a2e216dcd24cd8f4d64f30a390b0c79e3945daaef4dc10bfb2ea2dd"
+    },
+    {
+      "label": "after-canary",
+      "command": [
+        "cargo",
+        "xtask",
+        "verify",
+        "msl-parity",
+        "--sim-targets-file",
+        "infra/verification/msl-canary-20.json",
+        "--results-dir",
+        "/data/mrumoca/rumoca/target/modelsan-media-specialization-20260924/after-canary",
+        "--omc-script-mode",
+        "--no-plots",
+        "--no-remote-quality-baseline",
+        "--stage-parallelism",
+        "4",
+        "--sim-parallelism",
+        "4"
+      ],
+      "exit_code": 0,
+      "elapsed": 68.4174644947052,
+      "log": "target/modelsan-media-specialization-20260924/after-canary.log",
+      "sha256": "3460e6177a28a0e4d84daa7c4384c6d7775cfb4ffc11fed164d934c7620d5086"
+    }
+  ],
+  "native_simulations": [
+    {
+      "model": "GasControl",
+      "times": [
+        0.0,
+        0.025,
+        0.05,
+        0.07500000000000001,
+        0.1
+      ],
+      "first_values": {
+        "s": 6.219471474110942,
+        "recoveredT": 299.99999999999994,
+        "originalState.p": 101325.0,
+        "originalState.T": 300.0,
+        "recoveredState.p": 101325.0,
+        "recoveredState.T": 299.99999999999994
+      },
+      "termination": null
+    },
+    {
+      "model": "GasRoundTrip",
+      "times": [
+        0.0,
+        0.025,
+        0.05,
+        0.07500000000000001,
+        0.1
+      ],
+      "first_values": {
+        "s": 3.3632200369494933,
+        "recoveredT": 5204.053616778445,
+        "originalState.p": 102338.25,
+        "originalState.T": 300.0,
+        "recoveredState.p": 102338.25,
+        "recoveredState.T": 5204.053616778445
+      },
+      "termination": null
+    },
+    {
+      "model": "WaterRoundTrip",
+      "times": [
+        0.0,
+        0.025,
+        0.05,
+        0.07500000000000001,
+        0.1
+      ],
+      "first_values": {
+        "s": 392.297613143761,
+        "recoveredT": 327.4574409665021,
+        "originalState.p": 100000.0,
+        "originalState.T": 300.0,
+        "recoveredState.p": 100000.0,
+        "recoveredState.T": 327.4574409665021
+      },
+      "termination": null
+    }
+  ],
+  "canary": {
+    "before": {
+      "scope": "partial",
+      "counts": {
+        "total_models": 20,
+        "compiled_models": 11,
+        "flatten_failed": 0,
+        "todae_failed": 9,
+        "sim_ok": 8,
+        "sim_timeout": 0,
+        "sim_solver_fail": 3,
+        "sim_balance_fail": 0
+      },
+      "bands": {
+        "cohort_models": 20,
+        "compared_models": 8,
+        "high": 8,
+        "near": 0,
+        "deviation": 0,
+        "absent": 12,
+        "absent_by_reason": {
+          "not_attempted": 9,
+          "sim_failed": 3
+        }
+      },
+      "candidates": {
+        "models_candidate": 8,
+        "models_compared": 8,
+        "missing_trace_models": 0,
+        "skipped_models": 0,
+        "policy_excluded_models": 0,
+        "trace_nonidentifiable_models": 0
+      },
+      "rows": [
+        {
+          "model_name": "Modelica.Blocks.Examples.BooleanNetwork1",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Blocks.Examples.BooleanNetwork1 failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Tables.Internal.getTimeTableTmin.tableID` has unsupported type `Modelica.Blocks.Types.ExternalCombiTimeTable`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Blocks.Examples.Noise.AutomaticSeed",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Blocks.Examples.Noise.AutomaticSeed failed in ToDae: unsupported Flat semantic owner `impure call context`: impure function `Modelica.Math.Random.Utilities.initializeImpureRandom.setInternalState` is called from a pure function body; MLS \u00a712.3 permits an impure call only in an impure function, a `when` equation or statement, an initial equation or initial algorithm, or a `parameter` binding)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.BooleanSignals.BackSample",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Clocked.Examples.Elementary.BooleanSignals.BackSample failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Tables.Internal.getTimeTableTmin.tableID` has unsupported type `Modelica.Blocks.Types.ExternalCombiTimeTable`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.BooleanSignals.TimeBasedPulse",
+          "band": "high",
+          "compared_variables": 3,
+          "channel_high_count": 3,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0,
+          "mean_channel_bounded_normalized_l1": 0.0,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.IntegerSignals.BackSample",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Clocked.Examples.Elementary.IntegerSignals.BackSample failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Tables.Internal.getTimeTableTmin.tableID` has unsupported type `Modelica.Blocks.Types.ExternalCombiTimeTable`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.IntegerSignals.TimeBasedStep",
+          "band": "high",
+          "compared_variables": 3,
+          "channel_high_count": 3,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0,
+          "mean_channel_bounded_normalized_l1": 0.0,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.RealSignals.Sample1",
+          "band": "high",
+          "compared_variables": 5,
+          "channel_high_count": 5,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 1.9692871799549946e-07,
+          "mean_channel_bounded_normalized_l1": 7.877148734807988e-08,
+          "bounded_normalized_l1_score": 2.498001805406601e-16
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.RealSignals.TickBasedRamp",
+          "band": "high",
+          "compared_variables": 3,
+          "channel_high_count": 3,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0,
+          "mean_channel_bounded_normalized_l1": 0.0,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.SimpleControlledDrive.ClockedWithDiscreteController",
+          "band": "high",
+          "compared_variables": 26,
+          "channel_high_count": 26,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 4.799728938549861e-06,
+          "mean_channel_bounded_normalized_l1": 3.713101020305022e-07,
+          "bounded_normalized_l1_score": 3.2891413682269063e-16
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.DemoPowerSupply",
+          "band": "high",
+          "compared_variables": 21,
+          "channel_high_count": 21,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 1.5341750276657592e-10,
+          "mean_channel_bounded_normalized_l1": 4.473713745847687e-11,
+          "bounded_normalized_l1_score": 1.5254383786347729e-12
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.OpAmps.Comparator",
+          "band": "high",
+          "compared_variables": 45,
+          "channel_high_count": 45,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0004977005200683122,
+          "mean_channel_bounded_normalized_l1": 2.2183686998245517e-05,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Add",
+          "band": "absent",
+          "exit_reason": "sim_failed",
+          "exit_detail": "sim_solver_fail (EL005: solve-IR evaluation failed: [EL005] DAE structural proof failed: structurally singular system: 57 matched out of 58 equations and 58 unknowns)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.ShowSaturatingInductor",
+          "band": "high",
+          "compared_variables": 23,
+          "channel_high_count": 23,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 1.295126493447988e-05,
+          "mean_channel_bounded_normalized_l1": 3.224301236622765e-06,
+          "bounded_normalized_l1_score": 2.0153275602096597e-06
+        },
+        {
+          "model_name": "Modelica.Electrical.Digital.Examples.Counter",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Electrical.Digital.Examples.Counter failed in ToDae: invalid Appendix B discrete solved form: element assignments must cover a discrete coordinate exactly once)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Electrical.Digital.Examples.FullAdder",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Electrical.Digital.Examples.FullAdder failed in ToDae: unsupported model algorithm in canonical DAE: sequential read of `Adder1.Adder2.AND.G2.y_auxiliary` after an earlier write requires an SSA event transition)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Electrical.Polyphase.Examples.TransformerYD",
+          "band": "absent",
+          "exit_reason": "sim_failed",
+          "exit_detail": "sim_solver_fail (EL005: solve-IR evaluation failed: [EL005] DAE system is not computable: affine derivative coefficient is not compile-time numeric)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Math.Nonlinear.Examples.QuadratureLobatto3",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Math.Nonlinear.Examples.QuadratureLobatto3 failed in ToDae: unsupported Flat semantic owner `function partial application`: MLS \u00a712.4.2.1 partial application of `Modelica.Math.Nonlinear.Examples.UtilityFunctions.fun7` binds 2 of 3 formal parameters and denotes a function value, which the canonical DAE has no value shape for)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Mechanics.Rotational.Examples.FirstGrounded",
+          "band": "absent",
+          "exit_reason": "sim_failed",
+          "exit_detail": "sim_solver_fail (EL005: solve-IR evaluation failed: [EL005] DAE structural proof failed: index reduction would discard the stated initial value of `inertia2.phi`: MLS 3.6 section 8.6 adds `inertia2.phi = inertia2.phi.start` to the initialization equations for a `fixed = true` variable, and demoting `inertia2.phi` leaves no equation that states it)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Mechanics.Rotational.Examples.Friction",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Mechanics.Rotational.Examples.Friction failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Types.ExternalCombiTable1D.externalCombiTable1D` has unsupported type `ExternalCombiTable1D`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.StateGraph.Examples.ShowCompositeStep",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.StateGraph.Examples.ShowCompositeStep failed in ToDae: invalid Appendix B discrete solved form: a discrete-valued equation must have one unsubscripted resolved coordinate as its left-hand side)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        }
+      ],
+      "working_tree_digest": "7b3e5879eb43677f12849692de37867ad9043e00c558b679341abc616375a85e",
+      "rows_digest": "c8b1a5219a9a2f48583612456c8481b9a3be601d53bde9cc48a38de5335684ff"
+    },
+    "after": {
+      "scope": "partial",
+      "counts": {
+        "total_models": 20,
+        "compiled_models": 11,
+        "flatten_failed": 0,
+        "todae_failed": 9,
+        "sim_ok": 8,
+        "sim_timeout": 0,
+        "sim_solver_fail": 3,
+        "sim_balance_fail": 0
+      },
+      "bands": {
+        "cohort_models": 20,
+        "compared_models": 8,
+        "high": 8,
+        "near": 0,
+        "deviation": 0,
+        "absent": 12,
+        "absent_by_reason": {
+          "not_attempted": 9,
+          "sim_failed": 3
+        }
+      },
+      "candidates": {
+        "models_candidate": 8,
+        "models_compared": 8,
+        "missing_trace_models": 0,
+        "skipped_models": 0,
+        "policy_excluded_models": 0,
+        "trace_nonidentifiable_models": 0
+      },
+      "rows": [
+        {
+          "model_name": "Modelica.Blocks.Examples.BooleanNetwork1",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Blocks.Examples.BooleanNetwork1 failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Tables.Internal.getTimeTableTmin.tableID` has unsupported type `Modelica.Blocks.Types.ExternalCombiTimeTable`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Blocks.Examples.Noise.AutomaticSeed",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Blocks.Examples.Noise.AutomaticSeed failed in ToDae: unsupported Flat semantic owner `impure call context`: impure function `Modelica.Math.Random.Utilities.initializeImpureRandom.setInternalState` is called from a pure function body; MLS \u00a712.3 permits an impure call only in an impure function, a `when` equation or statement, an initial equation or initial algorithm, or a `parameter` binding)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.BooleanSignals.BackSample",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Clocked.Examples.Elementary.BooleanSignals.BackSample failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Tables.Internal.getTimeTableTmin.tableID` has unsupported type `Modelica.Blocks.Types.ExternalCombiTimeTable`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.BooleanSignals.TimeBasedPulse",
+          "band": "high",
+          "compared_variables": 3,
+          "channel_high_count": 3,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0,
+          "mean_channel_bounded_normalized_l1": 0.0,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.IntegerSignals.BackSample",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Clocked.Examples.Elementary.IntegerSignals.BackSample failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Tables.Internal.getTimeTableTmin.tableID` has unsupported type `Modelica.Blocks.Types.ExternalCombiTimeTable`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.IntegerSignals.TimeBasedStep",
+          "band": "high",
+          "compared_variables": 3,
+          "channel_high_count": 3,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0,
+          "mean_channel_bounded_normalized_l1": 0.0,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.RealSignals.Sample1",
+          "band": "high",
+          "compared_variables": 5,
+          "channel_high_count": 5,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 1.9692871799549946e-07,
+          "mean_channel_bounded_normalized_l1": 7.877148734807988e-08,
+          "bounded_normalized_l1_score": 2.498001805406601e-16
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.Elementary.RealSignals.TickBasedRamp",
+          "band": "high",
+          "compared_variables": 3,
+          "channel_high_count": 3,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0,
+          "mean_channel_bounded_normalized_l1": 0.0,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Clocked.Examples.SimpleControlledDrive.ClockedWithDiscreteController",
+          "band": "high",
+          "compared_variables": 26,
+          "channel_high_count": 26,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 4.799728938549861e-06,
+          "mean_channel_bounded_normalized_l1": 3.713101020305022e-07,
+          "bounded_normalized_l1_score": 3.2891413682269063e-16
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.DemoPowerSupply",
+          "band": "high",
+          "compared_variables": 21,
+          "channel_high_count": 21,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 1.5341750276657592e-10,
+          "mean_channel_bounded_normalized_l1": 4.473713745847687e-11,
+          "bounded_normalized_l1_score": 1.5254383786347729e-12
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.OpAmps.Comparator",
+          "band": "high",
+          "compared_variables": 45,
+          "channel_high_count": 45,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 0.0004977005200683122,
+          "mean_channel_bounded_normalized_l1": 2.2183686998245517e-05,
+          "bounded_normalized_l1_score": 0.0
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.OpAmps.OpAmpCircuits.Add",
+          "band": "absent",
+          "exit_reason": "sim_failed",
+          "exit_detail": "sim_solver_fail (EL005: solve-IR evaluation failed: [EL005] DAE structural proof failed: structurally singular system: 57 matched out of 58 equations and 58 unknowns)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Electrical.Analog.Examples.ShowSaturatingInductor",
+          "band": "high",
+          "compared_variables": 23,
+          "channel_high_count": 23,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0,
+          "max_channel_bounded_normalized_l1": 1.295126493447988e-05,
+          "mean_channel_bounded_normalized_l1": 3.224301236622765e-06,
+          "bounded_normalized_l1_score": 2.0153275602096597e-06
+        },
+        {
+          "model_name": "Modelica.Electrical.Digital.Examples.Counter",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Electrical.Digital.Examples.Counter failed in ToDae: invalid Appendix B discrete solved form: element assignments must cover a discrete coordinate exactly once)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Electrical.Digital.Examples.FullAdder",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Electrical.Digital.Examples.FullAdder failed in ToDae: unsupported model algorithm in canonical DAE: sequential read of `Adder1.Adder2.AND.G2.y_auxiliary` after an earlier write requires an SSA event transition)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Electrical.Polyphase.Examples.TransformerYD",
+          "band": "absent",
+          "exit_reason": "sim_failed",
+          "exit_detail": "sim_solver_fail (EL005: solve-IR evaluation failed: [EL005] DAE system is not computable: affine derivative coefficient is not compile-time numeric)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Math.Nonlinear.Examples.QuadratureLobatto3",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Math.Nonlinear.Examples.QuadratureLobatto3 failed in ToDae: unsupported Flat semantic owner `function partial application`: MLS \u00a712.4.2.1 partial application of `Modelica.Math.Nonlinear.Examples.UtilityFunctions.fun7` binds 2 of 3 formal parameters and denotes a function value, which the canonical DAE has no value shape for)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Mechanics.Rotational.Examples.FirstGrounded",
+          "band": "absent",
+          "exit_reason": "sim_failed",
+          "exit_detail": "sim_solver_fail (EL005: solve-IR evaluation failed: [EL005] DAE structural proof failed: index reduction would discard the stated initial value of `inertia2.phi`: MLS 3.6 section 8.6 adds `inertia2.phi = inertia2.phi.start` to the initialization equations for a `fixed = true` variable, and demoting `inertia2.phi` leaves no equation that states it)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.Mechanics.Rotational.Examples.Friction",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.Mechanics.Rotational.Examples.Friction failed in ToDae: unsupported Flat semantic owner `function value type`: `Modelica.Blocks.Types.ExternalCombiTable1D.externalCombiTable1D` has unsupported type `ExternalCombiTable1D`)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        },
+        {
+          "model_name": "Modelica.StateGraph.Examples.ShowCompositeStep",
+          "band": "absent",
+          "exit_reason": "not_attempted",
+          "exit_detail": "the run never simulated it (phase_reached ToDae: Modelica.StateGraph.Examples.ShowCompositeStep failed in ToDae: invalid Appendix B discrete solved form: a discrete-valued equation must have one unsubscripted resolved coordinate as its left-hand side)",
+          "compared_variables": 0,
+          "channel_high_count": 0,
+          "channel_minor_count": 0,
+          "channel_deviation_count": 0,
+          "channel_severe_count": 0
+        }
+      ],
+      "working_tree_digest": "df213301262d5170228d7cc1d18076a6adc7d33a927597032cc68bfa3a6e505b",
+      "rows_digest": "c8b1a5219a9a2f48583612456c8481b9a3be601d53bde9cc48a38de5335684ff"
+    }
+  },
+  "canary_status_changes": [],
+  "flatten_tests": {
+    "passed": 682,
+    "suite_counts": [
+      620,
+      6,
+      4,
+      3,
+      3,
+      1,
+      1,
+      2,
+      1,
+      6,
+      4,
+      7,
+      2,
+      1,
+      3,
+      5,
+      1,
+      8,
+      3,
+      1
+    ]
+  },
+  "artifact_sha256": {
+    "target/modelsan-media-specialization-20260924/after-WaterRoundTrip-flat.log": "ae33ecae81ac87767292c25e862354192b143cb03e5ff7d99e8df8da60994776",
+    "target/modelsan-media-specialization-20260924/after-source.json": "da509fd70bf9c74d783b8b440a28e29440dcee277d3e0718f7bc180c15b17266",
+    "target/modelsan-media-specialization-20260924/after-WaterRoundTrip-rbc.log": "4853b6e41a2e216dcd24cd8f4d64f30a390b0c79e3945daaef4dc10bfb2ea2dd",
+    "target/modelsan-media-specialization-20260924/final-flatten-tests.log": "95e28d2fedfcdbf9907ece1ebeda1f950b76830ddbdb59194356af7c241480b5",
+    "target/modelsan-media-specialization-20260924/before-WaterRoundTrip-flat.log": "b3466678dc9d0cea4db1ede2209a5fc7be63c9f178cac8d274e6c51366393510",
+    "target/modelsan-media-specialization-20260924/after-WaterRoundTrip.rbc": "2e22fc11302de77c897e27454abe97fb020455036791fd945e1bc59d326076cd",
+    "target/modelsan-media-specialization-20260924/before-WaterRoundTrip-flat.json": "4ac3a4413c04ce6b9e320fec01d1fb04e851933dd2b356b750768fbc5d2de506",
+    "target/modelsan-media-specialization-20260924/after-GasControl.rbc": "62a5736e333bf319a5eb069ebb41d2aefa669a80c30b4dae2e1d84a92affd49b",
+    "target/modelsan-media-specialization-20260924/before-WaterRoundTrip-rbc.log": "4ac2ff8e4c362b86626e39d3f76545a55d5011ecd1c5d067715aae3eb7546f60",
+    "target/modelsan-media-specialization-20260924/after-GasControl-flat.log": "8478dd8ca505d5cdcbdab081b60444894e5ec81a131df514c55ace065ff39cf8",
+    "target/modelsan-media-specialization-20260924/after-GasRoundTrip-rbc.log": "3b6a835b3e7016f2050f7baceaac6a2811a84f3be5a8a0c519894f82ff8533c9",
+    "target/modelsan-media-specialization-20260924/after-WaterRoundTrip-flat.json": "2f61329692489b56fdb86354b20f21f24d92e31385e4bbdc14a3836c6f0adbc8",
+    "target/modelsan-media-specialization-20260924/commands.json": "18585e89b8e5c3215dd483ce450253095e8c94927b47c3f002b50fdf9f73816f",
+    "target/modelsan-media-specialization-20260924/before-GasRoundTrip-flat.json": "f754f1af3725abae284e8d7c7aef7aa686287b0dcee42433487f670c8b50f99c",
+    "target/modelsan-media-specialization-20260924/native-WaterRoundTrip.log": "2656a80b2b2f3a03da421e86ef4233b2dad6f2a2e44c1e898c0b8cbed6c2cc52",
+    "target/modelsan-media-specialization-20260924/after-GasControl-flat.json": "a10488e7b8aa5166875d3e9a7459e892c3043f462865ac45a789844b27c446fc",
+    "target/modelsan-media-specialization-20260924/before-build.log": "8d4d28c2ef3967910a655a7fdb16400e034ab44aff5c2ade6f76a84e1da5f603",
+    "target/modelsan-media-specialization-20260924/before-canary.log": "18a088bddd120b51e34f1fb1ca640ce5a81a10798cf544b081f2c9a7a08e86c8",
+    "target/modelsan-media-specialization-20260924/after-GasRoundTrip.rbc": "704959e12ee6d7bbfed6fb48cdc577726212f1685bac5ae1b7c328aa353d652a",
+    "target/modelsan-media-specialization-20260924/after-GasRoundTrip-flat.log": "d6274df01217b204b8bd78dc1db05668bf42b7945f6d2ed38187947bee58f8f0",
+    "target/modelsan-media-specialization-20260924/before-GasRoundTrip-rbc.log": "bb79c26834fc3365ee55b17b5c1cd42524556d773724e8f56344062267b4a33d",
+    "target/modelsan-media-specialization-20260924/native-GasControl.log": "bfd8efbc324647001dec929298618062f5e673e8fc82ba33969c454c9e035ac6",
+    "target/modelsan-media-specialization-20260924/before-GasControl-flat.log": "7635cb6a4b4334f2c049831e45b7ed103b686754b4fdde84f66b096738eedacc",
+    "target/modelsan-media-specialization-20260924/before-GasControl-rbc.log": "bb79c26834fc3365ee55b17b5c1cd42524556d773724e8f56344062267b4a33d",
+    "target/modelsan-media-specialization-20260924/native-media-results.json": "a341b843c1677d0a36c4f77476b432422e9bb16b408eb2ccea1ecbd6d80e2d0d",
+    "target/modelsan-media-specialization-20260924/after-build.log": "6e8db93ccc28bf13c2501cfee780f8585655eae7664cd53512d6fa312dd8921a",
+    "target/modelsan-media-specialization-20260924/after-canary.log": "3460e6177a28a0e4d84daa7c4384c6d7775cfb4ffc11fed164d934c7620d5086",
+    "target/modelsan-media-specialization-20260924/native-GasRoundTrip.log": "283fdfe88b7d64d505bd066d01570d214deadcc684c6e00f95001e784b4bf399",
+    "target/modelsan-media-specialization-20260924/flatten-clippy-lib.log": "fce2ef577e89f019312f674f7401409ee69e1bcd83363e2ebed501afde0f7572",
+    "target/modelsan-media-specialization-20260924/before-GasRoundTrip-flat.log": "5168d61f03c92d819b7c2b09feca39e6194a90f2d1a9f785ecb098d46e7f4531",
+    "target/modelsan-media-specialization-20260924/after-GasRoundTrip-flat.json": "bcd9be8def84e005d961eeb8c4d306b677bc046bc109421d3f486efad837e659",
+    "target/modelsan-media-specialization-20260924/flatten-clippy.log": "4b7280f71ad98a718630ae9f740235fce318658b7b151c2260a226963f1781fd",
+    "target/modelsan-media-specialization-20260924/after-GasControl-rbc.log": "88398ca7e768b771babab3733a150680e4558ab8a88aaf42bdbf9c153fc854c0",
+    "target/modelsan-media-specialization-20260924/before-GasControl-flat.json": "726dd3273ef341761a94ea1f90b69e0476bba9738770eec2ba96342644fab36d"
+  },
+  "checks": {
+    "flatten_unit_and_integration": {
+      "command": "CARGO_BUILD_JOBS=4 RUST_TEST_THREADS=4 RAYON_NUM_THREADS=4 CC=gcc CXX=g++ cargo test -p rumoca-phase-flatten --lib --tests --quiet",
+      "exit_code": 0,
+      "passed": 682
+    },
+    "rustfmt_changed_files": {
+      "exit_code": 0
+    },
+    "clippy_all_targets": {
+      "exit_code": 101,
+      "preexisting_errors": [
+        "rumoca-phase-flatten/src/pipeline/context_and_tests/component_instance.rs:69 too_many_lines 107/100",
+        "rumoca-phase-dae/src/construction/analysis.rs:510 too_many_lines 107/100",
+        "rumoca-phase-instantiate/src/attributes.rs:232 excessive_nesting"
+      ]
+    },
+    "clippy_library": {
+      "exit_code": 101,
+      "preexisting_errors": [
+        "rumoca-phase-flatten/src/pipeline/context_and_tests/component_instance.rs:69 too_many_lines 107/100"
+      ]
+    }
+  },
+  "native_simulation_command_template": [
+    "target/debug/rumoca",
+    "sim",
+    "docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+    "--model",
+    "SemanticProbes.{model}",
+    "--source-root",
+    "target/msl/ModelicaStandardLibrary-4.1.0",
+    "--cache-dir",
+    "target/modelsan-media-specialization-20260924/cache",
+    "--no-fold-parameter-bindings",
+    "--t-end",
+    "0.1",
+    "--dt",
+    "0.025",
+    "--output",
+    "target/modelsan-media-specialization-20260924/native-{model}.html"
+  ],
+  "native_simulation_exit_codes": {
+    "GasControl": 0,
+    "GasRoundTrip": 0,
+    "WaterRoundTrip": 0
+  }
+}

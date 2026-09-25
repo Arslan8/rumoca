@@ -28,6 +28,7 @@ use rumoca_ir_solve::{
 };
 
 mod compute_block_scalarize;
+pub mod domain_diagnostics;
 pub mod execution;
 pub mod linear_solve;
 pub mod nan_trace;
@@ -794,6 +795,10 @@ impl PreparedLazyRowPlan {
         if !row.iter().all(lazy_row_op_supported) {
             return None;
         }
+        Some(Self::from_supported(row, register_count))
+    }
+
+    fn from_supported(row: &[LinearOp], register_count: usize) -> Self {
         let mut definitions = vec![usize::MAX; register_count];
         let mut outputs = Vec::new();
         for (op_index, op) in row.iter().enumerate() {
@@ -806,7 +811,7 @@ impl PreparedLazyRowPlan {
                 outputs.push(src);
             }
         }
-        Some(Self {
+        Self {
             definitions: definitions.into_boxed_slice(),
             outputs: outputs.into_boxed_slice(),
             trace: RefCell::new(None),
@@ -816,7 +821,7 @@ impl PreparedLazyRowPlan {
                     LinearOp::FunctionConditional { .. } | LinearOp::GuardedFunctionFold { .. }
                 )
             }),
-        })
+        }
     }
 
     fn specialization(&self, row: &[LinearOp]) -> Option<SpecializedRowProgram> {
@@ -1527,6 +1532,17 @@ pub(crate) fn eval_row_prepared_maybe_fast(
     scratch: &mut RowEvalScratch,
     sink: &mut OutputCursor<'_>,
 ) -> Result<(), EvalSolveError> {
+    // Diagnostic evaluation uses the existing demand-driven interpreter so
+    // an inactive Select arm cannot produce a false domain violation.
+    if domain_diagnostics::active() {
+        if domain_diagnostics::supported(input.row)
+            && (register_safe || domain_diagnostics::checked_flow(input.row, input.source_span))
+        {
+            let plan = PreparedLazyRowPlan::from_supported(input.row, input.register_count);
+            return eval_row_prepared_lazy(input.with_lazy_plan(Some(&plan)), scratch, sink);
+        }
+        domain_diagnostics::unobserved();
+    }
     let start = solve_row_eval_trace_active().then(Instant::now);
     let result = if register_safe && input.lazy_plan.is_some() {
         eval_row_prepared_lazy(input, scratch, sink)
@@ -1979,6 +1995,7 @@ fn eval_lazy_scalar_op(
     regs: &mut [f64],
     op: LinearOp,
 ) -> Result<(), EvalSolveError> {
+    domain_diagnostics::observe(input.row, &op, regs, input.t);
     match op {
         LinearOp::Const { dst, value } => regs[dst as usize] = value,
         LinearOp::LoadTime { dst } => regs[dst as usize] = input.t,

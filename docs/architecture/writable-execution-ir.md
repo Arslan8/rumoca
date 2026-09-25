@@ -133,6 +133,19 @@ Raw numerical edits are not replay recipes: keep them in a named pass if they
 must survive re-lowering. Saving changed execution data advances its revision.
 Editing numerical programs does not pretend to invert them back into equations.
 
+Run-local `bitcode run --param NAME=VALUE` and `--initial NAME=VALUE` overrides
+preserve the saved numerical program. Parameters must be tunable retained
+storage with no frozen dependent binding/start/nominal; initial values may only
+change unconstrained state seeds, never bypass explicit initialization rows.
+Refusals require intentional authoring/re-lowering, not silent equation edits.
+
+`--domain-diagnostics` selects the native interpreter and writes bounded
+internal numerical evidence separately from publications. The evaluator owns
+reached operand faults; the solver owns step, event and projection telemetry.
+These internal coordinates are not valid physical trace samples. See the
+[ModelSan integration guide](../modelsan-bitcode-integration.md#native-diagnostics)
+for identity, coverage, replay and diagnostic limits.
+
 The scalar equation removal transaction rejects retained references and
 unsupported structured/event owners, compacts all affected IDs and dead
 expressions, then commits only after checked import. Returned remapping tables

@@ -43,7 +43,27 @@ class RunOutcome:
     @property
     def coverage(self) -> dict[str, str]:
         """Sanitizer components that did not run, and why. Never empty silently."""
-        return self.plan.skipped_sanitizers() if self.plan else {}
+        gaps = self.plan.skipped_sanitizers() if self.plan else {}
+        for bug in self.database.bugs:
+            for finding in bug.findings:
+                if finding.kind == "contract-unobserved":
+                    key = f"behavior.contract.{finding.evidence['contract_id']}"
+                    gaps[key] = finding.evidence["reason"]
+        for index, result in enumerate(self.results):
+            evidence = result.backend_metadata.get("domain_diagnostics", {})
+            if evidence.get("available") is False:
+                gaps[f"domain.failure.run{index}"] = "native diagnostics unavailable for this run"
+            missing = evidence.get("unobserved_evaluations", 0)
+            if missing or evidence.get("truncated"):
+                gaps[f"domain.failure.run{index}"] = (
+                    f"partial native coverage: {missing} unobserved evaluations; "
+                    f"fault limit reached={bool(evidence.get('truncated'))}")
+            solver = evidence.get("solver", {})
+            omitted = solver.get("omitted", 0)
+            large = sum(r.get("values_omitted", False) for r in solver.get("records", []))
+            if omitted or large:
+                gaps[f"solver.telemetry.run{index}"] = f"bounded native diagnostics: {omitted} records and {large} matrices omitted"
+        return gaps
 
     @property
     def executed(self) -> int:
@@ -122,13 +142,18 @@ class Pipeline:
         outcome.hints = self.collect_hints(model, context)
 
         build_failure = self.backend.prepare(model_path, model_name)
+        # Preparation discovers per-artifact observation/connector coverage.
+        # Re-plan before executing; a saved program may have a different profile.
+        outcome.plan = self.plan(model, context)
         if build_failure is not None:
             # A backend error is evidence about the tool, not the model. It is
             # still recorded and still judged — SolverSan reports it at INFO —
             # so coverage stays visible instead of the model looking clean.
             outcome.results.append(build_failure)
             outcome.database.extend(self.judge(build_failure, model, context, NOMINAL))
-            outcome.note = "backend could not build the model"
+            outcome.note = ("compiler proved a violation in the declared model"
+                            if build_failure.status is ExecutionStatus.FAILED else
+                            "backend could not build the model")
             return outcome
 
         for sanitizer in self.registry.static_analyzers():

@@ -93,6 +93,20 @@ class VariableObservation(Anchored):
 
 
 @dataclass
+class UnorderedVariableObservation(Anchored):
+    """A measured value whose reported time cannot establish a trajectory.
+
+    Row order and the unmodified reported coordinate remain evidence. They do
+    not become a validated observation time or imply either side of an event.
+    Only properties that are independent of temporal order may use these values.
+    """
+
+    value: float = 0.0
+    reported_time: float | None = None
+    row_index: int = 0
+
+
+@dataclass
 class ExpressionObservation(Anchored):
     """The value of an instrumented sub-expression.
 
@@ -110,6 +124,7 @@ class EquationResidual(Anchored):
 
     residual: float = 0.0
     scale: float | None = None
+    coordinates: str = "published"
 
 
 # ── Events ───────────────────────────────────────────────────────────────────
@@ -137,6 +152,7 @@ class SolverStep(Observation):
     step_size: float = 0.0
     accepted: bool = True
     nonlinear_iterations: int = 0
+    coordinates: str = "integrator"
 
 
 @dataclass
@@ -145,6 +161,10 @@ class JacobianObservation(Observation):
     condition_estimate: float | None = None
     rank: int | None = None
     dimension: int = 0
+    rows: list[int] = field(default_factory=list)
+    columns: list[int] = field(default_factory=list)
+    values_column_major: list[float | None] = field(default_factory=list)
+    coordinates: str = "internal-evaluation"
 
 
 # ── Failures. First-class observations, not absences. ────────────────────────
@@ -163,6 +183,7 @@ class ExecutionFailureObservation(Anchored):
 class CompilationFailure(ExecutionFailureObservation):
     phase: ExecutionPhase = ExecutionPhase.COMPILATION
     kind: FailureKind = FailureKind.COMPILATION_ERROR
+    diagnostic: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -227,11 +248,10 @@ class ObservationStream:
 
     @property
     def has_trace(self) -> bool:
-        """Whether any variable was actually observed.
+        """Whether any variable has validated temporal observations.
 
-        Sanitizers do not test this themselves — the planner uses it to decide
-        which sanitizers could run at all, so that "no finding" never silently
-        means "no data".
+        Unordered value samples deliberately do not constitute a trajectory;
+        only explicitly order-independent analyses may consume them.
         """
         return any(isinstance(o, VariableObservation) for o in self.observations)
 

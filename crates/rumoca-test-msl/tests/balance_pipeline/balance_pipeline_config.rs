@@ -143,6 +143,8 @@ pub(crate) struct MslParityConfig {
     /// models rumoca already simulates. Needed by the long-budget event-cohort
     /// lane, where the point is to compare models that are *not* yet `sim_ok`.
     pub all_omc_targets: Option<bool>,
+    pub omc_script_mode: Option<bool>,
+    pub no_plots: Option<bool>,
 }
 
 /// Load (once) the MSL parity configuration from [`parity_config_path`]. A

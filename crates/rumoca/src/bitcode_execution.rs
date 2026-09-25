@@ -1,4 +1,5 @@
 //! CLI boundaries for public, writable execution artifacts.
+mod overrides;
 use anyhow::{Context, Result, bail};
 use clap::Args;
 use rumoca_bitcode::{Encoding, RbcFile};
@@ -38,6 +39,15 @@ pub struct RunArgs {
     /// Optional ordinary simulation result, for independent neutrality tests.
     #[arg(long)]
     pub result: Option<PathBuf>,
+    /// Set a retained tunable scalar parameter without re-lowering.
+    #[arg(long = "param")]
+    pub parameters: Vec<String>,
+    /// Override a scalar state start (refuses explicit initialization owners).
+    #[arg(long = "initial")]
+    pub initial_values: Vec<String>,
+    /// Capture reached scalar domain violations with the native interpreter.
+    #[arg(long)]
+    pub domain_diagnostics: bool,
 }
 
 pub fn digest(file: &RbcFile) -> Result<String> {
@@ -152,7 +162,9 @@ pub fn run(args: RunArgs) -> Result<()> {
     {
         bail!("invalid simulation interval/tolerances");
     }
-    let (file, _) = rumoca_bitcode::read_file(&args.input)?;
+    let (mut file, _) = rumoca_bitcode::read_file(&args.input)?;
+    check(&file)?;
+    overrides::apply(&mut file, &args.parameters, &args.initial_values)?;
     check(&file)?;
     let options = rumoca_sim::SimOptions {
         t_start: args.start,
@@ -163,7 +175,12 @@ pub fn run(args: RunArgs) -> Result<()> {
         solver_mode: rumoca_sim::SimSolverMode::RkLike,
         ..Default::default()
     };
-    let result = rumoca_sim::execution::run(
+    let runner = if args.domain_diagnostics {
+        rumoca_sim::execution::run_with_domain_diagnostics
+    } else {
+        rumoca_sim::execution::run
+    };
+    let result = runner(
         file.execution.as_ref().context("missing executable")?,
         &options,
         &args.trace_root,

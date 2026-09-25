@@ -1,0 +1,631 @@
+{
+  "note": "Supplemental linked PR, excluded from the open-issue census",
+  "pull_request": {
+    "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800",
+    "number": 4800,
+    "state": "open",
+    "merged": false,
+    "mergeable": true,
+    "draft": false,
+    "body": "When investigating the relation between spatial flux density distribution of a rotating rotor (with permanent magnets) and the flux linkage of a coil in the stator core (to calculate the induce voltage), I have to calculate an integral over the angle spanned by the coil. Since quadratureLobatto has some problems with a moving integration interval, I implemented two less sophisticated quadrature functions: quadratureTrapezoidal (based on the trapezoidal rule) and quadratureSimpson (based on Simpson's rule). \r\nBoth are tested in the example MovingIntegral (using the utility function funB). That's also a nice example for the usage of quadrature functions. Defined comparison signals, no backwards compatibility issues.",
+    "title": "Math.Nonlinear.quadratureNewtonCotes",
+    "base": "master",
+    "base_sha": "4c40388dde27ccb6702cea876adbf54c76d75b97",
+    "head": "Quadrature",
+    "head_sha": "83963838130468774c91136b8c17d35b65518e0b",
+    "head_repo_id": 189872337,
+    "head_repo_full_name": "AHaumer/ModelicaStandardLibrary",
+    "merge_commit_sha": "854cf9ef2a3eed25e9bba6f3079dddb854576929",
+    "user": {
+      "login": "AHaumer",
+      "name": "AHaumer",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+      "id": 6900273
+    },
+    "requested_reviewers": [
+      {
+        "login": "maltelenz",
+        "name": "maltelenz",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/329963?v=4",
+        "id": 329963
+      },
+      {
+        "login": "christiankral",
+        "name": "christiankral",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/4184218?v=4",
+        "id": 4184218
+      },
+      {
+        "login": "casella",
+        "name": "casella",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/4233148?v=4",
+        "id": 4233148
+      },
+      {
+        "login": "MartinOtter",
+        "name": "MartinOtter",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/7248038?v=4",
+        "id": 7248038
+      },
+      {
+        "login": "henrikt-ma",
+        "name": "henrikt-ma",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/25294143?v=4",
+        "id": 25294143
+      }
+    ],
+    "requested_team_reviewers": null,
+    "diff": "@@ -347,6 +347,88 @@ The displacement field <code>u(c,t)</code> of a particle (where <code>c</code> i\n         experiment(StopTime=5));\n     end QuadratureLobatto3;\n \n+    model MovingIntegral\n+      extends Modelica.Icons.Example;\n+      import Modelica.Units.SI;\n+      import Modelica.Constants.pi;\n+      import funB=Modelica.Math.Nonlinear.Examples.UtilityFunctions.funB;\n+      import Modelica.Math.Nonlinear.quadratureLobatto;\n+      import Modelica.Math.Nonlinear.quadratureNewtonCotes;\n+      parameter SI.MagneticFluxDensity Bpeak=1 \"Amplitude\";\n+      parameter SI.Angle alfa(final min=0, final max=pi)=2*pi/3 \"Pole coverage\";\n+      parameter SI.Angle beta(final min=0, final max=pi)=pi \"Coil width\";\n+      parameter Integer N=180 \"Number of intervals\";\n+      SI.Angle pos=2*pi*time/Tend \"Position\";\n+      SI.MagneticFluxDensity B=Bpeak*funB(pos, alfa) \"Flux density\";\n+      parameter SI.MagneticFlux psi0=Bpeak*wlD*(min(alfa, beta) +\n+        (if alfa<beta then (1 + (pi/2 - beta/2)/(pi/2 - alfa/2))/2*(beta - alfa) else 0))\n+        \"Max. flux linkage (analytical)\";\n+      SI.MagneticFlux psi1=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2 - beta/2, pos + pi/2  + beta/2, N=N, d=1)\n+        \"Flux linkage using trapezoidal rule\";\n+      SI.MagneticFlux psi2=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=2)\n+        \"Flux linkage using Simpson's rule\";\n+      SI.MagneticFlux psi3=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=3)\n+        \"Flux linkage using 3/8-rule\";\n+      SI.MagneticFlux psi4=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=4)\n+        \"Flux linkage using Boole's rule\";\n+      SI.MagneticFlux psi5=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=5)\n+        \"Flux linkage using d=5\";\n+      SI.MagneticFlux psi6=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=6)\n+        \"Flux linkage using d=6\";\n+      SI.Voltage v=-(psi1 - xi)/Td \"Induced voltage\";\n+    protected\n+      constant SI.Time Tend=1 \"Stop time of simulation\";\n+      constant SI.Area wlD=100*0.05*0.05 \"Number of turns x length x diameter\";\n+      parameter SI.Time Td(min=Modelica.Constants.small)=0.001 \"Derivative time constant\";\n+      SI.MagneticFlux xi(start=psi0, fixed=true) \"Internal DT1-variable\";\n+    equation\n+      der(xi) = -v;\n+      annotation (experiment(\n+          StopTime=1,\n+          Interval=0.001,\n+          Tolerance=1e-06), Documentation(info=\"<html>\n+<p>\n+This example tests quadrature functions:\n+</p>\n+<p>\n+The function <a hRef=\\\"modelica://Modelica.Math.Nonlinear.UtilityFunctions.funB\\\"><code>funB</code></a> \n+defines the spatial distribution of the flux density with respect to the rotor surface, dependent on pole coverage &alpha;.\n+</p>\n+<p>\n+As the rotor position increases, the flux linkage of a coil of width <code>&beta;</code> is caculated \n+by integration over the interval <code>[pos + &pi;/2 - beta/2, pos + &pi;/2 + &beta;/2]</code>.\n+</p>\n+<p>\n+The maximum of the flux linkage <code>psi0</code> is calculated using analytically. \n+</p>\n+<ul>\n+<li><code>psi1</code> is the result of the moving integral using <strong>d=1 trapezoidal rule</strong></li>\n+<li><code>psi2</code> is the result of the moving integral using <strong>d=2 Simpson's rule</strong></li>\n+<li><code>psi3</code> is the result of the moving integral using <strong>d=3 3/8-rule</strong></li>\n+<li><code>psi4</code> is the result of the moving integral using <strong>d=4 Boole's rule</strong></li>\n+<li><code>psi5</code> is the result of the moving integral using <strong>d=5</strong></li>\n+<li><code>psi6</code> is the result of the moving integral using <strong>d=6</strong></li>\n+</ul>\n+<p>\n+At <code>time = 0</code>, the positive maximum of flux density distribution is at <code>pos = &pi;/2</code>, \n+the coil spans the angle <code>[&pi;/2 - &beta;/2, &pi;/2 + &beta;/2]</code>. \n+Therefore the flux linkage has a maximum.\n+</p>\n+<div>\n+<img src=\\\"modelica://Modelica/Resources/Images/Math/Nonlinear/Examples/MovingIntegral.png\\\" alt=\\\"Moving Integral\\\">\n+</div>\n+<p>\n+Since flux linkage is not differentiable, a derivative with first-order lag is used to calculate induced voltage.\n+</p>\n+</html>\"));\n+    end MovingIntegral;\n+\n     package UtilityFunctions\n       \"Utility functions that are used as function arguments to the examples\"\n       extends Modelica.Icons.UtilitiesPackage;\n@@ -399,6 +481,45 @@ The displacement field <code>u(c,t)</code> of a particle (where <code>c</code> i\n       algorithm\n         y := A*sin(w*u);\n       end fun7;\n+\n+      function funB \"Spatial distribution of flux density\"\n+        extends Modelica.Math.Nonlinear.Interfaces.partialScalarFunction;\n+        import Modelica.Math.wrapAngle;\n+        import Modelica.Units.SI;\n+        import Modelica.Constants.pi;\n+        input SI.Angle alfa \"Pole coverage\";\n+      protected\n+        SI.Angle gap \"Pole gap\";\n+        SI.Angle b[4] \"Borders between linear and constant\";\n+        SI.Angle x \"Angle wrapped to [0, 2*pi)\";\n+      algorithm\n+        gap:=pi - alfa;\n+        b:={gap/2, pi - gap/2, pi + gap/2, 2*pi - gap/2};\n+        x:=wrapAngle(u, positiveRange=true);\n+        if x<b[1] then\n+          y:= 0 + (x - 0)   *2/gap;\n+        elseif x<b[2] then\n+          y:=+1;\n+        elseif x<b[3] then\n+          y:=+1 - (x - b[2])*2/gap;\n+        elseif x<b[4] then\n+          y:=-1;\n+        else\n+          y:=-1 + (x - b[4])*2/gap;\n+        end if;\n+        annotation (Documentation(info=\"<html>\n+<p>\n+This function defines a piecewise linear function on the interval [0, 2*&pi;], &alpha; indicates the angle of pole coverage. \n+</p>\n+<ul>\n+<li><pre>  &pi;/2 - &alpha;/2 &lt; x &lt;   &pi;/2 + &alpha;/2: y = +1</pre></li>\n+<li><pre>3*&pi;/2 - &alpha;/2 &lt; x &lt; 3*&pi;/2 + &alpha;/2: y = -1</pre></li>\n+</ul>\n+<p>\n+In the remaining intervals the function is a linear transition between positive and negative roof (trapezoidal shape).\n+</p>\n+</html>\"));\n+      end funB;\n       annotation (Documentation(info=\"<html>\n <p>\n This package provides utility functions that are used as input\n@@ -631,6 +752,72 @@ See the examples in <a href=\\\"modelica://Modelica.Math.Nonlinear.Examples\\\">Mode\n </html>\"));\n   end quadratureLobatto;\n \n+  function quadratureNewtonCotes \"Quadrature using the Newton-Cotes formulas\"\n+    extends Modelica.Icons.Function;\n+    input Modelica.Math.Nonlinear.Interfaces.partialScalarFunction f \"Integrand function\";\n+    input Real a \"Lower limit of integration interval\";\n+    input Real b \"Upper limit of integration interval\";\n+    input Integer N = 360 \"Number of intervals\";\n+    input Integer d(final min=1, final max=6) = 1 \"Degree of interpolation polynominal\";\n+    output Real integral \"Integral value\";\n+  protected\n+    constant Real c[6,7]={\n+      { 1,  1,  0,  0,  0,  0, 0},\n+      { 1,  4,  1,  0,  0,  0, 0},\n+      { 1,  3,  3,  1,  0,  0, 0},\n+      { 7, 32, 12, 32,  7,  0, 0},\n+      {19, 75, 50, 50, 75, 19, 0},\n+      {41,216, 27,272, 27,216,41}} \"Coefficients\";\n+    Real cRow[d + 1]=c[d, 1:d + 1] \"Used row\";\n+    Integer n=N + mod(-N, d) \"Ensure number of intervals is a multiple of d\";\n+    Real h=(b - a)/n \"Width of intervals\";\n+    Real x[n + 1]=linspace(a, b, n + 1) \"Knots\";\n+    Real y[n + 1] \"Function evaluations at knots\";\n+  algorithm\n+    y:={f(x[k]) for k in 1:n + 1};\n+    integral:=0;\n+    for kp in d:d:n loop\n+      integral:=integral + sum(cRow[k]*y[kp -d + k] for k in 1:d + 1);\n+    end for;\n+    integral:=integral*h*d/sum(cRow);\n+    annotation (Documentation(info=\"<html>\n+<h4>Syntax</h4>\n+<blockquote><pre>\n+<strong>quadratureNewtonCotes</strong>(function f(), a, b);\n+<strong>quadratureNewtonCotes</strong>(function f(), a, b, N=1440);\n+<strong>quadratureNewtonCotes</strong>(function f(), a, b, N=1440, d=1);\n+</pre></blockquote>\n+\n+<h4>Description</h4>\n+<p>\n+Compute definite integral over function f(u,...) from u=a up to u=b using the \n+<a href=\\\"https://en.wikipedia.org/wiki/Newton%E2%80%93Cotes_formulas#Closed_Newton%E2%80%93Cotes_formulas\\\">closed Newton-Cotes formulas</a>.\n+</p>\n+<p>\n+<code>N</code> refers to the number of intervals to be used.<br>\n+<code>1 &le; d &le; 6</code> refers to the degree of the used interpolation polynomial:\n+</p>\n+<ul>\n+<li><code>d=1</code> trapezoidal rule</li>\n+<li><code>d=2</code> Simpson's rule</li>\n+<li><code>d=3</code> 3/8-rule</li>\n+<li><code>d=4</code> Boole's rule</li>\n+<li><code>d=5</code> - </li>\n+<li><code>d=6</code> - </li>\n+</ul>\n+<h4>Note</h4>\n+<p>\n+Higher degree of interpolation polynomial are not supported as it increases the chance of high error (Runge's phenomenon). <br>\n+Even degrees of interpolation polynomial should be preferred, since they integrate the same polynomial as the next higher odd degree exactly.\n+</p>\n+<h4>Note</h4>\n+<p>\n+The formulas are non-adaptive but composite implementations,\n+i.e. dividing the interval [a, b] into sub-intervals and apply the Newton-Cotes formula to each sub-interval.\n+</p>\n+</html>\"));\n+  end quadratureNewtonCotes;\n+\n   function solveOneNonlinearEquation\n     \"Solve f(u) = 0 in a very reliable and efficient way (f(u_min) and f(u_max) must have different signs)\"\n     extends Modelica.Icons.Function;\n\n@@ -0,0 +1,7 @@\n+time\n+B\n+psi1\n+psi2\n+psi3\n+psi4\n+v",
+    "comments": [
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5387870206",
+        "body": "I managed to implement the first 4 closed Newton-Cotes formulas in 1 function, just distinguished by 1 parameter. \r\nThis is the desired formulation, allowing the user to choose the degree of the interpolation polynominal and the number of intervals.",
+        "user": {
+          "login": "AHaumer",
+          "name": "AHaumer",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+          "id": 6900273
+        },
+        "id": 5387870206,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-08-23T18:55:07Z",
+        "updated_at": "2026-08-23T18:55:07Z",
+        "review": null,
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5529559504",
+        "body": "pinging potential reviewers @christiankral @casella @HansOlsson @henrikt-ma @maltelenz @MartinOtter ",
+        "user": {
+          "login": "AHaumer",
+          "name": "AHaumer",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+          "id": 6900273
+        },
+        "id": 5529559504,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-03T17:29:32Z",
+        "updated_at": "2026-09-03T17:29:32Z",
+        "review": null,
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5585462945",
+        "body": "@HansOlsson to explain the motivation to implement rather simple quadrature formulas:\r\nI tried to use Modelica.Math.Nonlinear.quadratureLobatto, but all 3 tools I've used for testing get stuck (see enclosed model).\r\nThe Newton-Cotes-formulas in this PR work fine on this \"moving integral\" with the same 3 tools.\r\n\r\n[MovingIntegralSinusoidal.zip](https://github.com/user-attachments/files/31957753/MovingIntegralSinusoidal.zip)\r\n",
+        "user": {
+          "login": "AHaumer",
+          "name": "AHaumer",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+          "id": 6900273
+        },
+        "id": 5585462945,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-08T12:54:58Z",
+        "updated_at": "2026-09-08T12:54:58Z",
+        "review": null,
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5586381837",
+        "body": "Looking at the code and at: https://www.researchgate.net/publication/226706221_Adaptive_Quadrature-Revisited (which should replace the ftp-link) my only reaction is that the code is stupid and stupidly obscure.\r\n\r\nWithout looking further: Do you see and understand the stopping criteria for the recursion, and how it relates to tolerance?\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nThe correct answer is:\r\n`   if(is+(i1-i2)==is)`\r\nwhere `is` is computed as original integral times tolerance/eps!\r\n\r\nThere are a number of issues with that:\r\n- It is really really fragile\r\n  - Real comparisons are inherently fragile,\r\n  - Here it adds the logic that (i1-i2) should be evaluated first (maybe happens in Matlab, not guaranteed in Modelica) and the addition not computed with extra bits (may happen).\r\n- As a pure relative tolerance it fails badly if the integral is basically zero. That happens at time=0.25.\r\n- Probably more\r\n\r\n",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 5586381837,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-08T14:03:19Z",
+        "updated_at": "2026-09-08T14:03:19Z",
+        "review": null,
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5586923656",
+        "body": "@HansOlsson no I don't understand the code, and I don't trust it. \r\nThat's why I implemented an alternative much simpler solution.\r\nI do not know who implemented quadratureLobatto. Main authors of Math: Martin Otter and Marcus Baur.\r\n@MartinOtter could you please comment on the issues with quadratureLobatto?",
+        "user": {
+          "login": "AHaumer",
+          "name": "AHaumer",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+          "id": 6900273
+        },
+        "id": 5586923656,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-08T14:40:58Z",
+        "updated_at": "2026-09-08T14:40:58Z",
+        "review": null,
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5587079595",
+        "body": "> @HansOlsson no I don't understand the code, and I don't trust it. That's why I implemented an alternative much simpler solution. I do not know who implemented quadratureLobatto. Main authors of Math: Martin Otter and Marcus Baur. @MartinOtter could you please comment on the issues with quadratureLobatto?\r\n\r\nAs far as I understand the code implements the algorithm from the paper, it's just that the paper is more trying to be clever than correct and robust; so the problem isn't so much the Modelica-implementation as the underlying paper (although there are at least two issues with the Modelica implementation - related to the convergence criteria).\r\n\r\nLooking more at this and the paper contents:\r\n- The authors are proud of their `is+(i1-i2)==is` trick!\r\n- They add a guard against `is` being exactly zero, without considering what happens if `is` is _very close_ to zero.\r\n- The Modelica code uses `10*Modelica.Constans.eps` instead of `Modelica.Constans.eps`. One might think that it loosens up tolerances, but as far as I can tell the consequence is that effectively the _user_ given tolerances are divided by a factor of 10 (even if they are 1e-6 or 1e-7).\r\n\r\nI have tried to patch it as follows:\r\nUse `abs(i1-i2)<is` instead of `is+(i1-i2)==is`, and skip division by `eps` when computing `is`.\r\nReplace tolerance formula by `is := max(abs(is),isabs/10)*tol/10`; where `isabs` is computed using abs of `is`-formula; to guard against almost zero values.",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 5587079595,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-08T14:51:18Z",
+        "updated_at": "2026-09-08T14:51:18Z",
+        "review": null,
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5167155603",
+        "body": "I agree that the original adaptive quadratureLobatto wasn't working - and needs to be updated; see separate PR.\n\nHowever, a non-adaptive Newton-Cotes as this one seems like a step backwards, so:\n- It may be a necessary step backwards\n- Making it adaptive seem possible, but might run into the same issues and clearly take a lot of time to get right\n- A compromise might be to add an optional output for an error estimate\n- Clearly state that it is non-adaptive and highlight the benefits of a non-adaptive algorithm, e.g., that the result is differentiable\n\nThe last option may be the best.\n\n",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 5167155603,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-10T12:38:57Z",
+        "updated_at": null,
+        "review": "COMMENTED",
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#discussion_r3979124820",
+        "body": "```suggestion\nEven degrees of interpolation polynomial should be preferred, since they integrate the same polynomial as the next higher odd degree exactly.\n```",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 3979124820,
+        "pull_request_review_id": 5167160800,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-10T12:39:24Z",
+        "updated_at": "2026-09-10T12:39:24Z",
+        "review": null,
+        "side": "RIGHT",
+        "line": null,
+        "start_line": null,
+        "path": "Modelica/Math/Nonlinear.mo"
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5167160800",
+        "body": "",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 5167160800,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-10T12:39:24Z",
+        "updated_at": null,
+        "review": "COMMENTED",
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5167285872",
+        "body": "",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 5167285872,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-10T12:50:50Z",
+        "updated_at": null,
+        "review": "COMMENTED",
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#discussion_r3979227398",
+        "body": "However, a higher degree also decrease the error (if smooth enough etc).\n\nLooking at the Wikipedia page specifically https://en.wikipedia.org/wiki/Newton%E2%80%93Cotes_formulas#Instability_for_high_degree I tend to think the text is discussing an _even_ higher degree (which is possible), so one possibility would be:\n```suggestion\nHigher degree of interpolation polynomial are not supported as it increases the chance of high error (Runge's phenomenon). <br>\n```",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 3979227398,
+        "pull_request_review_id": 5167285872,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-10T12:50:51Z",
+        "updated_at": "2026-09-10T12:53:20Z",
+        "review": null,
+        "side": "RIGHT",
+        "line": null,
+        "start_line": null,
+        "path": "Modelica/Math/Nonlinear.mo"
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5176040291",
+        "body": "Looks ok, but might better document that it is non-adaptive which gives differentiable results.",
+        "user": {
+          "login": "HansOlsson",
+          "name": "HansOlsson",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+          "id": 13217430
+        },
+        "id": 5176040291,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-11T07:32:34Z",
+        "updated_at": null,
+        "review": "APPROVED",
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      },
+      {
+        "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5646067648",
+        "body": "@HansOlsson differentiable with respect to what? fun? a and b?\r\nAt least in my example it doesn't work to use `v=-der(psi);`\r\n\r\nError term: Good idea but rather hard to compute, you need a higher derivative of the integrand (taken from Wikipedia):\r\n<img width=\"706\" height=\"287\" alt=\"grafik\" src=\"https://github.com/user-attachments/assets/5eda878f-f951-40d1-b039-8ff7136745f2\" />\r\nThe variable &#958; should be varied over the whole interval [a, b] and pick the highest value of the derivative.\r\n\r\nSo the only thing that remains is to state that the formulas are non-adaptive but \"composite\" fomrulations, \r\ni.e. dividing the interval [a, b] into sub-intervals and apply the Newton-Cotes formula to each sub-interval.",
+        "user": {
+          "login": "AHaumer",
+          "name": "AHaumer",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+          "id": 6900273
+        },
+        "id": 5646067648,
+        "pull_request_review_id": null,
+        "in_reply_to_id": null,
+        "created_at": "2026-09-12T13:05:36Z",
+        "updated_at": "2026-09-12T13:09:41Z",
+        "review": null,
+        "side": null,
+        "line": null,
+        "start_line": null,
+        "path": null
+      }
+    ],
+    "created_at": "2026-08-22T19:05:49Z",
+    "updated_at": "2026-09-16T06:41:47Z",
+    "closed_at": null,
+    "merged_at": null,
+    "commits": 18,
+    "changed_files": 3,
+    "additions": 194,
+    "deletions": 0,
+    "display_url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800",
+    "display_title": "Math.Nonlinear.quadratureNewtonCotes"
+  },
+  "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800",
+  "title": "Math.Nonlinear.quadratureNewtonCotes",
+  "diff": "@@ -347,6 +347,88 @@ The displacement field <code>u(c,t)</code> of a particle (where <code>c</code> i\n         experiment(StopTime=5));\n     end QuadratureLobatto3;\n \n+    model MovingIntegral\n+      extends Modelica.Icons.Example;\n+      import Modelica.Units.SI;\n+      import Modelica.Constants.pi;\n+      import funB=Modelica.Math.Nonlinear.Examples.UtilityFunctions.funB;\n+      import Modelica.Math.Nonlinear.quadratureLobatto;\n+      import Modelica.Math.Nonlinear.quadratureNewtonCotes;\n+      parameter SI.MagneticFluxDensity Bpeak=1 \"Amplitude\";\n+      parameter SI.Angle alfa(final min=0, final max=pi)=2*pi/3 \"Pole coverage\";\n+      parameter SI.Angle beta(final min=0, final max=pi)=pi \"Coil width\";\n+      parameter Integer N=180 \"Number of intervals\";\n+      SI.Angle pos=2*pi*time/Tend \"Position\";\n+      SI.MagneticFluxDensity B=Bpeak*funB(pos, alfa) \"Flux density\";\n+      parameter SI.MagneticFlux psi0=Bpeak*wlD*(min(alfa, beta) +\n+        (if alfa<beta then (1 + (pi/2 - beta/2)/(pi/2 - alfa/2))/2*(beta - alfa) else 0))\n+        \"Max. flux linkage (analytical)\";\n+      SI.MagneticFlux psi1=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2 - beta/2, pos + pi/2  + beta/2, N=N, d=1)\n+        \"Flux linkage using trapezoidal rule\";\n+      SI.MagneticFlux psi2=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=2)\n+        \"Flux linkage using Simpson's rule\";\n+      SI.MagneticFlux psi3=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=3)\n+        \"Flux linkage using 3/8-rule\";\n+      SI.MagneticFlux psi4=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=4)\n+        \"Flux linkage using Boole's rule\";\n+      SI.MagneticFlux psi5=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=5)\n+        \"Flux linkage using d=5\";\n+      SI.MagneticFlux psi6=Bpeak*wlD*quadratureNewtonCotes(function funB(alfa=alfa),\n+        pos + pi/2  - beta/2, pos + pi/2  + beta/2, N=N, d=6)\n+        \"Flux linkage using d=6\";\n+      SI.Voltage v=-(psi1 - xi)/Td \"Induced voltage\";\n+    protected\n+      constant SI.Time Tend=1 \"Stop time of simulation\";\n+      constant SI.Area wlD=100*0.05*0.05 \"Number of turns x length x diameter\";\n+      parameter SI.Time Td(min=Modelica.Constants.small)=0.001 \"Derivative time constant\";\n+      SI.MagneticFlux xi(start=psi0, fixed=true) \"Internal DT1-variable\";\n+    equation\n+      der(xi) = -v;\n+      annotation (experiment(\n+          StopTime=1,\n+          Interval=0.001,\n+          Tolerance=1e-06), Documentation(info=\"<html>\n+<p>\n+This example tests quadrature functions:\n+</p>\n+<p>\n+The function <a hRef=\\\"modelica://Modelica.Math.Nonlinear.UtilityFunctions.funB\\\"><code>funB</code></a> \n+defines the spatial distribution of the flux density with respect to the rotor surface, dependent on pole coverage &alpha;.\n+</p>\n+<p>\n+As the rotor position increases, the flux linkage of a coil of width <code>&beta;</code> is caculated \n+by integration over the interval <code>[pos + &pi;/2 - beta/2, pos + &pi;/2 + &beta;/2]</code>.\n+</p>\n+<p>\n+The maximum of the flux linkage <code>psi0</code> is calculated using analytically. \n+</p>\n+<ul>\n+<li><code>psi1</code> is the result of the moving integral using <strong>d=1 trapezoidal rule</strong></li>\n+<li><code>psi2</code> is the result of the moving integral using <strong>d=2 Simpson's rule</strong></li>\n+<li><code>psi3</code> is the result of the moving integral using <strong>d=3 3/8-rule</strong></li>\n+<li><code>psi4</code> is the result of the moving integral using <strong>d=4 Boole's rule</strong></li>\n+<li><code>psi5</code> is the result of the moving integral using <strong>d=5</strong></li>\n+<li><code>psi6</code> is the result of the moving integral using <strong>d=6</strong></li>\n+</ul>\n+<p>\n+At <code>time = 0</code>, the positive maximum of flux density distribution is at <code>pos = &pi;/2</code>, \n+the coil spans the angle <code>[&pi;/2 - &beta;/2, &pi;/2 + &beta;/2]</code>. \n+Therefore the flux linkage has a maximum.\n+</p>\n+<div>\n+<img src=\\\"modelica://Modelica/Resources/Images/Math/Nonlinear/Examples/MovingIntegral.png\\\" alt=\\\"Moving Integral\\\">\n+</div>\n+<p>\n+Since flux linkage is not differentiable, a derivative with first-order lag is used to calculate induced voltage.\n+</p>\n+</html>\"));\n+    end MovingIntegral;\n+\n     package UtilityFunctions\n       \"Utility functions that are used as function arguments to the examples\"\n       extends Modelica.Icons.UtilitiesPackage;\n@@ -399,6 +481,45 @@ The displacement field <code>u(c,t)</code> of a particle (where <code>c</code> i\n       algorithm\n         y := A*sin(w*u);\n       end fun7;\n+\n+      function funB \"Spatial distribution of flux density\"\n+        extends Modelica.Math.Nonlinear.Interfaces.partialScalarFunction;\n+        import Modelica.Math.wrapAngle;\n+        import Modelica.Units.SI;\n+        import Modelica.Constants.pi;\n+        input SI.Angle alfa \"Pole coverage\";\n+      protected\n+        SI.Angle gap \"Pole gap\";\n+        SI.Angle b[4] \"Borders between linear and constant\";\n+        SI.Angle x \"Angle wrapped to [0, 2*pi)\";\n+      algorithm\n+        gap:=pi - alfa;\n+        b:={gap/2, pi - gap/2, pi + gap/2, 2*pi - gap/2};\n+        x:=wrapAngle(u, positiveRange=true);\n+        if x<b[1] then\n+          y:= 0 + (x - 0)   *2/gap;\n+        elseif x<b[2] then\n+          y:=+1;\n+        elseif x<b[3] then\n+          y:=+1 - (x - b[2])*2/gap;\n+        elseif x<b[4] then\n+          y:=-1;\n+        else\n+          y:=-1 + (x - b[4])*2/gap;\n+        end if;\n+        annotation (Documentation(info=\"<html>\n+<p>\n+This function defines a piecewise linear function on the interval [0, 2*&pi;], &alpha; indicates the angle of pole coverage. \n+</p>\n+<ul>\n+<li><pre>  &pi;/2 - &alpha;/2 &lt; x &lt;   &pi;/2 + &alpha;/2: y = +1</pre></li>\n+<li><pre>3*&pi;/2 - &alpha;/2 &lt; x &lt; 3*&pi;/2 + &alpha;/2: y = -1</pre></li>\n+</ul>\n+<p>\n+In the remaining intervals the function is a linear transition between positive and negative roof (trapezoidal shape).\n+</p>\n+</html>\"));\n+      end funB;\n       annotation (Documentation(info=\"<html>\n <p>\n This package provides utility functions that are used as input\n@@ -631,6 +752,72 @@ See the examples in <a href=\\\"modelica://Modelica.Math.Nonlinear.Examples\\\">Mode\n </html>\"));\n   end quadratureLobatto;\n \n+  function quadratureNewtonCotes \"Quadrature using the Newton-Cotes formulas\"\n+    extends Modelica.Icons.Function;\n+    input Modelica.Math.Nonlinear.Interfaces.partialScalarFunction f \"Integrand function\";\n+    input Real a \"Lower limit of integration interval\";\n+    input Real b \"Upper limit of integration interval\";\n+    input Integer N = 360 \"Number of intervals\";\n+    input Integer d(final min=1, final max=6) = 1 \"Degree of interpolation polynominal\";\n+    output Real integral \"Integral value\";\n+  protected\n+    constant Real c[6,7]={\n+      { 1,  1,  0,  0,  0,  0, 0},\n+      { 1,  4,  1,  0,  0,  0, 0},\n+      { 1,  3,  3,  1,  0,  0, 0},\n+      { 7, 32, 12, 32,  7,  0, 0},\n+      {19, 75, 50, 50, 75, 19, 0},\n+      {41,216, 27,272, 27,216,41}} \"Coefficients\";\n+    Real cRow[d + 1]=c[d, 1:d + 1] \"Used row\";\n+    Integer n=N + mod(-N, d) \"Ensure number of intervals is a multiple of d\";\n+    Real h=(b - a)/n \"Width of intervals\";\n+    Real x[n + 1]=linspace(a, b, n + 1) \"Knots\";\n+    Real y[n + 1] \"Function evaluations at knots\";\n+  algorithm\n+    y:={f(x[k]) for k in 1:n + 1};\n+    integral:=0;\n+    for kp in d:d:n loop\n+      integral:=integral + sum(cRow[k]*y[kp -d + k] for k in 1:d + 1);\n+    end for;\n+    integral:=integral*h*d/sum(cRow);\n+    annotation (Documentation(info=\"<html>\n+<h4>Syntax</h4>\n+<blockquote><pre>\n+<strong>quadratureNewtonCotes</strong>(function f(), a, b);\n+<strong>quadratureNewtonCotes</strong>(function f(), a, b, N=1440);\n+<strong>quadratureNewtonCotes</strong>(function f(), a, b, N=1440, d=1);\n+</pre></blockquote>\n+\n+<h4>Description</h4>\n+<p>\n+Compute definite integral over function f(u,...) from u=a up to u=b using the \n+<a href=\\\"https://en.wikipedia.org/wiki/Newton%E2%80%93Cotes_formulas#Closed_Newton%E2%80%93Cotes_formulas\\\">closed Newton-Cotes formulas</a>.\n+</p>\n+<p>\n+<code>N</code> refers to the number of intervals to be used.<br>\n+<code>1 &le; d &le; 6</code> refers to the degree of the used interpolation polynomial:\n+</p>\n+<ul>\n+<li><code>d=1</code> trapezoidal rule</li>\n+<li><code>d=2</code> Simpson's rule</li>\n+<li><code>d=3</code> 3/8-rule</li>\n+<li><code>d=4</code> Boole's rule</li>\n+<li><code>d=5</code> - </li>\n+<li><code>d=6</code> - </li>\n+</ul>\n+<h4>Note</h4>\n+<p>\n+Higher degree of interpolation polynomial are not supported as it increases the chance of high error (Runge's phenomenon). <br>\n+Even degrees of interpolation polynomial should be preferred, since they integrate the same polynomial as the next higher odd degree exactly.\n+</p>\n+<h4>Note</h4>\n+<p>\n+The formulas are non-adaptive but composite implementations,\n+i.e. dividing the interval [a, b] into sub-intervals and apply the Newton-Cotes formula to each sub-interval.\n+</p>\n+</html>\"));\n+  end quadratureNewtonCotes;\n+\n   function solveOneNonlinearEquation\n     \"Solve f(u) = 0 in a very reliable and efficient way (f(u_min) and f(u_max) must have different signs)\"\n     extends Modelica.Icons.Function;\n\n@@ -0,0 +1,7 @@\n+time\n+B\n+psi1\n+psi2\n+psi3\n+psi4\n+v",
+  "comments": [
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5387870206",
+      "body": "I managed to implement the first 4 closed Newton-Cotes formulas in 1 function, just distinguished by 1 parameter. \r\nThis is the desired formulation, allowing the user to choose the degree of the interpolation polynominal and the number of intervals.",
+      "user": {
+        "login": "AHaumer",
+        "name": "AHaumer",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+        "id": 6900273
+      },
+      "id": 5387870206,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-08-23T18:55:07Z",
+      "updated_at": "2026-08-23T18:55:07Z",
+      "review": null,
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5529559504",
+      "body": "pinging potential reviewers @christiankral @casella @HansOlsson @henrikt-ma @maltelenz @MartinOtter ",
+      "user": {
+        "login": "AHaumer",
+        "name": "AHaumer",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+        "id": 6900273
+      },
+      "id": 5529559504,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-03T17:29:32Z",
+      "updated_at": "2026-09-03T17:29:32Z",
+      "review": null,
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5585462945",
+      "body": "@HansOlsson to explain the motivation to implement rather simple quadrature formulas:\r\nI tried to use Modelica.Math.Nonlinear.quadratureLobatto, but all 3 tools I've used for testing get stuck (see enclosed model).\r\nThe Newton-Cotes-formulas in this PR work fine on this \"moving integral\" with the same 3 tools.\r\n\r\n[MovingIntegralSinusoidal.zip](https://github.com/user-attachments/files/31957753/MovingIntegralSinusoidal.zip)\r\n",
+      "user": {
+        "login": "AHaumer",
+        "name": "AHaumer",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+        "id": 6900273
+      },
+      "id": 5585462945,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-08T12:54:58Z",
+      "updated_at": "2026-09-08T12:54:58Z",
+      "review": null,
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5586381837",
+      "body": "Looking at the code and at: https://www.researchgate.net/publication/226706221_Adaptive_Quadrature-Revisited (which should replace the ftp-link) my only reaction is that the code is stupid and stupidly obscure.\r\n\r\nWithout looking further: Do you see and understand the stopping criteria for the recursion, and how it relates to tolerance?\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nThe correct answer is:\r\n`   if(is+(i1-i2)==is)`\r\nwhere `is` is computed as original integral times tolerance/eps!\r\n\r\nThere are a number of issues with that:\r\n- It is really really fragile\r\n  - Real comparisons are inherently fragile,\r\n  - Here it adds the logic that (i1-i2) should be evaluated first (maybe happens in Matlab, not guaranteed in Modelica) and the addition not computed with extra bits (may happen).\r\n- As a pure relative tolerance it fails badly if the integral is basically zero. That happens at time=0.25.\r\n- Probably more\r\n\r\n",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 5586381837,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-08T14:03:19Z",
+      "updated_at": "2026-09-08T14:03:19Z",
+      "review": null,
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5586923656",
+      "body": "@HansOlsson no I don't understand the code, and I don't trust it. \r\nThat's why I implemented an alternative much simpler solution.\r\nI do not know who implemented quadratureLobatto. Main authors of Math: Martin Otter and Marcus Baur.\r\n@MartinOtter could you please comment on the issues with quadratureLobatto?",
+      "user": {
+        "login": "AHaumer",
+        "name": "AHaumer",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+        "id": 6900273
+      },
+      "id": 5586923656,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-08T14:40:58Z",
+      "updated_at": "2026-09-08T14:40:58Z",
+      "review": null,
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5587079595",
+      "body": "> @HansOlsson no I don't understand the code, and I don't trust it. That's why I implemented an alternative much simpler solution. I do not know who implemented quadratureLobatto. Main authors of Math: Martin Otter and Marcus Baur. @MartinOtter could you please comment on the issues with quadratureLobatto?\r\n\r\nAs far as I understand the code implements the algorithm from the paper, it's just that the paper is more trying to be clever than correct and robust; so the problem isn't so much the Modelica-implementation as the underlying paper (although there are at least two issues with the Modelica implementation - related to the convergence criteria).\r\n\r\nLooking more at this and the paper contents:\r\n- The authors are proud of their `is+(i1-i2)==is` trick!\r\n- They add a guard against `is` being exactly zero, without considering what happens if `is` is _very close_ to zero.\r\n- The Modelica code uses `10*Modelica.Constans.eps` instead of `Modelica.Constans.eps`. One might think that it loosens up tolerances, but as far as I can tell the consequence is that effectively the _user_ given tolerances are divided by a factor of 10 (even if they are 1e-6 or 1e-7).\r\n\r\nI have tried to patch it as follows:\r\nUse `abs(i1-i2)<is` instead of `is+(i1-i2)==is`, and skip division by `eps` when computing `is`.\r\nReplace tolerance formula by `is := max(abs(is),isabs/10)*tol/10`; where `isabs` is computed using abs of `is`-formula; to guard against almost zero values.",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 5587079595,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-08T14:51:18Z",
+      "updated_at": "2026-09-08T14:51:18Z",
+      "review": null,
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5167155603",
+      "body": "I agree that the original adaptive quadratureLobatto wasn't working - and needs to be updated; see separate PR.\n\nHowever, a non-adaptive Newton-Cotes as this one seems like a step backwards, so:\n- It may be a necessary step backwards\n- Making it adaptive seem possible, but might run into the same issues and clearly take a lot of time to get right\n- A compromise might be to add an optional output for an error estimate\n- Clearly state that it is non-adaptive and highlight the benefits of a non-adaptive algorithm, e.g., that the result is differentiable\n\nThe last option may be the best.\n\n",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 5167155603,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-10T12:38:57Z",
+      "updated_at": null,
+      "review": "COMMENTED",
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#discussion_r3979124820",
+      "body": "```suggestion\nEven degrees of interpolation polynomial should be preferred, since they integrate the same polynomial as the next higher odd degree exactly.\n```",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 3979124820,
+      "pull_request_review_id": 5167160800,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-10T12:39:24Z",
+      "updated_at": "2026-09-10T12:39:24Z",
+      "review": null,
+      "side": "RIGHT",
+      "line": null,
+      "start_line": null,
+      "path": "Modelica/Math/Nonlinear.mo"
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5167160800",
+      "body": "",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 5167160800,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-10T12:39:24Z",
+      "updated_at": null,
+      "review": "COMMENTED",
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5167285872",
+      "body": "",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 5167285872,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-10T12:50:50Z",
+      "updated_at": null,
+      "review": "COMMENTED",
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#discussion_r3979227398",
+      "body": "However, a higher degree also decrease the error (if smooth enough etc).\n\nLooking at the Wikipedia page specifically https://en.wikipedia.org/wiki/Newton%E2%80%93Cotes_formulas#Instability_for_high_degree I tend to think the text is discussing an _even_ higher degree (which is possible), so one possibility would be:\n```suggestion\nHigher degree of interpolation polynomial are not supported as it increases the chance of high error (Runge's phenomenon). <br>\n```",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 3979227398,
+      "pull_request_review_id": 5167285872,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-10T12:50:51Z",
+      "updated_at": "2026-09-10T12:53:20Z",
+      "review": null,
+      "side": "RIGHT",
+      "line": null,
+      "start_line": null,
+      "path": "Modelica/Math/Nonlinear.mo"
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#pullrequestreview-5176040291",
+      "body": "Looks ok, but might better document that it is non-adaptive which gives differentiable results.",
+      "user": {
+        "login": "HansOlsson",
+        "name": "HansOlsson",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/13217430?v=4",
+        "id": 13217430
+      },
+      "id": 5176040291,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-11T07:32:34Z",
+      "updated_at": null,
+      "review": "APPROVED",
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    },
+    {
+      "url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800#issuecomment-5646067648",
+      "body": "@HansOlsson differentiable with respect to what? fun? a and b?\r\nAt least in my example it doesn't work to use `v=-der(psi);`\r\n\r\nError term: Good idea but rather hard to compute, you need a higher derivative of the integrand (taken from Wikipedia):\r\n<img width=\"706\" height=\"287\" alt=\"grafik\" src=\"https://github.com/user-attachments/assets/5eda878f-f951-40d1-b039-8ff7136745f2\" />\r\nThe variable &#958; should be varied over the whole interval [a, b] and pick the highest value of the derivative.\r\n\r\nSo the only thing that remains is to state that the formulas are non-adaptive but \"composite\" fomrulations, \r\ni.e. dividing the interval [a, b] into sub-intervals and apply the Newton-Cotes formula to each sub-interval.",
+      "user": {
+        "login": "AHaumer",
+        "name": "AHaumer",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/6900273?v=4",
+        "id": 6900273
+      },
+      "id": 5646067648,
+      "pull_request_review_id": null,
+      "in_reply_to_id": null,
+      "created_at": "2026-09-12T13:05:36Z",
+      "updated_at": "2026-09-12T13:09:41Z",
+      "review": null,
+      "side": null,
+      "line": null,
+      "start_line": null,
+      "path": null
+    }
+  ],
+  "display_url": "https://github.com/modelica/ModelicaStandardLibrary/pull/4800",
+  "display_title": "Math.Nonlinear.quadratureNewtonCotes"
+}

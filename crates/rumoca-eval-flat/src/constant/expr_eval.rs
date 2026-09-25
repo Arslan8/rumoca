@@ -443,57 +443,9 @@ fn apply_subscripts(
     ctx: &EvalContext,
     span: Span,
 ) -> Result<Value, EvalError> {
-    let mut current = value.clone();
-
-    for subscript in subscripts {
-        match subscript {
-            Subscript::Index { value: idx, .. } => {
-                let idx = *idx as usize;
-
-                let arr = current
-                    .as_array()
-                    .ok_or_else(|| EvalError::type_mismatch("Array", current.type_name(), span))?;
-
-                // Modelica uses 1-based indexing
-                if idx < 1 || idx > arr.len() {
-                    return Err(EvalError::IndexOutOfBounds {
-                        index: idx as i64,
-                        size: arr.len(),
-                        span,
-                    });
-                }
-                current = arr[idx - 1].clone();
-            }
-            Subscript::Colon { .. } => {
-                // Colon means "all elements" - just pass through
-                // (this is a simplification; real slicing would need more work)
-            }
-            Subscript::Expr { expr, .. } => {
-                // Evaluate the expression to get the index
-                let idx_val = eval_expr_with_span(expr, ctx, span)?;
-                let idx = idx_val
-                    .as_integer()
-                    .ok_or_else(|| EvalError::type_mismatch("Integer", idx_val.type_name(), span))?
-                    as usize;
-
-                let arr = current
-                    .as_array()
-                    .ok_or_else(|| EvalError::type_mismatch("Array", current.type_name(), span))?;
-
-                // Modelica uses 1-based indexing
-                if idx < 1 || idx > arr.len() {
-                    return Err(EvalError::IndexOutOfBounds {
-                        index: idx as i64,
-                        size: arr.len(),
-                        span,
-                    });
-                }
-                current = arr[idx - 1].clone();
-            }
-        }
-    }
-
-    Ok(current)
+    super::indexing::apply_subscripts(value, subscripts, span, &mut |expr| {
+        eval_expr_with_span(expr, ctx, span)
+    })
 }
 
 /// Try to evaluate an expression to an integer.

@@ -24,6 +24,7 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
 
+mod omc_script;
 mod omc_session;
 mod output;
 mod retry_policy;
@@ -45,6 +46,12 @@ use state_selection::StateSelectionMetric;
 
 #[derive(Debug, Clone, ClapArgs)]
 pub struct Args {
+    /// Run isolated .mos scripts instead of interactive ZeroMQ sessions.
+    #[arg(long, default_value_t = false)]
+    script_mode: bool,
+    /// Write comparison JSON without downloading/building browser plots.
+    #[arg(long, default_value_t = false)]
+    no_plots: bool,
     /// Write the sample OMC command stream instead of running OMC.
     #[arg(long, default_value_t = false)]
     dry_run: bool,
@@ -686,6 +693,7 @@ struct SessionModelOutcome {
 
 /// Shared, immutable context handed to each session worker thread.
 struct SessionWorkerCtx<'a> {
+    script_mode: bool,
     models: &'a [String],
     next: &'a AtomicUsize,
     tx: &'a mpsc::Sender<SessionModelOutcome>,
@@ -758,7 +766,12 @@ fn run_session_pending(
     let load_timeout = Duration::from_secs(120);
     let total = models.len();
     println!(
-        "OMC session pool: {worker_count} persistent omc worker(s) ({pinned} pinned; {physical_cores} physical cores, headroom reserved) over {total} models (MSL loaded once per worker)"
+        "OMC pool: {worker_count} workers ({pinned} pinned; {physical_cores} physical cores) over {total} models; transport={}",
+        if args.script_mode {
+            "isolated scripts"
+        } else {
+            "persistent ZeroMQ"
+        }
     );
 
     let models = Arc::new(models);
@@ -775,8 +788,10 @@ fn run_session_pending(
         let use_experiment = args.use_experiment_stop_time;
         let omc_threads = args.omc_threads;
         let cpu_core_id = core_plan.get(worker_idx).copied().flatten();
+        let script_mode = args.script_mode;
         handles.push(thread::spawn(move || {
             run_one_session_worker(SessionWorkerCtx {
+                script_mode,
                 models: &models,
                 next: &next,
                 tx: &tx,
@@ -837,6 +852,10 @@ fn run_one_session_worker(ctx: SessionWorkerCtx<'_>) {
         let Some(model) = ctx.models.get(idx) else {
             break;
         };
+        if ctx.script_mode {
+            let _ = ctx.tx.send(omc_script::run(&ctx, idx, model));
+            continue;
+        }
         if session.is_none() {
             match OmcSession::spawn(
                 ctx.work_dir,
@@ -1597,6 +1616,7 @@ fn finalize_and_write_output(
         rumoca_runtimes,
         &state,
         &agreeing_models,
+        args.no_plots,
     )?;
     Ok(())
 }

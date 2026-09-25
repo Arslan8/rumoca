@@ -31,29 +31,51 @@ pub(super) fn materialize_function_shape_constants(
         .chain(function.outputs.iter_mut())
         .chain(function.locals.iter_mut())
     {
-        let mut dimensions = parameter.dimensions().to_vec();
-        for (axis, subscript) in parameter.shape_expr.iter_mut().enumerate() {
+        for subscript in &mut parameter.shape_expr {
             materializer.materialize_subscript(subscript)?;
-            if let Subscript::Index { value, .. } = subscript {
-                let dimension = dimensions
-                    .get_mut(axis)
-                    .expect("function shape expressions and dimensions are constructed together");
-                *dimension = *value;
-            }
         }
-        parameter.effective_type = rumoca_core::EffectiveType::new(
-            parameter.effective_type.nominal_type(),
-            parameter.effective_type.canonical_type(),
-            dimensions,
-        )
-        .map_err(|error| {
-            FlattenError::missing_resolved_class_metadata(
-                &parameter.name,
-                format!("materialized function shape: {error}"),
-                parameter.span,
-            )
-        })?;
+        materialize_literal_parameter_shape(parameter)?;
     }
+    Ok(())
+}
+
+/// Keep the checked shape synchronized when a producer resolves a dimension.
+/// Package specialization must do this before constructor layout retention.
+pub(crate) fn materialize_literal_parameter_shape(
+    parameter: &mut rumoca_core::FunctionParam,
+) -> Result<(), FlattenError> {
+    let mut dimensions = parameter.dimensions().to_vec();
+    for (axis, subscript) in parameter.shape_expr.iter_mut().enumerate() {
+        if let Subscript::Expr { expr, .. } = subscript
+            && let Expression::Literal {
+                value: rumoca_core::Literal::Integer(value),
+                span,
+            } = expr.as_ref()
+        {
+            *subscript = Subscript::Index {
+                value: *value,
+                span: *span,
+            };
+        }
+        if let Subscript::Index { value, .. } = subscript {
+            let dimension = dimensions
+                .get_mut(axis)
+                .expect("function shape expressions and dimensions are constructed together");
+            *dimension = *value;
+        }
+    }
+    parameter.effective_type = rumoca_core::EffectiveType::new(
+        parameter.effective_type.nominal_type(),
+        parameter.effective_type.canonical_type(),
+        dimensions,
+    )
+    .map_err(|error| {
+        FlattenError::missing_resolved_class_metadata(
+            &parameter.name,
+            format!("materialized function shape: {error}"),
+            parameter.span,
+        )
+    })?;
     Ok(())
 }
 

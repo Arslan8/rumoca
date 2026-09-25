@@ -15,6 +15,8 @@ from enum import Enum
 class Capability(str, Enum):
     OBSERVE_VARIABLE = "observe_variable"
     OBSERVE_EXPRESSION = "observe_expression"
+    OBSERVE_DOMAIN_FAILURE = "observe_domain_failure"
+    """Reached native scalar domain violation; may have execution-only identity."""
     OBSERVE_EQUATION_RESIDUAL = "observe_equation_residual"
     OBSERVE_JACOBIAN = "observe_jacobian"
     OBSERVE_EVENTS = "observe_events"

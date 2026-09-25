@@ -55,6 +55,7 @@ pub(super) fn write_and_print_speed_comparison(
     rumoca_runtimes: &HashMap<String, RumocaRuntime>,
     state: &SimRunState,
     agreeing_models: &BTreeSet<String>,
+    no_plots: bool,
 ) -> Result<()> {
     let records = collect_speed_records(rumoca_runtimes, state, agreeing_models);
     let size_curve = scaling_curve(&records, SIZE_BINS, |record| record.scalar_equations);
@@ -72,11 +73,13 @@ pub(super) fn write_and_print_speed_comparison(
         &paths.results_dir.join("msl_speed_comparison.json"),
         &build_payload(&records, &size_curve, &state_curve),
     )?;
-    crate::web_assets::ensure_web_vendor_assets(&paths.repo_root)?;
-    std::fs::write(
-        paths.results_dir.join("msl_speed_scaling.html"),
-        generate_scaling_html(&records)?,
-    )?;
+    if !no_plots {
+        crate::web_assets::ensure_web_vendor_assets(&paths.repo_root)?;
+        std::fs::write(
+            paths.results_dir.join("msl_speed_scaling.html"),
+            generate_scaling_html(&records)?,
+        )?;
+    }
     print_speed_comparison(&records, &size_curve);
     Ok(())
 }

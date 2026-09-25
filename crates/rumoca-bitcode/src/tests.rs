@@ -4,6 +4,8 @@
 //! way a malformed artifact could reach reconstruction must be a clean
 //! rejection rather than a panic or an invalid model.
 
+mod clock_transport;
+
 use crate::build::Builder;
 use crate::codec::{Encoding, decode, encode};
 use crate::schema::*;
@@ -630,6 +632,42 @@ fn import_rebuilds_a_checked_dae() {
 }
 
 #[test]
+fn import_preserves_static_and_dynamic_time_event_owners() {
+    let mut model = decay_model();
+    model.time_events = vec![
+        RbcTimeEvent {
+            id: EventId(0),
+            schedule: RbcSchedule::Static {
+                numerator: 1,
+                denominator: 10,
+            },
+            provenance: source_provenance(),
+        },
+        RbcTimeEvent {
+            id: EventId(1),
+            schedule: RbcSchedule::Dynamic {
+                deadline: ExprId(0),
+            },
+            provenance: source_provenance(),
+        },
+    ];
+    recompute_summary(&mut model);
+    let dae = crate::import(&file(model)).expect("time schedules rebuild through checked owners");
+    dae.inspect(|view| {
+        assert_eq!(view.time_event_count(), 2);
+        let first = view.time_event(view.time_event_id(0).unwrap()).unwrap();
+        let instant = first.instant().unwrap();
+        assert_eq!((instant.numerator(), instant.denominator()), (1, 10));
+        assert!(
+            view.time_event(view.time_event_id(1).unwrap())
+                .unwrap()
+                .deadline()
+                .is_some()
+        );
+    });
+}
+
+#[test]
 fn import_refuses_a_dangling_reference() {
     let mut model = decay_model();
     model.equations[0].residual = ExprId(999);
@@ -694,17 +732,13 @@ fn unary_plus_survives_a_round_trip() {
     let again =
         crate::export(&dae, None, &original.model.name, &Default::default()).expect("re-export");
     assert!(
-        again
-            .model
-            .expressions
-            .iter()
-            .any(|expression| matches!(
-                expression.node,
-                RbcExprNode::Unary {
-                    op: RbcUnaryOp::Plus,
-                    ..
-                }
-            )),
+        again.model.expressions.iter().any(|expression| matches!(
+            expression.node,
+            RbcExprNode::Unary {
+                op: RbcUnaryOp::Plus,
+                ..
+            }
+        )),
         "unary plus must survive the round trip rather than be dropped or refused"
     );
 }
@@ -714,23 +748,26 @@ fn textual_ir_round_trips_exactly() {
     // The property that makes it an IR rather than a listing: print, parse,
     // and the artifact is the one you started with.
     let original = file(decay_model());
-    let text = crate::text::print_text_with(
-        &original,
-        crate::text::TextOptions { sources: true },
-    )
-    .expect("print");
+    let text = crate::text::print_text_with(&original, crate::text::TextOptions { sources: true })
+        .expect("print");
     let parsed = crate::text::parse_text(&text).expect("parse");
 
     assert_eq!(original.model.name, parsed.model.name);
     assert_eq!(original.model.variables.len(), parsed.model.variables.len());
-    assert_eq!(original.model.expressions.len(), parsed.model.expressions.len());
+    assert_eq!(
+        original.model.expressions.len(),
+        parsed.model.expressions.len()
+    );
     assert_eq!(original.model.equations.len(), parsed.model.equations.len());
     // Serialize both: field-by-field equality is what "exactly" has to mean,
     // and comparing the encodings checks every field including ones added
     // after this test was written.
     let left = serde_json::to_value(&original.model).expect("encode original");
     let right = serde_json::to_value(&parsed.model).expect("encode parsed");
-    assert_eq!(left, right, "textual round-trip must preserve the whole model");
+    assert_eq!(
+        left, right,
+        "textual round-trip must preserve the whole model"
+    );
 }
 
 #[test]
@@ -743,12 +780,19 @@ fn textual_ir_omits_only_source_text_by_default() {
     let text = crate::text::print_text(&original).expect("print");
     let mut parsed = crate::text::parse_text(&text).expect("parse");
 
-    assert!(original.model.sources.iter().any(|s| s.text.is_some()),
-            "the fixture must carry source text for this to test anything");
-    assert!(parsed.model.sources.iter().all(|s| s.text.is_none()),
-            "the default must omit source text");
+    assert!(
+        original.model.sources.iter().any(|s| s.text.is_some()),
+        "the fixture must carry source text for this to test anything"
+    );
+    assert!(
+        parsed.model.sources.iter().all(|s| s.text.is_none()),
+        "the default must omit source text"
+    );
 
-    for (source, restored) in original.model.sources.iter()
+    for (source, restored) in original
+        .model
+        .sources
+        .iter()
         .zip(parsed.model.sources.iter_mut())
     {
         restored.text = source.text.clone();
@@ -762,15 +806,18 @@ fn textual_ir_omits_only_source_text_by_default() {
 
 #[test]
 fn textual_ir_reports_the_line_of_a_syntax_error() {
-    let text = "rbc 1\nproducer \"x\"\nmodel \"M\"\n$0 type nonsense\n";
+    let text = "rbc 2\nproducer \"x\"\nmodel \"M\"\n$0 type nonsense\n";
     let error = crate::text::parse_text(text).expect_err("must refuse");
     assert_eq!(error.line, 4, "the error must name the offending line");
-    assert!(error.message.contains("nonsense"), "and quote what it saw: {error}");
+    assert!(
+        error.message.contains("nonsense"),
+        "and quote what it saw: {error}"
+    );
 }
 
 #[test]
 fn textual_ir_refuses_an_unclosed_block() {
-    let text = "rbc 1\nmodel \"M\"\ndisc 1 targets %0\n";
+    let text = "rbc 2\nmodel \"M\"\ndisc 1 targets %0\n";
     let error = crate::text::parse_text(text).expect_err("must refuse");
     assert!(error.message.contains("never closed"), "got: {error}");
 }
@@ -812,7 +859,9 @@ fn connection_ids_are_dense_after_filtering() {
 
     let failures = errors(&model);
     assert!(
-        failures.iter().any(|e| e.to_string().contains("connections entry at position 1")),
+        failures
+            .iter()
+            .any(|e| e.to_string().contains("connections entry at position 1")),
         "a hole in the connection ids must be a validation error, got {failures:?}"
     );
 
@@ -858,8 +907,8 @@ fn equation_families_are_exported_and_round_trip() {
     // whole change exists to remove.
     let original = file(model);
     let dae = crate::import(&original).expect("a family with its domain imports");
-    let again = crate::export(&dae, None, "test", &crate::ExportOptions::default())
-        .expect("re-export");
+    let again =
+        crate::export(&dae, None, "test", &crate::ExportOptions::default()).expect("re-export");
     assert_eq!(
         again.model.summary.family_scalar_rows, 3,
         "the rebuilt DAE must still stand for three scalar equations"
@@ -905,11 +954,8 @@ fn the_textual_ir_carries_equation_families() {
     recompute_summary(&mut model);
 
     let original = file(model);
-    let text = crate::text::print_text_with(
-        &original,
-        crate::text::TextOptions { sources: true },
-    )
-    .expect("print");
+    let text = crate::text::print_text_with(&original, crate::text::TextOptions { sources: true })
+        .expect("print");
     let parsed = crate::text::parse_text(&text).expect("parse");
     assert_eq!(
         serde_json::to_value(&original.model).expect("encode original"),
@@ -948,6 +994,7 @@ enum Cost {
 fn cost_of_node(node: &RbcExprNode) -> Cost {
     match node {
         RbcExprNode::Literal { .. } => Cost::Bounded,
+        RbcExprNode::StringConversion { .. } => Cost::Bounded,
         RbcExprNode::Coordinate { .. } => Cost::Bounded,
         RbcExprNode::Unary { .. } => Cost::Bounded,
         RbcExprNode::Binary { .. } => Cost::Bounded,
@@ -1009,15 +1056,14 @@ fn the_expression_arena_cannot_hold_a_cycle() {
     let last = model.expressions.len() - 1;
     model.expressions[last].node = RbcExprNode::Binary {
         op: RbcBinaryOp::Add,
-        lhs: ExprId(last as u32),           // itself
+        lhs: ExprId(last as u32), // itself
         rhs: ExprId(0),
     };
     let errors = validate(&model, &ValidateOptions::default()).unwrap_err();
     assert!(
-        errors.iter().any(|error| matches!(
-            error,
-            ValidationError::NonTopologicalOperand { .. }
-        )),
+        errors
+            .iter()
+            .any(|error| matches!(error, ValidationError::NonTopologicalOperand { .. })),
         "a self-referencing operand must be rejected, got {errors:?}"
     );
 
@@ -1039,10 +1085,16 @@ fn a_function_body_is_never_carried_so_nothing_can_recurse() {
     // exhaustive match in `cost_of_body` is the guard; this pins the reason.
     let variants = [
         RbcFunctionBody::ElidedModelica,
-        RbcFunctionBody::External { language: "C".into(), symbol: "f".into() },
+        RbcFunctionBody::External {
+            language: "C".into(),
+            symbol: "f".into(),
+        },
     ];
-    assert_eq!(variants.len(), 2,
-               "a third body kind means re-deriving the totality argument");
+    assert_eq!(
+        variants.len(),
+        2,
+        "a third body kind means re-deriving the totality argument"
+    );
 }
 
 // ── Building ─────────────────────────────────────────────────────────────────
@@ -1159,7 +1211,10 @@ fn operands_lists_every_child_of_every_node_kind() {
     let node = &model.expressions[negated.0 as usize].node;
     assert_eq!(crate::build::operands(node), vec![sum]);
     let node = &model.expressions[a.0 as usize].node;
-    assert!(crate::build::operands(node).is_empty(), "a literal is a leaf");
+    assert!(
+        crate::build::operands(node).is_empty(),
+        "a literal is a leaf"
+    );
 }
 
 #[test]

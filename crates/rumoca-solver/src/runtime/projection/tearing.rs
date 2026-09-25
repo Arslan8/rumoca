@@ -175,6 +175,14 @@ fn advance_torn_newton<M: ImplicitProjectionModel>(
         return Ok(TornStep::Decline);
     };
     let row_scales = jacobian_row_scales(&jacobian, variable_scales, variable_scales, None);
+    crate::diagnostics::projection(
+        "torn-projection",
+        t,
+        &tearing.residual_rows,
+        &tearing.tear_y_indices,
+        residual,
+        &jacobian,
+    );
     let converged = scaled_residual_converged(residual, &row_scales, tol);
     let delta = scaled_newton_delta(ScaledNewtonSystem {
         jacobian: &jacobian,

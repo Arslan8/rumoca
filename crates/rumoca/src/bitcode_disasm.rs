@@ -25,8 +25,8 @@ use std::path::Path;
 
 use anyhow::Result;
 use rumoca_bitcode::schema::{
-    ExprId, RbcAction, RbcBinaryOp, RbcCoordinate, RbcExprNode, RbcLiteral, RbcModel, RbcUnaryOp,
-    VariableId,
+    ExprId, RbcAction, RbcBinaryOp, RbcCoordinate, RbcExprNode, RbcLiteral, RbcModel,
+    RbcStringConversionFormat, RbcUnaryOp, VariableId,
 };
 
 /// What to include beyond the default variable and equation listing.
@@ -91,10 +91,7 @@ impl<'a> Listing<'a> {
                 binary(*op),
                 self.expression(*rhs)
             ),
-            RbcExprNode::Conditional {
-                branches,
-                fallback,
-            } => {
+            RbcExprNode::Conditional { branches, fallback } => {
                 let mut out = String::new();
                 for (index, branch) in branches.iter().enumerate() {
                     let _ = write!(
@@ -113,14 +110,31 @@ impl<'a> Listing<'a> {
                     arguments.iter().map(|arg| self.expression(*arg)).collect();
                 format!("{name}({})", rendered.join(", "))
             }
+            RbcExprNode::StringConversion { value, format } => {
+                let mut arguments = vec![self.expression(*value)];
+                let options = match format {
+                    RbcStringConversionFormat::Options {
+                        minimum_length,
+                        left_justified,
+                        significant_digits,
+                    } => vec![
+                        ("minimumLength", *minimum_length),
+                        ("leftJustified", *left_justified),
+                        ("significantDigits", *significant_digits),
+                    ],
+                    RbcStringConversionFormat::Format { value } => vec![("format", Some(*value))],
+                };
+                arguments.extend(options.into_iter().filter_map(|(name, value)| {
+                    value.map(|id| format!("{name}={}", self.expression(id)))
+                }));
+                format!("String({})", arguments.join(", "))
+            }
             RbcExprNode::Array { elements, .. } => {
-                let rendered: Vec<String> =
-                    elements.iter().map(|e| self.expression(*e)).collect();
+                let rendered: Vec<String> = elements.iter().map(|e| self.expression(*e)).collect();
                 format!("{{{}}}", rendered.join(", "))
             }
             RbcExprNode::Record { fields, .. } => {
-                let rendered: Vec<String> =
-                    fields.iter().map(|f| self.expression(*f)).collect();
+                let rendered: Vec<String> = fields.iter().map(|f| self.expression(*f)).collect();
                 format!("record({})", rendered.join(", "))
             }
             RbcExprNode::Field { base, field } => {
@@ -141,7 +155,11 @@ impl<'a> Listing<'a> {
                 self.domain_binders(*domain).join(", ")
             ),
             RbcExprNode::Index { base, subscripts } => {
-                format!("{}[{}]", self.expression(*base), self.subscripts(subscripts))
+                format!(
+                    "{}[{}]",
+                    self.expression(*base),
+                    self.subscripts(subscripts)
+                )
             }
             RbcExprNode::ArrayUpdate {
                 base,
@@ -309,7 +327,10 @@ pub fn run_disasm(path: &Path, options: DisasmOptions) -> Result<()> {
     let listing = Listing::new(model);
 
     println!("; {} ({})", path.display(), encoding.as_str());
-    println!("; bitcode v{}, produced by {}", file.bitcode_version, file.producer);
+    println!(
+        "; bitcode v{}, produced by {}",
+        file.bitcode_version, file.producer
+    );
     println!("; model {}", model.name);
     println!();
 
@@ -378,7 +399,10 @@ pub fn run_disasm(path: &Path, options: DisasmOptions) -> Result<()> {
     // header keeps the listing the same shape as the source it came from.
     for (label, families) in [
         ("equation families", &model.equation_families),
-        ("initial equation families", &model.initial_equation_families),
+        (
+            "initial equation families",
+            &model.initial_equation_families,
+        ),
     ] {
         if families.is_empty() {
             continue;

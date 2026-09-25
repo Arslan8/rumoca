@@ -1,0 +1,91 @@
+{
+  "issue": "https://github.com/modelica/ModelicaStandardLibrary/issues/4771",
+  "date": "2026-09-24",
+  "reproducer_kind": "issue-body-derived; attachment unavailable",
+  "model_source": "within;\nmodel Upstream4771Full\n  parameter Real p = 100000;\n  parameter Real targetT = 300;\n  parameter Real water = 0;\n  parameter Real s = Modelica.Media.Air.MoistAir.s_pTX(p, targetT, {water, 1-water});\n  Real T;\nequation\n  T = Modelica.Media.Air.MoistAir.temperature_psX(p, s, {water, 1-water});\nend Upstream4771Full;\n\nmodel Upstream4771Reduced\n  parameter Real p = 100000;\n  parameter Real targetT = 300;\n  parameter Real water = 0;\n  parameter Real s = Modelica.Media.Air.MoistAir.s_pTX(p, targetT, {water, 1-water});\n  Real T;\nequation\n  T = Modelica.Media.Air.MoistAir.temperature_psX(p, s, {water});\nend Upstream4771Reduced;\n",
+  "source_sha256": "02f9983a77c006912991700bc2073eee32ac3194c859f2ddb3cefaf53576d356",
+  "rumoca_binary_sha256": "6d50c5ababb18c68b367a7b353599d7ce2b595c61f65187f98abfb38b625aa06",
+  "library_sha256": {
+    "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/Air/MoistAir.mo": "fd604a3412dece831de2b1ae7244de6610b6ac6d3f3ce62345c2969b4ddb9ccd",
+    "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Math/Nonlinear.mo": "ed8b5bca248a0105fe98c614d90c3043c4139dad08b9460d91bf218149d6e101"
+  },
+  "omc_version": "OpenModelica 1.27.1~2-g6db4671",
+  "cases": [
+    {
+      "model": "Upstream4771Full",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/Upstream4771.mo",
+          "--model",
+          "Upstream4771Full",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/Upstream4771Full.rbc"
+        ],
+        "exit": 1,
+        "seconds": 8.533,
+        "stdout": "",
+        "stderr": "  \u001b[31m\u001b[0m \u001b[31m[ED019]\u001b[0m unsupported Flat semantic owner `parameter binding`: `s` cannot be\n  \u001b[31m│\u001b[0m evaluated: type mismatch: expected numeric, got Integer / Enumeration\n      ╭─[\u001b[36;1;4m/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/package.mo:5180:22\u001b[0m]\n \u001b[2m5179\u001b[0m │       for i in 1:size(X, 1) loop\n \u001b[2m5180\u001b[0m │         invMMX[i] := 1/MMX[i];\n      · \u001b[31;1m                     ──┬──\u001b[0m\n      ·                        \u001b[31;1m╰── \u001b[31;1munsupported semantic owner\u001b[0m\u001b[0m\n \u001b[2m5181\u001b[0m │       end for;\n      ╰────\n\u001b[36m  help: \u001b[0mthis construct is rejected before simulation until its checked DAE\n        representation is implemented\n\n"
+      },
+      "sanitizer_status": "blocked-before-artifact; compiler failure is not issue detection"
+    },
+    {
+      "model": "Upstream4771Reduced",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/Upstream4771.mo",
+          "--model",
+          "Upstream4771Reduced",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/Upstream4771Reduced.rbc"
+        ],
+        "exit": 1,
+        "seconds": 3.022,
+        "stdout": "",
+        "stderr": "  \u001b[31m\u001b[0m \u001b[31m[ED019]\u001b[0m unsupported Flat semantic owner `parameter binding`: `s` cannot be\n  \u001b[31m│\u001b[0m evaluated: type mismatch: expected numeric, got Integer / Enumeration\n      ╭─[\u001b[36;1;4m/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/package.mo:5180:22\u001b[0m]\n \u001b[2m5179\u001b[0m │       for i in 1:size(X, 1) loop\n \u001b[2m5180\u001b[0m │         invMMX[i] := 1/MMX[i];\n      · \u001b[31;1m                     ──┬──\u001b[0m\n      ·                        \u001b[31;1m╰── \u001b[31;1munsupported semantic owner\u001b[0m\u001b[0m\n \u001b[2m5181\u001b[0m │       end for;\n      ╰────\n\u001b[36m  help: \u001b[0mthis construct is rejected before simulation until its checked DAE\n        representation is implemented\n\n"
+      },
+      "sanitizer_status": "blocked-before-artifact; compiler failure is not issue detection"
+    }
+  ],
+  "omc": {
+    "argv": [
+      "omc",
+      "--locale=C",
+      "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/omc/pair.mos"
+    ],
+    "exit": 0,
+    "seconds": 4.126,
+    "stdout": "true\ntrue\ntrue\ntrue\nMSL 4.1.0\n\nCASE full\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/omc/Upstream4771Full_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.01, numberOfIntervals = 10, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'Upstream4771Full', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.158961126,\n    timeBackend = 0.003922976,\n    timeSimCode = 0.001355234,\n    timeTemplates = 0.014508,\n    timeCompile = 1.176989577,\n    timeSimulation = 0.014563228000000001,\n    timeTotal = 1.370454361\nend SimulationResult;\n\nCASE reduced\n\nrecord SimulationResult\n    resultFile = \"\",\n    simulationOptions = \"startTime = 0.0, stopTime = 0.01, numberOfIntervals = 10, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'Upstream4771Reduced', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"Simulation execution failed for model: Upstream4771Reduced\narray s->index[0][1] == 2 incorrect, a->dim_size[0] == 1\nLOG_ASSERT        | debug   | util/base_array.c:747: index_alloc_base_array_size: Assertion `index_spec_fit_base_array(source_spec, source)` failed.\nLOG_ASSERT        | info    | simulation terminated by an assertion at initialization\n\",\n    timeFrontend = 0.1595930969999999,\n    timeBackend = 0.002141693,\n    timeSimCode = 8.509930000000001e-4,\n    timeTemplates = 0.0036087980000000003,\n    timeCompile = 1.144322007,\n    timeSimulation = 0.013770583000000001,\n    timeTotal = 1.324376029\nend SimulationResult;\n\n",
+    "stderr": "",
+    "result_files": [
+      "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/probes-run-01/omc/Upstream4771Full_res.csv",
+      ""
+    ],
+    "successes": 1
+  },
+  "classification": "upstream-defect-reproduced-in-omc; current-modelsan-blocked-before-artifact",
+  "issue_body_source": "https://github.com/modelica/ModelicaStandardLibrary/issues/4771",
+  "attachment_status": "linked upstream zip unavailable through available web tool; wrapper derived from body, not identical attachment",
+  "upstream_4807": {
+    "url": "https://github.com/modelica/ModelicaStandardLibrary/issues/4807",
+    "title": "Modelica.Math.Nonlinear.quadratureLobatto",
+    "open_status_source": "https://github.com/modelica/ModelicaStandardLibrary/issues",
+    "body_status": "unread: cache miss",
+    "linked_pr_status": "https://github.com/modelica/ModelicaStandardLibrary/pull/4808 also unavailable",
+    "defect": "not established from accessible content",
+    "detection": "unassessed; no reproduction credited"
+  }
+}

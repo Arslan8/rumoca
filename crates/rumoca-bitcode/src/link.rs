@@ -168,6 +168,8 @@ tables!(
     initial_equation_families,
     relations,
     conditions,
+    clocks,
+    clock_ownerships,
     roots,
     events,
     time_events,
@@ -208,7 +210,7 @@ ids!(SourceId=>sources, TypeId=>types, VariableId=>variables, ExprId=>expression
     RootId=>roots, EventId=>events, ConnectionId=>connections,
     ConnectionSetId=>connection_sets, ComponentId=>components,
     TracePointId=>trace_points, DomainId=>domains, FunctionId=>functions,
-    FamilyId=>equation_families);
+    FamilyId=>equation_families, ClockId=>clocks);
 
 macro_rules! fields {
     ($value:ident, $map:ident, $($field:ident),+ $(,)?) => { $( $value.$field.shift($map)?; )+ }
@@ -246,6 +248,8 @@ impl Map<'_> {
         m.discrete_definitions.shift(self)?;
         m.relations.shift(self)?;
         m.conditions.shift(self)?;
+        m.clocks.shift(self)?;
+        m.clock_ownerships.shift(self)?;
         m.roots.shift(self)?;
         m.events.shift(self)?;
         m.time_events.shift(self)?;
@@ -256,7 +260,11 @@ impl Map<'_> {
         m.connector_types.shift(self)?;
         m.connectors.shift(self)?;
         // These tables have no entry IDs, but are still concatenated/count-checked.
-        let _ = (self.initial_discrete_values, self.discrete_definitions);
+        let _ = (
+            self.initial_discrete_values,
+            self.discrete_definitions,
+            self.clock_ownerships,
+        );
         Ok(())
     }
 }

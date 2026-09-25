@@ -1,97 +1,100 @@
 # ModelSan
 
-Finds parameter configurations under which a *valid* Modelica model behaves
-incorrectly.
+ModelSan checks Modelica models using static analyses and observations from an explicitly selected execution backend. Findings retain the property, input configuration, source or backend identity, and observed evidence. Unsupported compilation and missing observations are coverage gaps. A typed compiler proof of an array-bounds violation is a model finding with its original source location.
 
-ModelSan is not a linter. Whether a model is syntactically valid is the
-compiler's job, and Rumoca does it. ModelSan looks for the bugs that only
-appear after flattening, or only under particular parameter values.
+## Check known upstream issues
 
-```bash
-modelsan examples/modelsan/Tank.mo --model-name Tank
+The [known-issue campaign](../../examples/modelsan/known-msl-issues.json) exercises actual MSL APIs and includes non-triggering controls. It uses general behavioral contracts; the sanitizer contains no issue-number or model-name special cases.
+
+From the repository root, with the existing Rumoca executable and cached MSL 4.1.0:
+
+```sh
+PYTHONPATH=packages/rumoca-bitcode:packages/modelsan python3 -m modelsan.cli contracts \
+  examples/modelsan/known-msl-issues.json \
+  --backend rumoca-source \
+  --freeze-parameters \
+  --source-root target/msl/ModelicaStandardLibrary-4.1.0 \
+  --output target/modelsan-known-issues/native.json
 ```
 
-```text
-[+] Parsed model Tank
-    2 equations, 4 variables, 2 parameters
+The native source profile executes `rumoca sim` directly. It supports nominal runs and variable/failure observations, with backend names rather than invented canonical IDs. It rejects unsupported overrides and instrumentation requests. This is an explicit profile, not a silent fallback from the separate editable-bitcode backend.
 
-[+] 2 operation(s) with a mathematical domain condition
-  divide: requires resistance != 0
-      equation E0 at Tank.mo:7:3
-      expression   (level / resistance)
-      constrained  resistance
-      parameters   resistance
-      why          division by zero yields inf or nan
+Use `--backend rumoca` with the same options to compile, instrument and execute a saved equation artifact. Its runtime findings use the artifact's canonical identities. The campaign's `--freeze-parameters` option explicitly fixes declared parameter values during compilation; changing them requires recompilation. This permits pure constant evaluation of MoistAir's nonlinear inverse and reports its bounds defect before execution. Ordinary compilation keeps tunable parameters. The profile does not provide general runtime convergence-loop support.
 
-[!] ModelSan found a failure
+OpenModelica is also an explicit backend:
 
-Type:            simulation-failure
-Trigger:         resistance = 0
-Minimal config:  resistance = 0
+```sh
+PYTHONPATH=packages/rumoca-bitcode:packages/modelsan python3 -m modelsan.cli contracts \
+  examples/modelsan/known-msl-issues.json --backend openmodelica \
+  --library 'target/msl/ModelicaStandardLibrary-4.1.0/ModelicaServices 4.1.0/package.mo' \
+  --library target/msl/ModelicaStandardLibrary-4.1.0/Complex.mo \
+  --library 'target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/package.mo' \
+  --output target/modelsan-known-issues/omc.json
 ```
 
-## How it works
+Exit status is **0** when no violation was observed, **1** for observed violations, proven model rejection or execution failures, and **2** when any case is blocked, inconclusive or unobserved. An expected-failure benchmark must inspect the specific finding and its passing controls, not just assert a nonzero exit code. Reports include evidence, traces, coverage and execution/source fingerprints. `model-rejected` means the compiler proved a defect; it does not imply that a simulation ran.
 
-```text
-Modelica -> rumoca -> .rbc -> ModelSan -> parameter candidates
-                                   |              |
-                                   |              v
-                                   |          rumoca --simulate --check
-                                   v              |
-                             domain analysis      v
-                                            violation + counterexample
+## Behavioral contracts
+
+`BehaviorSan` adds four reusable checks over real observations:
+
+| Contract | Property |
+|---|---|
+| `equality` | Two synchronized signals agree within declared absolute/relative tolerance, e.g. a round trip restores the original value. |
+| `periodic_pulse` | Output matches the configured period, start and duty cycle away from switching boundaries. |
+| `sample_delay` | Output holds the previous sampled continuous input; required sample history must be observed. |
+| `cardinality` | Observations require no more than the permitted number of output levels, accounting for declared observation uncertainty. |
+
+Every contract requires an explicit origin and unique ID. It binds exact signal names chosen by the caller; it does not infer intent from names or units. Unknown, partial, unsynchronized or nonfinite evidence cannot establish a successful behavioral check. Temporal contracts additionally require ordered timestamps. Event boundaries are skipped where a timestamp cannot establish the event side. Cardinality tolerances define a possible-level interval around each reading; the minimum number of levels consistent with those intervals is compared to the limit.
+
+Some OpenModelica clocked CSVs contain decreasing timestamps. The backend preserves their validated values as explicitly unordered observations, including original row numbers and reported times. Such a result has no temporal trace. Cardinality can use those values because its property is independent of order; pulse, delay and equality checks cannot. No timestamp sorting, jittering or inferred event order is applied.
+
+A campaign JSON declares `schema: 1`, a source path relative to the JSON file, and cases containing `model` and `contracts`. For example:
+
+```json
+{
+  "schema": 1,
+  "source": "MyModel.mo",
+  "cases": [{
+    "model": "MyModel",
+    "contracts": [{
+      "kind": "equality",
+      "contract_id": "state-round-trip",
+      "origin": "My API: inverse(forward(x)) restores x",
+      "actual": "recovered",
+      "expected": "original",
+      "atol": 1e-8,
+      "rtol": 1e-7
+    }]
+  }]
+}
 ```
 
-ModelSan never simulates anything itself. It asks Rumoca to, because a second
-evaluator would be a second set of numerical behaviour to explain. Rumoca
-already refuses a solve that goes non-finite and names the offending variable,
-which is a better detector than anything reimplemented here.
+Contracts are opt-in expectations, not automatic discovery of arbitrary physical correctness. The known-issue fixtures call the original MSL implementations. Their expectations are supplied to ModelSan, not inserted into MSL as assertions. Additional static/domain/range/physical sanitizers remain available through the Python registry and canonical bitcode pipeline; the contract CLI activates BehaviorSan, NumericSan and SolverSan without requiring a canonical model.
 
-## What it detects today
+## Validation
 
-| Detector | Kind | Finds |
-|---|---|---|
-| Mathematical domain | static + runtime | `/ 0`, `sqrt` of a negative, `log` of a non-positive, `asin`/`acos` outside `[-1, 1]`, `mod`/`rem` by zero |
-| Declared range | runtime | a variable leaving its own `min`/`max` |
-| Non-finite value | runtime | `nan` or `inf` anywhere in a trajectory |
+Focused unit and backend tests:
 
-Every one of these is a property the *model itself* declares. ModelSan infers
-no physics: a violation means the model contradicted something its author
-wrote down.
+```sh
+RUMOCA="$PWD/target/debug/rumoca" PYTHONPATH=packages/rumoca-bitcode:packages/modelsan \
+  python3 -m pytest packages/modelsan/tests -q
+```
 
-## Why boundary values, not random ones
+Actual known-issue detection gate (requires Rumoca, OpenModelica and the cached MSL):
 
-Random floats rarely break a physical model. The values that break them sit
-exactly on a boundary — zero, the declared `min`, one epsilon past `max` — or
-make two previously independent parameters equal, which is where singularities
-live. The generator is ordered by how likely a value is to expose something,
-and the search stops at the first failure.
+```sh
+MODELSAN_MSL_TESTS=1 RUMOCA="$PWD/target/debug/rumoca" \
+  PYTHONPATH=packages/rumoca-bitcode:packages/modelsan \
+  python3 -m pytest packages/modelsan/tests/test_known_msl_issues.py -q
+```
 
-Every failure is then minimised: overrides are dropped one at a time and the
-drop is kept if the failure survives. A report naming one parameter is worth
-far more than one naming six.
-
-## Limits
-
-- Parameter search only. Initial conditions and input trajectories are not
-  explored yet.
-- Bounds that are expressions rather than literals are skipped, not evaluated —
-  doing so would duplicate the compiler's evaluator, less correctly.
-- No singularity detection. Detecting a Jacobian that loses rank when `a == b`
-  needs the equation-level Jacobian, which bitcode does not yet carry.
-- Coverage follows bitcode's: a model using functions, records or arrays
-  exports with `unsupported` nodes, and ModelSan says so before reporting
-  anything else.
+The gate requires all six specific issue detections and five passing controls in each backend profile. Linux CI runs both native profiles with the cached MSL; missing prerequisites fail an enabled gate. Native and OpenModelica observations are separate results; this is not a compiler parity measurement or a 352-issue recall score. See the [upstream inventory](../../docs/evaluations/msl-upstream-open-issues-2026-09-24/README.md) for the broader scope and historical evaluation.
 
 ## Install
 
-```bash
+```sh
 pip install -e packages/rumoca-bitcode -e packages/modelsan
 ```
 
-or
-
-```bash
-export PYTHONPATH=packages/rumoca-bitcode:packages/modelsan
-python3 -m modelsan.cli model.mo --model-name M --rumoca ./target/debug/rumoca
-```
+This provides the same `modelsan contracts ...` entry point. Execution remains in the selected simulator; ModelSan does not implement a second Modelica evaluator.

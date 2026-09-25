@@ -25,6 +25,9 @@ NEVER_IN_SIGNATURE = frozenset({"time", "test_case", "value", "step_size", "seed
 def compute(finding: Finding) -> str:
     """A short, stable identifier for what bug this is."""
     parts = [finding.sanitizer, finding.kind]
+    # Distinct declared behavioral properties can concern the same signal.
+    if finding.evidence.get("contract_id"):
+        parts.append(f"contract:{finding.evidence['contract_id']}")
     quality = finding.anchor_quality
 
     if quality is AnchorQuality.CANONICAL:

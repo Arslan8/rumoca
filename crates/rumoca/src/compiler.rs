@@ -296,6 +296,7 @@ pub struct Compiler {
     /// replacing it with the constant it evaluates to. See
     /// `SessionConfig::fold_parameter_declaration_bindings`.
     no_fold_parameter_bindings: bool,
+    freeze_parameters: bool,
 }
 
 impl Compiler {
@@ -329,10 +330,18 @@ impl Compiler {
         self
     }
 
+    /// Build an artifact specialized to the declared fixed parameter values.
+    /// Its evaluated parameters cannot be overridden without recompilation.
+    pub fn freeze_parameters(mut self, freeze: bool) -> Self {
+        self.freeze_parameters = freeze;
+        self
+    }
+
     /// The session configuration these settings describe.
     fn session_config(&self) -> SessionConfig {
         SessionConfig {
             fold_parameter_declaration_bindings: !self.no_fold_parameter_bindings,
+            freeze_parameters: self.freeze_parameters,
             ..SessionConfig::default()
         }
     }

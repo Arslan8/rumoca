@@ -18,7 +18,10 @@ algorithm
 end addOffset;
 
 model UsesDefault
-  Real result = addOffset(value = 2.0);
+  // `time`, not a literal: a call whose arguments are all settled at
+  // translation is folded to its result before the final Flat model, and this
+  // test inspects the surviving call's argument slots.
+  Real result = addOffset(value = time);
 end UsesDefault;
 "#;
 
@@ -59,30 +62,32 @@ fn named_and_dependent_default_arguments_are_positional_in_final_flat() {
             .map(|function| function.name.as_str()),
         Some("addOffset")
     );
+    // Two positional slots: the named argument and the materialized default,
+    // in declaration order. The supplied argument is `time` rather than a
+    // literal so the call survives pure-constant folding; what is asserted is
+    // unchanged, namely that the dependent default carries the *actual*
+    // argument and the package constant is substituted.
     assert_eq!(args.len(), 2);
-    assert!(matches!(
-        &args[0],
-        Expression::Literal {
-            value: rumoca_core::Literal::Real(value),
-            ..
-        } if *value == 2.0
-    ));
-    assert!(matches!(
-        &args[1],
-        Expression::Binary { lhs, rhs, .. }
-            if matches!(
-                lhs.as_ref(),
-                Expression::Literal {
-                    value: rumoca_core::Literal::Real(value),
-                    ..
-                } if *value == 2.0
-            )
-            && matches!(
-                rhs.as_ref(),
-                Expression::Literal {
-                    value: rumoca_core::Literal::Real(value),
-                    ..
-                } if *value == 1.0
-            )
-    ));
+    assert!(
+        matches!(&args[0], Expression::VarRef { name, .. } if name.as_str() == "time"),
+        "the named argument becomes the first positional slot, found {:?}",
+        &args[0]
+    );
+    assert!(
+        matches!(
+            &args[1],
+            Expression::Binary { lhs, rhs, .. }
+                if matches!(lhs.as_ref(), Expression::VarRef { name, .. } if name.as_str() == "time")
+                && matches!(
+                    rhs.as_ref(),
+                    Expression::Literal {
+                        value: rumoca_core::Literal::Real(value),
+                        ..
+                    } if *value == 1.0
+                )
+        ),
+        "the dependent default materializes as `value + defaultOffset` with the \
+         actual argument and the constant substituted, found {:?}",
+        &args[1]
+    );
 }

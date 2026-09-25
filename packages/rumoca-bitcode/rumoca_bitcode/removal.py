@@ -11,7 +11,7 @@ def remove(builder, *, variables=(), equations=(), initial_equations=()):
     raw = deepcopy(builder.raw)
     for table in ("domains", "functions", "equation_families", "initial_equation_families",
                   "discrete_definitions", "discrete_real_equations", "initial_discrete_values",
-                  "relations", "conditions", "roots", "events", "time_events", "connections"):
+                  "relations", "conditions", "clocks", "clock_ownerships", "roots", "events", "time_events", "connections"):
         if raw.get(table):
             raise ValueError(f"scalar removal does not support {table}; use a structured transformation")
     maps = {}

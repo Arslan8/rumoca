@@ -432,6 +432,16 @@ pub enum FlattenError {
         #[label("call would silently use the declared default")]
         span: Span,
     },
+    /// A pure, fully evaluated binding attempts a source array coordinate that
+    /// is outside the actual array. This code never reports an unsupported fold.
+    #[error("constant evaluation proves array index out of bounds: index {index}, size {size}")]
+    #[diagnostic(code(rumoca::flatten::EF032), help("the declared binding accesses outside the supplied array"))]
+    ConstantIndexOutOfBounds {
+        index: i64,
+        size: usize,
+        #[label("out-of-bounds access during pure constant evaluation")]
+        span: Span,
+    },
 }
 
 impl FlattenError {
@@ -729,7 +739,8 @@ impl PhaseError for FlattenError {
                 member_pair = [*structural_span, *variable_span];
                 &member_pair
             }
-            Self::StructuralAssertionFailed { span, .. }
+            Self::ConstantIndexOutOfBounds { span, .. }
+            | Self::StructuralAssertionFailed { span, .. }
             | Self::UndefinedVariable { span, .. }
             | Self::IncompatibleConnectors { span, .. }
             | Self::UnsupportedEquation { span, .. }

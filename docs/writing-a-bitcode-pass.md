@@ -153,12 +153,12 @@ for node in equation.residual.walk():
         print("differentiates", node.variable.name)
 ```
 
-**Handle `Unsupported`.** It means bitcode v1 could not represent part of the
+**Handle `Unsupported`.** It means bitcode v2 could not represent part of the
 model. Refuse, or narrow your claim — never treat it as a default:
 
 ```python
 if any(isinstance(n, Unsupported) for e in model.equations for n in e.residual.walk()):
-    raise SystemExit("this model uses constructs bitcode v1 cannot represent")
+    raise SystemExit("this model uses constructs bitcode v2 cannot represent")
 ```
 
 ## Provenance
@@ -307,7 +307,7 @@ model.save("decay.rbc")
 
 ```console
 $ rumoca bitcode check decay.rbc --strict
-decay.rbc: valid bitcode v1 (strict)
+decay.rbc: valid bitcode v2 (strict)
 $ rumoca compile-bitcode decay.rbc --simulate --trace-out decay.csv
   x(0) = 1.000000   x(1) = 0.135337      # exp(-2) = 0.135335
 ```

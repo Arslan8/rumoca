@@ -66,6 +66,22 @@ Both were execution-confirmed in two tools and both were wrong: the trigger was
 a value the declaration already forbids. Cause and fix in
 [TOOLBUG-010](../toolbugs/TOOLBUG-010-divisorsan-misread-non-literal-min.md).
 
+## Findings — dimensional defects
+
+A declaration whose own binding expression computes a different SI dimension.
+Distinct from the parameter-triggered failures above: nothing has to be
+*triggered*, and the equations are silent because nothing is inconsistent
+*between* equations — the disagreement is inside one declaration.
+
+| Finding | Fix site | Declared | Binding computes |
+|---|---|---|---|
+| [DCPM_Drive resistance](msl-dcpm-drive-resistance-from-voltage.md) | `Electrical.Machines.Examples.DCMachines.DCPM_Drive:81` | `Ohm` | a voltage |
+
+Found by `QuantitySan`'s `binding-unit-conflict` check with no issue-specific
+code; the same check reproduces upstream #4078 and #4079, which share the
+mechanism. Method in
+[the pattern catalogue](../method/recurring-issue-patterns.md), P1.
+
 ## Catalog — every declaration site, with source references
 
 [`catalog/`](catalog/) lists **911 declarations** in MSL 4.1.0 that accept a

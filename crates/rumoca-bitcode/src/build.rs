@@ -86,6 +86,8 @@ impl Builder {
             initial_equation_families: Vec::new(),
             relations: Vec::new(),
             conditions: Vec::new(),
+            clocks: Vec::new(),
+            clock_ownerships: Vec::new(),
             roots: Vec::new(),
             events: Vec::new(),
             time_events: Vec::new(),
@@ -394,7 +396,11 @@ impl Builder {
         id
     }
 
-    pub fn component(&mut self, path: impl Into<String>, class_name: Option<String>) -> ComponentId {
+    pub fn component(
+        &mut self,
+        path: impl Into<String>,
+        class_name: Option<String>,
+    ) -> ComponentId {
         let id = ComponentId(self.model.components.len() as u32);
         self.model.components.push(crate::schema::RbcComponent {
             id,
@@ -459,6 +465,11 @@ impl Builder {
 /// checked against the arena in the crate's tests.
 pub fn operands(node: &RbcExprNode) -> Vec<ExprId> {
     match node {
+        RbcExprNode::StringConversion { value, format } => {
+            let mut found = vec![*value];
+            found.extend(format.operands());
+            found
+        }
         RbcExprNode::Literal { .. } | RbcExprNode::Coordinate { .. } => Vec::new(),
         RbcExprNode::Unary { operand, .. } => vec![*operand],
         RbcExprNode::Binary { lhs, rhs, .. } => vec![*lhs, *rhs],

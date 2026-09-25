@@ -1,0 +1,354 @@
+issue	category	rationale
+85	ENHANCEMENT	Media redesign is an architecture proposal; numerical sanitizers cannot choose the desired public interface.
+89	ENHANCEMENT	Library organization discussion has no numerical failure criterion.
+106	DOCUMENTATION	Tutorial update requires documentation review and executable examples where appropriate.
+241	ENHANCEMENT	Unified power-system connectors require an agreed interface and conversion/compatibility tests.
+283	DOCUMENTATION	Naming conventions need source/style lint, not numerical execution.
+324	REFERENCE	Missing pump/accumulator closed-circuit examples require test construction; no failing witness is supplied by the request itself.
+325	REFERENCE	Steam-turbine example coverage is a requested test/model addition.
+326	REFERENCE	Steam-generator example coverage is a requested test/model addition.
+327	REFERENCE	Heat-exchanger example coverage is a requested test/model addition.
+328	REFERENCE	inner/outer connection examples should exercise elaboration and binding rules, not just trace finiteness.
+342	ENHANCEMENT	Integrating Dissipation pressure-loss components requires interface/regression work, not defect detection alone.
+344	ENHANCEMENT	Additional pipe correlations require validated physical regimes and reference data.
+359	ENHANCEMENT	Moving conditional heat-port classes is library/API organization work.
+464	ENHANCEMENT	Adding PlanarMultiBody is a library-scope decision and implementation request.
+506	ENHANCEMENT	A missing differential component is a feature request; no existing-model sanitizer can implement it.
+609	DOCUMENTATION	Model renaming requires naming/conversion checks.
+671	DOCUMENTATION	Connector icon sizes need graphical/style validation.
+740	ENHANCEMENT	A simple turbine model is an added modeling capability.
+742	ENHANCEMENT	A unified regularization framework needs API design and smoothness/accuracy tests once specified.
+814	ENHANCEMENT	Duplicate electric-element definitions are maintainability/refactoring work unless behavior differences are demonstrated.
+849	ENHANCEMENT	Vendor-neutral annotations require specification/tool interoperability validation.
+966	DOCUMENTATION	Density/viscosity naming conventions need API naming review.
+967	ENHANCEMENT	PressureDifference is a requested medium type addition, not a demonstrated numerical failure.
+1118	ENHANCEMENT	Standardizing tool command annotations requires cross-tool metadata support.
+1157	ENHANCEMENT	XML interchange formats require schema/round-trip compatibility tests.
+1339	REFERENCE	Changes to shipped resources need versioning/provenance and downstream reference tests.
+1400	ENHANCEMENT	Additional mathematical means require specified definitions/domains and implementation tests.
+1539	ENHANCEMENT	Unused model cleanup needs dependency/reachability review.
+1860	FRONTEND	Use of class restrictions is a language/style compatibility question for the frontend.
+1873	ENHANCEMENT	Requested mechanical components extend library coverage.
+1904	ENHANCEMENT	Texture support belongs to visualization/services capabilities.
+1906	DOCUMENTATION	Hiding protected outer world objects concerns diagram/browser presentation.
+1954	EXTERNAL	Directory support in loadResource requires resource resolver/API tests.
+2018	EXTERNAL	A standardized PLC interface needs protocol/interface integration tests.
+2058	ENHANCEMENT	An improved ideal transmission-line implementation needs agreed behavior and cross-version regression tests.
+2083	REFERENCE	DLATROM lacks a test/example; add a memory truth-table and timing fixture.
+2089	DOCUMENTATION	Spice3 result-variable comments require documentation coverage checks.
+2126	ENHANCEMENT	StringExpression is a new source-block feature.
+2164	ENHANCEMENT	Replacing Blocks.Logical requires API/semantic migration decisions.
+2239	ENHANCEMENT	Complex matrix inversion is a requested mathematical API capability with numerical conditioning contracts.
+2259	DOCUMENTATION	Files.list purpose/API explanation is needed before defining a failure criterion.
+2333	DOCUMENTATION	Release-note cleanup is editorial consistency work.
+2346	DOCUMENTATION	Image transparency is graphical asset work.
+2389	EXTERNAL	A portable FMU import block requires FMI lifecycle and platform integration capabilities.
+2431	DOCUMENTATION	Mechanics class names need naming policy and conversion validation.
+2455	DOCUMENTATION	Missing browser documentation strings require frontend/UI metadata checks.
+2460	DOCUMENTATION	Shorter sensor names are an API naming/conversion proposal.
+2481	DOCUMENTATION	Connector-label placement/color discrepancies need diagram/style validation.
+2485	DOCUMENTATION	Plane parameter renaming requires API migration checks.
+2519	DOCUMENTATION	HTML figure inclusion needs documentation rendering/link validation.
+2534	ENHANCEMENT	Replacing PartialAbsoluteSensor is interface/refactoring work.
+2554	ENHANCEMENT	Piston/pump enhancements need explicitly specified additional physical behavior.
+2603	DOCUMENTATION	Generating documentation images requires a rendering/tooling workflow.
+2609	DOCUMENTATION	Protected top-level connector purpose needs source/API documentation clarification.
+2629	ENHANCEMENT	Adaptor package location is library organization work.
+2633	DOCUMENTATION	OpAmpDetailed missing variable comments need documentation completeness checks.
+2680	REFERENCE	FluidHeatFlow relative-sensor examples are missing; add known-signal test fixtures.
+2681	REFERENCE	HeatTransfer sensor test coverage is missing; use known thermal-network fixtures.
+2694	DOCUMENTATION	Spelling dictionary additions need text/style tooling.
+2695	DOCUMENTATION	Image file organization is asset maintenance.
+2749	DOCUMENTATION	Ellipsis typography belongs to documentation style checks.
+2751	DOCUMENTATION	Nonbreaking spaces belong to documentation rendering/style checks.
+2781	REFERENCE	mixtureViscosityChung needs a reference-data/function test; absent coverage is not an observed numerical defect.
+2795	DOCUMENTATION	MOSFET documentation needs comparison to the implemented device equations and cited model.
+2831	ENHANCEMENT	An Equal logical block is a missing API feature.
+2836	ENHANCEMENT	PRNG replacement requires reproducibility and statistical-quality criteria; generic trace determinism is insufficient.
+2907	DOCUMENTATION	UsersGuide convention rules need editorial clarification.
+2913	CONTRACT	Berkeley Spice3 compatibility requires a versioned external behavioral corpus, not universal numerical safety rules.
+2931	DOCUMENTATION	Code/variable styling guidelines need source/style tooling.
+2935	ENHANCEMENT	Replaceable friction and geometric/Reynolds formulations extend FluidHeatFlow modeling flexibility.
+2938	ENHANCEMENT	Flexible beam is a requested additional physical model.
+2946	DOCUMENTATION	StateSelection guidance needs alignment with actual language/compiler behavior.
+2990	DOCUMENTATION	Missing user guides require documentation coverage and authorship.
+3060	DOCUMENTATION	Formatting checker is a source lint tool request.
+3122	DOCUMENTATION	Markdown versus HTML is an authoring/rendering workflow decision.
+3125	DOCUMENTATION	Connector appearance/naming harmonization requires graphical and API style checks.
+3145	DOCUMENTATION	loadResource naming is API naming/conversion work.
+3305	DOCUMENTATION	Analog-source names require naming convention review.
+3359	ENHANCEMENT	FluxTubes improvements are a broad development request; evaluate concrete subchanges separately.
+3362	DOCUMENTATION	Support-flange base-class names require API naming and migration checks.
+3374	ENHANCEMENT	StateGraph2 replacement is an architecture/API migration decision with semantic regression obligations.
+3387	FRONTEND	Replacing integer modes with enumerations improves source typing/API; use conversion and elaboration tests.
+3425	ENHANCEMENT	Splitting Blocks into files is source organization work.
+3430	DOCUMENTATION	Empty icon classes need icon/diagram metadata validation.
+3460	DOCUMENTATION	Delay-block package placement is categorization/API organization.
+3557	ENHANCEMENT	A wire-like one-sided spring is a new constitutive model requiring a unilateral-force contract.
+3561	DOCUMENTATION	Syntax highlighting is documentation rendering work.
+3581	DOCUMENTATION	SIunits package icon typography is graphical presentation.
+3601	EXTERNAL	HDF5 multidimensional I/O is a format/API feature; requires shape-preserving I/O round-trip tests.
+3611	ENHANCEMENT	Fluid-to-translational power conversion is a missing component capability.
+3653	DOCUMENTATION	Leftover internal IF97 comments require editorial/source cleanup.
+3734	DOCUMENTATION	Primary/secondary terminology is naming/documentation policy.
+3739	ENHANCEMENT	MultiBody inheritance improvements require API and elaboration regression checks.
+3769	DOCUMENTATION	RevisionHistory organization is editorial maintenance.
+3772	DOCUMENTATION	Delta icon/name correctness needs diagram and naming checks.
+3775	DOCUMENTATION	Lowercase function-name policy is a style convention question.
+3793	DOCUMENTATION	2D table extrapolation needs precise API documentation; use documented boundary examples as future contracts.
+3820	DOCUMENTATION	skipWhiteSpace behavior needs API documentation/examples, not a numeric sanitizer.
+3877	ENHANCEMENT	Complex vector/matrix multiplication is a missing operator implementation.
+3909	ENHANCEMENT	Breaking a ModelicaServices dependency cycle is library architecture/build work.
+3925	ENHANCEMENT	Release cadence is project governance, not model correctness.
+3931	ENHANCEMENT	Vector/arrow visualization is a rendering capability request.
+3934	ENHANCEMENT	World leftovers after vector visualization need dependency/cleanup review.
+3962	DOCUMENTATION	nports parameter-window visibility is GUI annotation behavior.
+3977	ENHANCEMENT	Rotational freewheel requests component behavior beyond generic numerical validity.
+3978	DOCUMENTATION	SignalBus icon/diagram colors need style validation.
+3992	ENHANCEMENT	Visualizer transparency input is a rendering API enhancement.
+3994	DOCUMENTATION	Truncated Modelica prefix is metadata/presentation correctness.
+3995	DOCUMENTATION	MuMetall record spelling change requires name/conversion validation.
+4001	DOCUMENTATION	Release-note HTML needs markup/link/rendering validation.
+4003	ENHANCEMENT	Replaceable parameter records require API design and modifier/elaboration compatibility checks.
+4034	DOCUMENTATION	Surface visualizer prose must match rendering/API semantics.
+4075	DOCUMENTATION	TerminateSimulation icon layout is graphical consistency work.
+4082	EXTERNAL	Website search-index migration is website/deployment configuration outside numerical model execution.
+4083	ENHANCEMENT	Specular coefficient interpretation needs a rendering contract and image-based validation.
+4092	ENHANCEMENT	MultiBody BaseClasses organization is API/refactoring work.
+4110	DOCUMENTATION	Relative magnetization quantity spelling is naming-policy validation.
+4123	ENHANCEMENT	Spherical harmonics integration extends mathematical/visualization capability.
+4159	EXTERNAL	A deleted example PR is repository/workflow recovery, not a numerical model defect.
+4162	DOCUMENTATION	Citation punctuation requires documentation style checks.
+4166	DOCUMENTATION	Promoting a documentation style guide is editorial policy.
+4168	DOCUMENTATION	debye name policy is quantity naming and compatibility, not a numerical domain error.
+4186	DOCUMENTATION	Diagram class-name text needs graphical annotation checks.
+4329	DOCUMENTATION	Example naming inconsistency requires naming/style validation.
+4376	DOCUMENTATION	Broken modelica.org link requires link checking.
+4394	DOCUMENTATION	Table smoothness descriptions need interpolation-contract documentation and matching examples.
+4399	DOCUMENTATION	Assertion-message improvement is diagnostic clarity; AssertSan can report a failure but cannot supply missing explanation.
+4400	DOCUMENTATION	Permability misspelling needs naming/conversion checks.
+4431	DOCUMENTATION	FluxTubes example comments from #4418 need contextual documentation review.
+4456	ENHANCEMENT	MPC blocks are a new control-library capability.
+4467	ENHANCEMENT	Queue primitives are a requested data-structure/API feature.
+4468	EXTERNAL	Malformed test-report HTML breaks automation; use report schema/markup validation rather than model sanitizers.
+4471	DOCUMENTATION	Resistor example complexity is a teaching/example-design concern.
+4476	EXTERNAL	Shared external objects need ModelicaUtilities symbol/API visibility and linking tests.
+4494	ENHANCEMENT	Replaceable data records require interface/modifier compatibility decisions.
+4597	ENHANCEMENT	Custom fluid-property model guidance is modeling support; no concrete supported failing witness is established.
+4645	EXTERNAL	Adding binary deployment to CI is build/distribution pipeline work.
+4689	ENHANCEMENT	Cool-warm colormap is a visualization feature.
+4690	DOCUMENTATION	Missing 4.1.0 release notes require release/change documentation review.
+4694	ENHANCEMENT	API policy for minor releases and bug fixes is compatibility/governance work.
+4699	DOCUMENTATION	Missing statechart PDF link requires documentation link repair.
+4704	DOCUMENTATION	CSV header requirements need correct table-format documentation.
+4710	DOCUMENTATION	GlobalSeed missingInnerMessage needs a clearer source diagnostic annotation.
+4722	DOCUMENTATION	StateGraph example improvements concern examples/explanation unless a concrete behavioral defect is isolated.
+4747	DOCUMENTATION	QuasiStatic documentation cleanup requires editorial/domain review.
+4756	DOCUMENTATION	ModelicaReference update needs specification-version alignment.
+4758	DOCUMENTATION	Missing magnetic-material PDF requires link/provenance repair.
+4759	DOCUMENTATION	Missing quaternion conversion reference requires link/provenance repair.
+4760	DOCUMENTATION	Missing PowerConverters book reference requires link/provenance repair.
+4761	DOCUMENTATION	RobotR3 author link returns an access error; link checks cannot determine physical model correctness.
+4785	DOCUMENTATION	FourPin/TwoPort misleading diagram needs comparison of picture and connector/equation semantics.
+4792	DOCUMENTATION	Rotational interface colors violate a graphical convention.
+4799	DOCUMENTATION	SoftMaterial cleanup concerns names/order/documentation; no numerical defect follows from tidying the package.
+143	CONTRACT	DC transmission is a limitation of an ideal transformer; establish the intended frequency/flux applicability before calling it a defect.
+287	CONTRACT	Temperature dependence needs material-law and reference-data checks; a finite value can still implement the wrong constitutive law.
+322	CONTRACT	Kinetic energy omitted from the Fluid energy balance; stream conservation alone cannot validate the chosen kinetic/potential energy approximation.
+329	CONTRACT	Valve/fitting kinetic-energy accounting overlaps #322; requires a total-energy control-volume oracle and declared approximation regime.
+414	UNIT	Missing Spice3 unit declarations require declaration coverage and interprocedural dimensional inference, not merely checking declared additions.
+665	INIT	Wall-friction homotopy improvement; compare continuation paths and initialization robustness rather than declaring every failed solve a library defect.
+666	INIT	Heat-transfer homotopy improvement needs a legal initial-condition suite and continuation diagnostics.
+667	INIT	Valve homotopy improvement needs legal parameter/initial-condition sweeps and continuation diagnostics.
+668	INIT	Fitting homotopy improvement needs continuation-path and initialization diagnostics.
+669	REFERENCE	Requests homotopy tests/examples; test coverage is the deliverable, not a numerical defect witness.
+694	UNRESOLVED	Reference-temperature convention (300.15 versus 293.15 K) is a design choice; no invalid computation is established.
+738	FRONTEND	Stream/inStream separate-compilation semantics require connector elaboration and cross-compilation equivalence checks.
+825	UNRESOLVED	Large negative Spice sentinel represents an unspecified parameter; do not infer a physical violation from its sign or GUI display.
+1064	NUMERIC	Tiny capacitances can cause stiffness/conditioning problems; SolverSan may report failure but lacks a scaled conditioning diagnosis.
+1225	UNRESOLVED	Negative specific enthalpy can be valid because its zero is conventional; blanket positivity checking would be incorrect.
+1292	REFERENCE	Intentionally failing ModelicaTest models need expected-failure metadata so correct diagnostic behavior is not counted as a regression.
+1410	FRONTEND	Deprecated cardinality usage is source-level compatibility/lint work, not evidence of an invalid numerical trajectory.
+1575	FRONTEND	R134a differentiation needs function/record differentiation support and derivative-contract checks; compilation failure is not a sanitizer hit.
+1659	CONTRACT	Missing pressure contribution to table-based entropy needs thermodynamic identity/derivative tests with the medium's approximation assumptions.
+1741	REFERENCE	Umbrella for problematic regression models; compare appropriate signals, conditioning and horizons, not raw trajectory equality alone.
+1742	ENHANCEMENT	Suppressing unused reverse-flow equations is an optimization when reversal is disabled; the discussion does not establish wrong results.
+1752	ENHANCEMENT	Stator-current input is legal Modelica; request is for a graphical connector/API with compatibility preserved.
+1773	INIT	Claim of an arbitrary initial system is disputed in comments; inspect actual initial constraints and state selection before assigning blame.
+1808	CONTRACT	An implausible default line resistance needs a specification/datasheet or scale contract; positive finite resistance is not intrinsically invalid.
+1862	ENHANCEMENT	Despite the bug label, this is a sorting implementation/performance improvement note, not an established wrong-result reproducer.
+1898	NUMERIC	Pump efficiency refers to nonlinear solve cost and Jacobian structure; discussion disputes whether simplification preserves the relevant physics.
+1910	FRONTEND	Uninitialized record fields require path-sensitive definite assignment across functions; nonfinite observations cover only some downstream symptoms.
+1913	UNRESOLVED	Low-concentration entropy handling is defended as a deliberate singularity guard; continuity/asymptotic checks need an agreed error bound.
+1915	UNRESOLVED	Real equality is legal in functions and sometimes necessary for root termination; blanket equality lint would misclassify valid code.
+1942	EXTERNAL	Resource handles created during parameter editing need lifetime/leak instrumentation in the external/runtime/GUI path.
+1959	EVENT	Digital pre semantics require a discrete state-transition truth table and event history; event density does not identify wrong logical state.
+1974	REFERENCE	API/signature compatibility after adding crossArea needs conversion and downstream-call regression tests; discussion points to #1973.
+2062	SHAPE	Vector-length parameters need nonnegative size constraints and legal zero-size/negative-size elaboration tests.
+2189	ENHANCEMENT	State-selection suggestion aims at efficiency; no incorrect trace is established by the requested attribute change alone.
+2193	EVENT	IdealGTOThyristor iteration loop may be tool-specific; event-loop/progress diagnostics are symptoms until reproduced across supported tools.
+2241	EXTERNAL	Invalid unused Fortran callback pointer in dgees requires ABI validation/C instrumentation, not a Modelica arithmetic-domain oracle.
+2248	NUMERIC	Flux/state scaling can impair solver accuracy; need normalized residuals and Jacobian conditioning rather than a sign/range heuristic.
+2302	UNIT	Spice3 unit consistency spans declarations and equations; current DimensionSan has incomplete call, power and assignment coverage.
+2347	UNIT	Missing Thyristor units/comments require source declaration coverage and dimensional contracts; unknown units are not detected mismatches.
+2348	CONTRACT	Unused IDRM parameter needs dependency/influence testing against the specified saturation-current behavior.
+2350	REFERENCE	Nonperiodic AD_DA reference needs a discrete-time/steady-period oracle; the stored reference cannot automatically be treated as ground truth.
+2413	NUMERIC	Unused pump-characteristic calculations can add difficult nonlinear equations; require dependency slicing and legal-parameter perturbations.
+2482	FRONTEND	StateSelect.always/never constraints need compiler/state-selection validation; flattened structural matching is not the same check.
+2512	DOCUMENTATION	initialScale controls icon size, not numerical initialization; this is graphical consistency work.
+2556	FRONTEND	FreeMotionScalarInit constraints should not affect dynamics when states are not selected; preserve state-selection semantics through lowering.
+2574	SHAPE	Conditional Fluid components and zero port arrays require language elaboration/array-shape checks before numerical analysis.
+2672	CONTRACT	Reverse-flow abrupt-adaptor failure is tied in comments to always-negative pressure-loss values; test both flow directions against the intended loss law.
+2717	NUMERIC	Lumped-volume curve parameter scaling and zero-volume limits need scaled residual/Jacobian diagnostics and legal boundary tests.
+2766	UNRESOLVED	DC-machine usage/connection assumptions must be resolved before blaming the component; an out-of-contract setup is not an independent bug.
+2776	ENHANCEMENT	from_nxz constructs a fixed orientation, for which zero angular velocity is intentional; a moving-frame API is a separate feature.
+2815	NUMERIC	Low-temperature moist-air logarithm failures can occur on internal solver trial states; DomainSan symptoms must retain trial/accepted-state provenance.
+2921	ENHANCEMENT	Derivative annotations may help tools but can be redundant with automatic differentiation; missing annotation alone is not a wrong-result bug.
+2941	INIT	bearingFriction branch guesses can make initialization singular; need branch-aware initialization and actual rank/residual evidence.
+2964	UNRESOLVED	Triac idealization and firing behavior remain a model-contract question; require an agreed switching truth table before judging results.
+2969	NUMERIC	kc_roundTube NaN discussion evolves from log/Re hypotheses to uninitialized outputs; use version-specific reproduction, not the earliest explanation alone.
+3098	CONTRACT	Gravity-dependent pump behavior needs a metamorphic gravity/head contract with boundary conditions and physical reference held consistent.
+3124	UNRESOLVED	Bend-loss coefficients allegedly differ from a handbook; determine the matching correlation/regime/reference before asserting a defect.
+3140	INIT	BranchingDynamicPipes homotopy failure needs continuation and initialization conditioning diagnostics; solver/assertion failures alone do not locate the cause.
+3158	UNIT	Angle_deg versus SI API refactoring requires conversion semantics and compatibility; degrees are not inherently invalid units.
+3168	ENHANCEMENT	Capacitance initial-condition handling is an API/convention proposal; test agreed semantics after the interface is specified.
+3241	INIT	Stator/rotor reference-angle constraints require phase-aware initialization consistency; structural warnings alone may not establish numerical rank.
+3417	NUMERIC	Unnecessary events in SignalGenerator are primarily a performance concern; need event-cost profiling and equivalent-trace checks.
+3477	REFERENCE	Chaotic systems need shorter comparison horizons or statistical/invariant checks; long-time pointwise divergence is not sufficient defect evidence.
+3481	ENHANCEMENT	Solid/ice behavior at the water triple point is outside the supported medium model; extending phase support is a feature request.
+3545	NUMERIC	Unbounded angle metadata changes error scaling; accuracy/solver-cost tradeoffs need explicit tolerance experiments.
+3546	ENHANCEMENT	Changing from_dp defaults targets nonlinear-system complexity; validate performance and physical equivalence rather than assume a numerical bug.
+3569	CONTRACT	DynamicPipe momentum pressure-drop claim needs discretization/refinement and conservation or analytic-solution checks.
+3624	EVENT	OMC phase-equivalent controls reproduce the pulse-initialization discrepancy; Rumoca event execution is blocked. See focused-results.md.
+3635	NUMERIC	Unbounded attributes on mechanical sources affect error scaling; no generic range violation proves the requested improvement.
+3655	FRONTEND	loadResource purity violation needs source effect analysis across ModelicaServices/external calls.
+3671	REFERENCE	Clocked signal references need clock phase, sample instant and hold semantics; pointwise unaligned traces are unsafe oracles.
+3672	DOCUMENTATION	Expansion factor is called compressibility factor; reporter states there is no code impact.
+3680	REFERENCE	DynamicPipeClosingValve reference quality needs solver refinement and invariant checks before treating reference differences as defects.
+3687	FRONTEND	Umbrella includes record fields (overlaps #1910), empty arrays and Spice cases; retain subcases and use definite-assignment/shape analyses.
+3711	REFERENCE	Rectifier spikes in reference data need event-aware comparison and a physical switching oracle; the reference may be wrong.
+3713	REFERENCE	Dimmer_RL comparison variable is ill-conditioned; use stable observables and scaled tolerances.
+3714	ENHANCEMENT	Redundant WallFriction variable is cleanup unless an actual behavior/performance effect is demonstrated.
+3747	CONTRACT	BasicHX temperatures require a mesh-convergence or analytic heat-exchanger oracle; finite temperatures can remain materially inaccurate.
+3761	CONTRACT	1D torque applied to a 3D joint needs support/reaction-frame semantics and total angular-momentum checks.
+3789	EXTERNAL	UTF-8 string length is an encoding/API contract, not numerical-domain safety; test code points/bytes according to the language specification.
+3795	FRONTEND	zeta can remain unset in a branch indirectly used by dp_nominal; needs conditional parameter-binding/definite-value analysis.
+3799	INIT	Tank initial levels at a boundary have no error margin; distinguish legal initialization/tolerance robustness from arbitrary illegal perturbations.
+3853	UNIT	LogarithmicDecrement has the wrong declared unit; expression checks cannot infer the intended physical quantity from its name.
+3855	FRONTEND	MemoryBase.getMemory purity requires transitive effect checking, overlapping the broader #4182 audit.
+3856	FRONTEND	Impure print in an equation section is a language/effect-system violation; check source context before flattening.
+3857	FRONTEND	Pure functions calling impure functions need a transitive source call graph; overlaps #4182.
+3858	REFERENCE	LogicalSample reference looks suspicious; overlaps clock/event coincidence discussions #4063 and #4731.
+3883	ENHANCEMENT	Second SweptVolume flange is a support/interface enhancement, also discussed in #4153.
+3917	UNIT	Non-SI units in Fluid require conversion/API policy checks; non-SI use is not automatically a dimensional error.
+3946	EXTERNAL	Unicode support is an umbrella including Windows-path #4773; use platform/encoding regression tests without double-counting subissues.
+3950	REFERENCE	Expected-failure annotations should distinguish correct diagnostics from failures of the test harness; overlaps #1292.
+3969	EXTERNAL	loadResource error behavior depends on the tool's ModelicaServices implementation; distinguish template stubs from resolved runtime services.
+3970	FRONTEND	Overriding final parameters needs modifier legality and binding provenance; a downstream finite value does not expose an ignored modifier.
+3996	EXTERNAL	Files.copy request is recoverable error-status behavior; existing halt-with-diagnostic can be intentional, not silent numerical corruption.
+4000	UNRESOLVED	LossyGear locking may reflect intended friction behavior; require operating-point and friction-law agreement before assigning a bug verdict.
+4002	EVENT	StateGraph behavior under simultaneous events needs an explicit transition-priority/temporal contract.
+4005	UNIT	Medium versus SI connector types concern inherited nominal/unit metadata; check type/attribute propagation rather than scalar finiteness.
+4013	ENHANCEMENT	Requests a discoverable regularization-function package and monotone option; no demonstrated regStep/smoothStep wrong result.
+4016	EVENT	SuperSampleInterpolated behavior needs a tick-index/interpolation oracle with exact clock alignment.
+4026	ENHANCEMENT	Removing a tool-specific state workaround requires cross-tool regression evidence; its presence is not intrinsically a model defect.
+4028	UNRESOLVED	PartialLinearFluid consistency depends on its linearization assumptions; thermodynamic derivative identities need an agreed approximation tolerance.
+4029	NUMERIC	PullInStroke initialization is reported extremely ill-conditioned; structural matching cannot replace scaled numerical rank/conditioning evidence.
+4046	UNIT	Units for constants and context-polymorphic literals are specification-sensitive; blanket dimensionless inference would create false positives.
+4050	UNIT	Machine default-parameter formulas need dimensional inference through constants, powers and bindings.
+4058	UNRESOLVED	Discussion corrects the target to ReferenceMoistAir and disputes ideal-gas assumptions; do not report the original MoistAir accusation as confirmed.
+4062	UNIT	Electron-volt quantities need correct conversion factors and quantity semantics, not just SI dimensional exponents.
+4063	REFERENCE	LogicalSample event tick is ill-defined; overlaps #3858/#4731 and requires simultaneous-event/reference semantics.
+4068	UNRESOLVED	Pipe/choked-flow expectations may exceed the selected approximation; reproduce within the model's supported physical regime.
+4069	REFERENCE	Outflow enthalpy at zero mass flow is a poor comparison signal; use flow-weighted energy and meaningful active-port quantities.
+4078	UNIT	Cauer filter capacitance formula uses dimensional literals; current checker cannot guarantee detection through context inference/powers/bindings.
+4079	UNIT	CauerLowPassAnalog unit report has the same dimensional-literal/inference limitation as #4078.
+4085	UNIT	Quantity names TimeAging/ChargeAging need semantic type-policy review; numerical dimension checking alone cannot decide naming correctness.
+4086	UNIT	Missing quantity metadata is a declaration-completeness check, not proof of inconsistent equations.
+4088	UNIT	CircularWaveNumber spelling/quantity identity requires metadata consistency checks, not a runtime sanitizer.
+4089	SHAPE	IntersectivePWM combines hardcoded phase count, faulty parameter propagation and startTime/f units; test nondefault m, frequency and start time separately.
+4097	UNIT	IntakeManifold empirical polynomial needs coefficient units and a matching published correlation; current power/call inference is incomplete.
+4125	UNRESOLVED	HeatingSystem failure differs between tools in the discussion; a Rumoca/OpenModelica failure alone cannot establish an MSL defect.
+4153	ENHANCEMENT	SweptVolume support-flange enhancement overlaps #3883; do not count these as independent demonstrated physical bugs.
+4170	NUMERIC	Near-zero flow cost requires progress budgets, equation/Jacobian scaling and profiling; timeout is a symptom, not a root-cause oracle.
+4173	EVENT	JKFF q/qn connection allegation needs a truth-table/temporal assertion; a connected graph cannot infer intended Boolean polarity.
+4182	FRONTEND	Umbrella purity audit requires transitive effects including external calls; overlaps #3655/#3855/#3856/#3857.
+4185	EXTERNAL	Table constructor null-pointer guards are C API contract/ABI checks; no generic Modelica numeric rule covers optional pointers.
+4190	REFERENCE	Requests realistic initialization tests with the specified start-value selection procedure, rather than fixed=true everywhere.
+4193	UNIT	One tolerance is used for position and speed; need unit inference and specification-aware constant/literal rules.
+4207	ENHANCEMENT	Evaluate annotations for start parameters are a compilation/API policy question; not intrinsically a failed initialization.
+4242	ENHANCEMENT	Initial excitation-current dialog access is usability/API work; detecting a bad initial trajectory does not implement that request.
+4244	REFERENCE	atan2 branch cuts require angle-equivalent comparison, not scalar pointwise differences near plus/minus pi.
+4317	FRONTEND	Unused connector fails a pedantic local-balance rule; flattened global matching is not source local-balance checking.
+4325	REFERENCE	A clock with zero second derivative cannot test the alleged derivative path; add nontrivial excitation and derivative oracles.
+4352	CONTRACT	Magnetic material properties need provenance and a matching datasheet/reference curve; valid finite numbers can still be wrong material data.
+4364	REFERENCE	DifferenceAmplifier stop time misses signal decay; check test horizon and observable coverage, not just whether simulation succeeds.
+4365	REFERENCE	Documented experiment settings differ from annotations; compare source/test metadata rather than numerical trajectories alone.
+4368	UNIT	ReferenceMoistAir unit/style concerns need interprocedural dimension and declaration coverage; style findings are separate from physics defects.
+4369	UNIT	Spice gamma units require fractional dimensional exponents and function propagation beyond the current checker.
+4370	CONTRACT	ClosedVolume vesselArea formula allegedly misses pi; test geometry/scale identities, since finite positive area passes basic safety checks.
+4386	UNRESOLVED	IdealSemiconductor quantity/literal semantics are disputed; avoid treating a context-dependent dimension warning as a confirmed defect.
+4401	DOCUMENTATION	PI y_start dialog enablement is inconsistent with steady-state mode; GUI dependency validation is the relevant check.
+4409	NUMERIC	PadeDelay cancellation needs high-precision or analytically bounded error comparison; cancellation without demonstrated material error is not a bug verdict.
+4410	REFERENCE	An err_u threshold may be unrealistically small; calibrate numerical tolerance and reference accuracy.
+4421	REFERENCE	CSV comparison of zero reference signals needs mixed absolute/relative tolerances; exact or purely relative checks are unreliable.
+4432	CONTRACT	Euler-angle jumps can describe a continuous orientation; compare rotations modulo representation and define desired angle-continuity behavior.
+4436	ENHANCEMENT	Simpler equations with flow reversal disabled are an optimization; validate equivalent supported behavior.
+4439	UNIT	Add gain units involve weighted-sum API semantics and inference; missing unit annotations are not automatically mismatches.
+4451	EVENT	OMC confirms pre(u) samples the current continuous input rather than one sample earlier; ModelSan execution is blocked. See focused-results.md.
+4457	ENHANCEMENT	Polyphase-current initialization choices need API and initial-condition conventions, not blanket failure classification.
+4459	CONTRACT	OMC yields five distinct levels with bits=2; ModelSan instrumentation/backend is blocked. A level-cardinality/end-point oracle is missing.
+4474	DOCUMENTATION	Missing sample() operator documentation; distinguish synchronous-clock overloads from discrete event sample semantics.
+4477	REFERENCE	ChuaCircuit is chaotic; use limited horizons and physical/statistical invariants instead of long-run exact trace matching.
+4482	DOCUMENTATION	VariableLimiter assertion-message clarity is diagnostic quality, not a new arithmetic-domain detection capability.
+4502	REFERENCE	Mean test compares only one of several relevant block outputs; improve signal coverage in the regression harness.
+4503	FRONTEND	Modelica.Constants.Inf versus language/tool semantics requires constant-definition and portability checks.
+4504	EXTERNAL	FMU initialization depends on exporter/importer lifecycle and coupling; test the FMI interface rather than attributing any failure to MSL.
+4507	REFERENCE	JointUSP2 drift changes with output intervals; assess integration/projection tolerance and invariant error, not raw reference identity.
+4523	REFERENCE	Assertion just after stop time reveals a test-horizon problem; reaching the intended check is a harness requirement.
+4525	ENHANCEMENT	Horizontal-pipe static-head special case avoids unnecessary complex functions; verify equivalence and performance across the zero-height boundary.
+4542	CONTRACT	Fresh-air CO2 concentration is outdated external data; require an authoritative scenario/date rather than infer incorrectness from finite range.
+4556	UNRESOLVED	Spherical-joint formulas may be algebraically redundant or intentional; establish a failed geometric identity before declaring a defect.
+4571	NUMERIC	Power-converter defaults involve ideal-limit conditioning; compare solver robustness while preserving the intended physical approximation.
+4573	ENHANCEMENT	Continuous rectangular-to-polar angle is an unwrap feature; atan2's branch cut is not itself an incorrect angle.
+4585	REFERENCE	Add the a=b, b>0 pressure-loss regression witness; a requested regression test is distinct from a still-open demonstrated defect.
+4594	UNRESOLVED	Multibody instability needs a minimal supported reproducer; a report involving a custom library cannot be adjudicated from its title.
+4607	NUMERIC	Machine eps/inf/small usage needs portable numerical contracts, scale analysis and actual-domain checks; usage alone is not a defect.
+4610	ENHANCEMENT	Multibody initialization usability/conventions require agreed API and state-selection semantics.
+4632	UNIT	EPSSIL/EPSSOX missing units need declaration audit and dielectric-constant semantics before equation inference can help.
+4637	REFERENCE	Chaotic behavior comparisons need appropriate horizon/invariants and uncertainty, not universal pointwise equality.
+4639	ENHANCEMENT	Interpolation improvement/performance requests require monotonicity/input contracts; optimization opportunity alone is not wrong behavior.
+4640	EXTERNAL	Discussion ties FMU results to lost input derivatives; requires exporter/importer derivative-transport checks and FMI experiments.
+4667	FRONTEND	Spice MOS2 parameter without value requires definite-value/binding analysis across records/functions before execution.
+4684	FRONTEND	Missing each on displayUnit is modifier/elaboration legality; a compiler warning/rejection is not a numerical sanitizer detection.
+4687	NUMERIC	Determinant is not a scale-invariant singularity test; need scaled rank/SVD or condition estimates with perturbation checks.
+4688	REFERENCE	IMC_DCBraking test concerns numerical tolerance/reference validity; separate model error from regression-harness sensitivity.
+4695	UNRESOLVED	Connection order in a diagram does not by itself establish reversed physical behavior; inspect actual connectivity and expected signals.
+4696	EXTERNAL	Table simulation report involves development binaries/header integration; distinguish build/distribution mismatch from interpolation defects.
+4697	FRONTEND	Variable binding modification violates local balancing; requires source-level instance/binding rules before flattening.
+4701	EXTERNAL	Missing installation-directory creation is a Makefile/build-system defect outside numerical model sanitizers.
+4702	EXTERNAL	MinGW Makefile support requires platform build CI, not arithmetic-domain monitoring.
+4703	FRONTEND	Conditional CompositeStep local balance/cardinality needs source elaboration checks for every structural configuration.
+4709	EXTERNAL	MAT inflate/checking report lacks a shareable failing original file; needs malformed-file/I/O validation and a retained reproducer.
+4719	NUMERIC	Root-bracket endpoint roundoff can trigger an assertion; use tolerant endpoint/bracket and residual oracles, not assertion-as-root-cause reasoning.
+4721	ENHANCEMENT	Nominal-point induction-machine initialization is an interface/workflow improvement, not an automatically detectable numerical violation.
+4723	CONTRACT	Invalid smooth(1) claim needs a precise differentiability contract at transitions; discussion disputes the proposed witness and interpretation.
+4724	UNRESOLVED	A Length quantity may be negative; quantity names alone do not impose a nonnegative domain.
+4728	CONTRACT	cp/cv need not equal the real two-phase isentropic exponent; check thermodynamic derivative identities near saturation.
+4729	EVENT	Sine/Cosine startTime behavior differs from prose expectations; phase/time-shift contracts and documentation intent are needed.
+4730	CONTRACT	IsentropicExponent definition overlaps #4728; distinguish a thermodynamic derivative from an ideal-gas heat-capacity ratio.
+4731	REFERENCE	LogicalSample simultaneous-event/reference issue overlaps #3858/#4063; do not count all three as independent confirmed defects.
+4742	ENHANCEMENT	SpecificPower type is missing; adding a quantity definition is an API enhancement rather than a runtime numerical bug.
+4743	UNRESOLVED	Table usage question needs a specified configuration and expected interpolation behavior before a defect/detection verdict.
+4744	EXTERNAL	Security-enhanced C function proposal requires platform/API analysis; function-name replacement alone neither proves nor fixes a vulnerability.
+4749	CONTRACT	OMC API evaluation violates entropy/state round trip away from reference pressure; Rumoca fails before artifact creation. See focused-results.md.
+4750	CONTRACT	OMC API evaluation returns 327.45744 K for a 300 K water state; reference-temperature mismatch needs a round-trip oracle. Rumoca is blocked.
+4751	ENHANCEMENT	Derivative/inverse annotations for special functions improve tool support; validate derivatives/domain branches rather than flag every absent annotation.
+4770	UNRESOLVED	Discussion compares different spline families/smoothing choices; matching interpolants is required before an accuracy defect is established.
+4771	SHAPE	Earlier OMC full/reduced-composition control reproduces bounds failure; Rumoca cannot lower either witness. Requires interprocedural extent/index contracts.
+4773	EXTERNAL	Windows UTF-8 paths need wide-character conversions and platform tests; numerical sanitizers cannot validate encoding transport.
+4794	EXTERNAL	tmpnam creates a filename race; atomic creation/handle ownership and C/platform analysis are needed, outside numerical sanitizers.
+4801	UNRESOLVED	Source passes smoothness to the external table constructor, which selects interpolation; common lookup-call names do not establish ignored smoothness.
+4807	NUMERIC	Linked #4800 discussion identifies fragile near-zero integral termination; needs function evaluation budgets and mixed absolute/relative quadrature accuracy checks.
+4814	EXCLUDED	Authored by Arslan8 (the connected user); retained in the census but excluded from independent evaluation and discovery counts.
+4815	REFERENCE	Model StartTime=-1 versus reference start=0 needs test metadata/horizon validation; newly opened issue explains the increase from cached 352 to 353.

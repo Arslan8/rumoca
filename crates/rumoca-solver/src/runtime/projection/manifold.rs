@@ -204,6 +204,14 @@ fn project_manifold_block<M: ManifoldProjectionModel>(
         seed[state] = 0.0;
         jvp.fill(0.0);
     }
+    crate::diagnostics::projection(
+        "manifold",
+        t,
+        &block.rows,
+        &block.y_indices,
+        &residual,
+        &jacobian,
+    );
     let structure = model
         .manifold_projection_block_structure(block_index)
         .map(solve::JacobianStructure::pattern);

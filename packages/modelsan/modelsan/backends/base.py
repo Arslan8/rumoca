@@ -125,7 +125,11 @@ class Backend(Protocol):
     """Which observation capabilities this execution environment can provide."""
 
     def prepare(self, model_path: str, model_name: str) -> ExecutionResult | None:
-        """One-time work. Returns a BACKEND_ERROR result on failure, else None."""
+        """One-time work, or a result when preparation prevents execution.
+
+        Unsupported compilation is BACKEND_ERROR. A typed, source-backed proof
+        of a model defect can instead be FAILED in the COMPILATION phase.
+        """
 
     def run(self, testcase: TestCase, instrumentation: list | None = None) -> ExecutionResult:
         ...

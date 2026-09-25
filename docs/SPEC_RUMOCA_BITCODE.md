@@ -1,6 +1,6 @@
-# Rumoca Bitcode v1
+# Rumoca Bitcode v2
 
-**Status:** implemented, v1.
+**Status:** implemented, v2.
 **Scope:** the public interchange format for a compiled Modelica model.
 
 Rumoca Bitcode (`.rbc`) is a versioned, machine-readable representation of a
@@ -20,7 +20,7 @@ Bitcode is deliberately **not** Rumoca's internal DAE serialization.
 | | internal wire | Rumoca Bitcode |
 |---|---|---|
 | Produced by | `Serialize for Dae` (`--emit dae-json`) | `rumoca-bitcode::export` |
-| Version | `DAE_SCHEMA_VERSION`, currently 33 | `RBC_VERSION`, currently 1 |
+| Version | `DAE_SCHEMA_VERSION`, currently 33 | `RBC_VERSION`, currently 2 |
 | Compatibility | single version only; SPEC_0033 requires the old reader be deleted on every change | versioned public contract |
 | Audience | the compiler | external tools |
 | Stability | changes freely | changes only when the public contract changes |
@@ -38,7 +38,7 @@ Rumoca's representation and create a plugin-versus-compiler upgrade deadlock.
 ```
 RbcFile
   magic            "RUMOCA-RBC"
-  bitcode_version  1
+  bitcode_version  2
   producer         e.g. "rumoca 0.10.0"   (informational only)
   model            RbcModel
 ```
@@ -110,9 +110,18 @@ Every enum is externally tagged by an explicit `kind` string, never by
 declaration order, so appending or reordering variants in the producer cannot
 change how an existing file decodes.
 
-v1 implements exactly one version. Migration infrastructure is deliberately
-absent until a v2 exists; the design constraint it must satisfy is that a
-breaking *internal* Rust change never forces a bitcode version change.
+The implementation reads and writes exactly version 2. Version 1 is rejected;
+recompile the source to create a current artifact. Rewriting the header is not
+a migration: the former payload-free `clock` condition lost the schedule,
+identity and ownership information required for faithful replay. Version 2
+replaces it with `clock_activation` referencing the exact `clocks` table and
+preserves `clock_ownerships`, including sampled ownership. No superseded
+payload-free clock reader is retained.
+
+`execution.version = 1` is a separate numerical-program contract. It remains
+unchanged and event-free. Equation artifacts containing supported clocks can
+be rebuilt and simulated with `compile-bitcode --simulate`; they do not acquire
+support in the numerical `bitcode run` adapter.
 
 ## 5. Identity
 
@@ -209,7 +218,7 @@ A flat arena in topological order: **every operand references a strictly lower
 the tree in one forward pass, and makes a cycle unrepresentable rather than
 something to detect.
 
-v1 represents literals, coordinates, unary and binary operators, and
+The current schema represents literals, coordinates, unary and binary operators, and
 conditionals. Anything else is recorded as `unsupported` with a detail string.
 A consumer that requires completeness must treat an `unsupported` node as "this
 artifact does not fully describe the model", never as a default value.
@@ -397,36 +406,40 @@ confirmed to produce `E0004` rather than a silent default. Two further tests
 assert that a self-referencing operand and a forward reference are both
 rejected.
 
-## 10. Known limits of v1
+## 10. Equation transport support and limits
 
-Stated plainly, because a format that hides its gaps is worse than one that
-names them.
+Version 2 carries exact periodic schedules (including negative phase and the
+absolute/simulation-start anchor), triggered clocks, activation identities and
+discrete-variable ownership. Decimal strings preserve each clock rational's
+128-bit numerator and denominator in JSON and CBOR. Checked import validates
+positive periods, references, ownership roles and sampled ownership.
 
-| Limit | Effect | Path |
-|---|---|---|
-| Expressions cover literals, coordinates, unary, binary, conditional | Other forms export as `unsupported`; import refuses them | extend `RbcExprNode` |
-| No function definitions or calls | Models with functions do not round-trip | v2 |
-| No arrays beyond type dimensions; no records or enumerations as structured types | Records collapse to a scalar kind | v2 |
-| No clocks or synchronous features | Clocked conditions refuse on import | v2 |
-| Type aliases collapse on import | `Voltage` and `Current` both become `Real`; structure is preserved, alias identity is not | carry alias names in `RbcType` |
-| Connection-set grouping beyond two members, inside/outside sign, connector-type `DefId` | A three-way connection reports as pairs | retain a connection inventory on `flat::Model` |
-| `--target` from bitcode covers `ir = "dae"` only | `dae-modelica` and custom DAE targets render. FMI packaging needs the artifact session the `compile` path owns; Flat/AST/Algorithm-Code targets need artifacts bitcode does not carry. | thread `Option<&CompilationResult>` through `ManifestRenderer::render` and the packaging functions |
+The predefined `String` conversion is a closed semantic expression tag. Its
+value, formatting options and format-string operand remain typed expression
+references. Import registers a fresh local predefined declaration and uses the
+checked DAE constructor; it does not infer builtins from user function names or
+transport a source compiler's declaration IDs.
 
-## 10a. Forward compatibility
+| Limit | Effect |
+|---|---|
+| Modelica function bodies remain elided | Signatures are inspectable, but calls cannot be rebuilt without the body. |
+| Previous/clock-transfer/delay/terminal operations are not represented | Unsupported expressions refuse on import; unrepresented semantic owner tables refuse export. |
+| Model-event transactions and structured roots are not represented | Export refuses rather than discarding their semantic ownership. |
+| Type aliases collapse on import | `Voltage` and `Current` both become `Real`; alias identity is not retained. |
+| Native numerical `execution.version = 1` remains scalar-real and event-free | Transporting an equation artifact does not expand the separate execution adapter. |
+| `--target` from bitcode covers `ir = "dae"` only | Flat/AST/Algorithm-Code and FMI packaging need artifacts or session state this projection does not carry. |
 
-`dump` and `convert` operate on the raw document, so a field written by a newer
-producer survives both. This is deliberate: changing how an artifact is
-*stored* must not change what it *contains*.
+Arrays, records and enumerations have typed representations. Every unsupported
+expression remains explicit, and import refuses it. An artifact's successful
+export alone does not prove that it can be imported or executed.
 
-The typed path is the contrast. `import` rebuilds only what it understands, and
-the Python SDK preserves the whole document because it never round-trips
-through a typed schema. So a v1 pass can load, edit and re-save a v2 artifact
-without destroying the parts it does not know.
+## 10a. Unknown-field preservation
 
-The one thing that does not survive is a v1 *reader* meeting a v2 enum variant
-it cannot interpret: it is refused, not guessed. Adding a variant is a
-compatible change for the format and a hard stop for an older reader, which is
-the honest trade.
+Raw `dump` and `convert` preserve unknown fields in the document. The Python
+SDK preserves unknown fields within the current version when saving edits.
+Typed import rebuilds only the current schema and rejects unknown variants;
+all semantic readers reject unsupported version headers. Unknown-field
+preservation does not authorize interpreting another contract version.
 
 ## 11. Connector provenance: what was recovered, and what was not
 
@@ -434,7 +447,7 @@ The DAE retains **no** connector structure. Of the original `connect(...)`, only
 a `connection_equation` / `flow_balance_equation` tag survives, anchored to the
 connector member declaration.
 
-v1 recovers connections at export time by joining the DAE with the Flat model,
+The exporter recovers connections at export time by joining the DAE with the Flat model,
 which retains per-equation `EquationOrigin::Connection { lhs, rhs }` and
 per-variable `flow` / `stream` / `connected` flags. That is enough for
 endpoints, flow-versus-potential classification, connector membership, and
@@ -451,5 +464,5 @@ What is still lost: the connection-set grouping for sets with more than two
 members, the inside/outside sign, and the connector type's `DefId`.
 `ConnectionSet` and `ConnectionGraph` exist in `rumoca-ir-flat` but are built
 and discarded inside `rumoca-phase-flatten/src/vcg.rs`; they are not fields of
-`flat::Model`. The schema is already shaped for the richer data, so v1 → v2
+`flat::Model`. The schema is already shaped for the richer data, so extending it
 would be additive.

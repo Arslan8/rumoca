@@ -76,6 +76,16 @@ DERIVED: dict[str, Dimension] = {
     "Gy": Dimension((0, 2, -2, 0, 0, 0, 0)),
     "Sv": Dimension((0, 2, -2, 0, 0, 0, 0)),
     "kat": Dimension((0, 0, -1, 0, 0, 1, 0)),
+    # Non-SI units MSL declares. They belong in a *dimension* table even though
+    # they are not SI-coherent: `deg` is an angle and `eV` is an energy, and
+    # leaving them unparseable does not make them safe — it makes them
+    # invisible. A checker that asks "is this unit SI?" needs to know what the
+    # unit is before it can answer, and `is_si_coherent` answers separately.
+    "deg": ONE,
+    "eV": Dimension((1, 2, -2, 0, 0, 0, 0)),
+    "var": Dimension((1, 2, -3, 0, 0, 0, 0)),
+    "degF": Dimension((0, 0, 0, 0, 1, 0, 0)),
+    "degRk": Dimension((0, 0, 0, 0, 1, 0, 0)),
 }
 
 _FACTOR = re.compile(r"^([A-Za-z]+)(-?\d+)?$")

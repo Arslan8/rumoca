@@ -4,6 +4,8 @@
 compile_error!("rumoca-solver production builds require the `sparse-linalg` feature");
 
 #[cfg(not(kani))]
+pub mod diagnostics;
+#[cfg(not(kani))]
 pub mod fmi_me;
 #[cfg(not(kani))]
 pub mod report_payload;

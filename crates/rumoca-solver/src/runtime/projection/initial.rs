@@ -372,6 +372,7 @@ pub(super) fn project_initial_block<M: AlgebraicProjectionModel>(
         });
     }
     let jacobian = initial_block_jacobian(model, y, p, t, rows, y_indices, &residual)?;
+    crate::diagnostics::projection("initialization", t, rows, y_indices, &selected, &jacobian);
     let structure = model
         .initial_projection_block_structure(block_index)
         .map(solve::JacobianStructure::pattern);

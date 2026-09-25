@@ -333,6 +333,9 @@ fn resolve_bench_input(args: &SimBenchArgs) -> Result<BenchInput> {
 
 #[cfg(feature = "scheduled-sim")]
 fn resolve_config_bench_input(args: &SimBenchArgs, config_path: &str) -> Result<BenchInput> {
+    if args.model_options.freeze_parameters {
+        bail!("--freeze-parameters requires direct model-file input, without --config");
+    }
     let config = rumoca_sim::scenario_config::SimulationConfig::load(Path::new(config_path))
         .with_context(|| format!("Load simulation config: {config_path}"))?;
     let config_dir = Path::new(config_path).parent().unwrap_or(Path::new("."));
@@ -381,6 +384,7 @@ fn resolve_config_bench_input(args: &SimBenchArgs, config_path: &str) -> Result<
                 model: Some(model_name),
                 source_roots,
                 no_fold_parameter_bindings: false,
+                freeze_parameters: false,
             },
         },
         t_end: args.t_end.unwrap_or(config.sim.t_end),

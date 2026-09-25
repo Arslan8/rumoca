@@ -8,23 +8,32 @@ The narrative — container, encodings, versioning, identity, provenance, valida
 
 **Compatibility** is per member. `additive` means a reader of an artifact written before the member existed still works, because the member is optional or defaulted; `required` means adding it is a version break.
 
-56 types.
+66 types.
 
 | Type | Kind | Members |
 |---|---|---:|
-| [`RbcModel`](#rbcmodel) | struct | 24 |
-| [`RbcSummary`](#rbcsummary) | struct | 27 |
+| [`RbcModel`](#rbcmodel) | struct | 28 |
+| [`RbcSummary`](#rbcsummary) | struct | 29 |
 | [`RbcAction`](#rbcaction) | enum | 3 |
 | [`RbcBinaryOp`](#rbcbinaryop) | enum | 13 |
 | [`RbcBinder`](#rbcbinder) | struct | 5 |
 | [`RbcBranch`](#rbcbranch) | struct | 2 |
 | [`RbcCausality`](#rbccausality) | enum | 6 |
+| [`RbcClock`](#rbcclock) | struct | 3 |
+| [`RbcClockAnchor`](#rbcclockanchor) | enum | 2 |
+| [`RbcClockNode`](#rbcclocknode) | enum | 2 |
+| [`RbcClockOwnership`](#rbcclockownership) | struct | 4 |
+| [`RbcClockRational`](#rbcclockrational) | struct | 2 |
 | [`RbcComponent`](#rbccomponent) | struct | 3 |
 | [`RbcCondition`](#rbccondition) | struct | 3 |
 | [`RbcConditionNode`](#rbcconditionnode) | enum | 10 |
 | [`RbcConnection`](#rbcconnection) | struct | 8 |
 | [`RbcConnectionSet`](#rbcconnectionset) | struct | 7 |
+| [`RbcConnectorField`](#rbcconnectorfield) | struct | 5 |
+| [`RbcConnectorFieldBinding`](#rbcconnectorfieldbinding) | struct | 3 |
+| [`RbcConnectorInstance`](#rbcconnectorinstance) | struct | 7 |
 | [`RbcConnectorMember`](#rbcconnectormember) | struct | 2 |
+| [`RbcConnectorType`](#rbcconnectortype) | struct | 4 |
 | [`RbcCoordinate`](#rbccoordinate) | enum | 15 |
 | [`RbcDiscreteActivation`](#rbcdiscreteactivation) | enum | 2 |
 | [`RbcDiscreteBranch`](#rbcdiscretebranch) | struct | 3 |
@@ -36,8 +45,8 @@ The narrative — container, encodings, versioning, identity, provenance, valida
 | [`RbcEquationFamily`](#rbcequationfamily) | struct | 10 |
 | [`RbcEventAction`](#rbceventaction) | struct | 5 |
 | [`RbcExpr`](#rbcexpr) | struct | 4 |
-| [`RbcExprNode`](#rbcexprnode) | enum | 15 |
-| [`RbcFile`](#rbcfile) | struct | 4 |
+| [`RbcExprNode`](#rbcexprnode) | enum | 16 |
+| [`RbcFile`](#rbcfile) | struct | 5 |
 | [`RbcFlowBalance`](#rbcflowbalance) | struct | 2 |
 | [`RbcFlowTerm`](#rbcflowterm) | struct | 2 |
 | [`RbcFunction`](#rbcfunction) | struct | 7 |
@@ -60,6 +69,7 @@ The narrative — container, encodings, versioning, identity, provenance, valida
 | [`RbcSchedule`](#rbcschedule) | enum | 2 |
 | [`RbcSource`](#rbcsource) | struct | 3 |
 | [`RbcSpan`](#rbcspan) | struct | 5 |
+| [`RbcStringConversionFormat`](#rbcstringconversionformat) | enum | 2 |
 | [`RbcSubscript`](#rbcsubscript) | enum | 3 |
 | [`RbcSymbolContract`](#rbcsymbolcontract) | struct | 9 |
 | [`RbcTimeEvent`](#rbctimeevent) | struct | 3 |
@@ -75,6 +85,8 @@ A compiled Modelica model in public form.
 
 | Member | Type | Compatibility | Meaning |
 |---|---|---|---|
+| `connector_types` | `Vec<RbcConnectorType>` | additive | Semantic connector type declarations for public model construction. |
+| `connectors` | `Vec<RbcConnectorInstance>` | additive | Connector instances own member identities independently of connection edges. |
 | `name` | `String` | required | Top-level model name as compiled, e.g. `"Circuit.Test"`. |
 | `sources` | `Vec<RbcSource>` | required | Source files referenced by provenance in this artifact. |
 | `types` | `Vec<RbcType>` | required | Value types referenced by variables and expressions. |
@@ -90,6 +102,8 @@ A compiled Modelica model in public form.
 | `initial_equation_families` | `Vec<RbcEquationFamily>` | additive | — |
 | `relations` | `Vec<RbcRelation>` | required | Primitive comparisons that can generate events. |
 | `conditions` | `Vec<RbcCondition>` | required | Boolean activation conditions over relations, clocks and discretes. |
+| `clocks` | `Vec<RbcClock>` | additive | Exact schedules referenced by clock activations. |
+| `clock_ownerships` | `Vec<RbcClockOwnership>` | additive | Clock ownership of discrete variables, including sampled left-limit reads. |
 | `roots` | `Vec<RbcRoot>` | required | Zero-crossing surfaces the solver must monitor. |
 | `events` | `Vec<RbcEventAction>` | required | Actions performed when an event fires. |
 | `time_events` | `Vec<RbcTimeEvent>` | required | Scheduled (time-triggered) events. |
@@ -120,6 +134,8 @@ Denormalised counts, for cheap validation and for `bitcode inspect`.
 | `expressions` | `u32` | required | — |
 | `relations` | `u32` | required | — |
 | `conditions` | `u32` | required | — |
+| `clocks` | `u32` | additive | — |
+| `clock_ownerships` | `u32` | additive | — |
 | `roots` | `u32` | required | — |
 | `events` | `u32` | required | — |
 | `time_events` | `u32` | required | — |
@@ -198,6 +214,54 @@ Interface causality, orthogonal to [`RbcRole`].
 | `Independent` | — |
 | `Local` | — |
 
+## RbcClock
+
+_No description._
+
+| Member | Type | Compatibility | Meaning |
+|---|---|---|---|
+| `id` | `ClockId` | required | — |
+| `node` | `RbcClockNode` | required | — |
+| `provenance` | `RbcProvenance` | required | — |
+
+## RbcClockAnchor
+
+_No description._
+
+| Variant | Meaning |
+|---|---|
+| `Absolute` | — |
+| `SimulationStart` | — |
+
+## RbcClockNode
+
+_No description._
+
+| Variant | Meaning |
+|---|---|
+| `Periodic` | — |
+| `Triggered` | — |
+
+## RbcClockOwnership
+
+_No description._
+
+| Member | Type | Compatibility | Meaning |
+|---|---|---|---|
+| `variable` | `VariableId` | required | — |
+| `clock` | `ClockId` | required | — |
+| `sampled` | `bool` | required | — |
+| `provenance` | `RbcProvenance` | required | — |
+
+## RbcClockRational
+
+Exact clock rational. Decimal strings preserve 128-bit integers in both CBOR and JSON, including clients whose JSON numbers use floating point.
+
+| Member | Type | Compatibility | Meaning |
+|---|---|---|---|
+| `numerator` | `String` | required | — |
+| `denominator` | `String` | required | — |
+
 ## RbcComponent
 
 One component instance, identified by its flattened path prefix.
@@ -232,7 +296,7 @@ _No description._
 | `And` | — |
 | `Or` | — |
 | `AnyRise` | MLS §8.3.5 vector activation: fires when any element rises. |
-| `Clock` | Clocked activation this schema version does not detail. |
+| `ClockActivation` | Activation of one clock in the exact schedule table. |
 | `Unsupported` | — |
 
 ## RbcConnection
@@ -264,6 +328,42 @@ One node of the connection graph: everything `connect(...)` joined together. A `
 | `unconnected` | `bool` | additive | A connector nothing was connected to, whose flow MLS §9.2 sets to zero. Not a defect on its own --- a model compiled standalone has unconnected ports by construction --- but the distinction between "conserved among several" and "forced to zero alone" is one a reader needs, and it is invisible once both are just equations. |
 | `provenance` | `RbcProvenance` | required | — |
 
+## RbcConnectorField
+
+_No description._
+
+| Member | Type | Compatibility | Meaning |
+|---|---|---|---|
+| `name` | `String` | required | — |
+| `scalar_type` | `String` | required | — |
+| `unit` | `String` | additive | — |
+| `quantity` | `String` | additive | — |
+| `kind` | `RbcQuantityKind` | required | — |
+
+## RbcConnectorFieldBinding
+
+_No description._
+
+| Member | Type | Compatibility | Meaning |
+|---|---|---|---|
+| `name` | `String` | required | — |
+| `variable` | `VariableId` | required | — |
+| `kind` | `RbcQuantityKind` | required | — |
+
+## RbcConnectorInstance
+
+_No description._
+
+| Member | Type | Compatibility | Meaning |
+|---|---|---|---|
+| `id` | `u32` | required | — |
+| `path` | `String` | required | — |
+| `owner` | `ComponentId` | required | — |
+| `type_id` | `u32` | required | — |
+| `orientation` | `String` | required | — |
+| `members` | `Vec<RbcConnectorFieldBinding>` | required | — |
+| `provenance` | `RbcProvenance` | required | — |
+
 ## RbcConnectorMember
 
 Modelica connector semantics for one variable. A `flow` member obeys a sum-to-zero conservation law; a `potential` member is equated across a connection. Preserving this distinction is why connections are not modelled as directional messages.
@@ -272,6 +372,17 @@ Modelica connector semantics for one variable. A `flow` member obeys a sum-to-ze
 |---|---|---|---|
 | `quantity` | `RbcQuantityKind` | required | — |
 | `connected` | `bool` | required | True when this member participates in at least one `connect(...)`. |
+
+## RbcConnectorType
+
+_No description._
+
+| Member | Type | Compatibility | Meaning |
+|---|---|---|---|
+| `id` | `u32` | required | — |
+| `name` | `String` | required | — |
+| `members` | `Vec<RbcConnectorField>` | required | — |
+| `flow_convention` | `String` | required | — |
 
 ## RbcCoordinate
 
@@ -419,6 +530,7 @@ Expression node. Operands always reference nodes with a **lower** [`ExprId`], so
 
 | Variant | Meaning |
 |---|---|
+| `StringConversion` | The predefined MLS scalar-to-String operation, never an arbitrary call whose display name happens to be String. |
 | `Literal` | — |
 | `Coordinate` | — |
 | `Unary` | — |
@@ -441,6 +553,7 @@ One `.rbc` artifact.
 
 | Member | Type | Compatibility | Meaning |
 |---|---|---|---|
+| `execution` | `Option<rumoca_ir_solve::execution::ExecutionArtifact>` | additive | Optional public, independently versioned executable projection. |
 | `magic` | `String` | required | Always [`RBC_MAGIC`]. |
 | `bitcode_version` | `u32` | required | Public contract version. See [`RBC_VERSION`]. |
 | `producer` | `String` | required | Free-form producer identification, e.g. `"rumoca 0.10.0"`. Informational only: a consumer must not change behaviour based on it. |
@@ -466,7 +579,7 @@ One flow member of a connection set, with the sign the balance gives it.
 
 ## RbcFunction
 
-One function declaration, without its body. The signature is what a *call site* needs: which function, how many arguments, what they mean. The body is a separate IR — SSA definitions, loop transitions, conditionals, external interfaces — and bitcode v1 does not carry it, which `body` records explicitly so an absent body is never mistaken for an empty one.
+One function declaration, without its body. The signature is what a *call site* needs: which function, how many arguments, what they mean. The body is a separate IR — SSA definitions, loop transitions, conditionals, external interfaces — and bitcode v2 does not carry it, which `body` records explicitly so an absent body is never mistaken for an empty one.
 
 | Member | Type | Compatibility | Meaning |
 |---|---|---|---|
@@ -498,7 +611,7 @@ _No description._
 
 ## RbcGeneration
 
-Lowering kinds a consumer may care about. Mirrors the compiler's own classification; `Other` keeps a v1 reader working against a producer that learns a new kind.
+Lowering kinds a consumer may care about. Mirrors the compiler's own classification; `Other` keeps a current reader working against a producer that learns a new kind.
 
 | Variant | Meaning |
 |---|---|
@@ -695,6 +808,15 @@ A resolved source location. Byte offsets are authoritative; line and column are 
 | `end` | `u32` | required | — |
 | `line` | `u32` | required | 1-based line of `start`. |
 | `column` | `u32` | required | 1-based column of `start`. |
+
+## RbcStringConversionFormat
+
+Optional operands of the predefined String conversion (MLS §3.7.1).
+
+| Variant | Meaning |
+|---|---|
+| `Options` | — |
+| `Format` | — |
 
 ## RbcSubscript
 

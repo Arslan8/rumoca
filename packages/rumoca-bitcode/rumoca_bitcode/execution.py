@@ -14,7 +14,7 @@ from . import Model
 from .compiler import invoke
 
 
-def lower(model: Model, *, observe=None) -> "Program":
+def lower(model: Model, *, observe=None, executable=None, timeout=None) -> "Program":
     with tempfile.TemporaryDirectory(prefix="rbc-lower-") as tmp:
         source, target = Path(tmp) / "equations.rbc", Path(tmp) / "execution.json"
         document = deepcopy(model._document)
@@ -24,7 +24,7 @@ def lower(model: Model, *, observe=None) -> "Program":
         if observe is not None:
             for identifier in observe:
                 args += ["--observe", str(identifier)]
-        invoke(*args)
+        invoke(*args, executable=executable, timeout=timeout)
         artifact = Model.load(target)
     return Program(model, artifact._document["execution"])
 
@@ -66,23 +66,24 @@ class Program:
         doc["execution"] = deepcopy(self.raw)
         return doc
 
-    def validate(self, *, strict=True):
+    def validate(self, *, strict=True, executable=None, timeout=None):
         with tempfile.TemporaryDirectory(prefix="rbc-execution-check-") as tmp:
             path = Path(tmp) / "program.rbc"
             Model(self._document()).save(path)
-            invoke("bitcode", "check", path, *(["--strict"] if strict else []))
+            invoke("bitcode", "check", path, *(["--strict"] if strict else []),
+                   executable=executable, timeout=timeout)
 
-    def save(self, path, *, include_equations=True):
+    def save(self, path, *, include_equations=True, executable=None, timeout=None):
         if not include_equations:
             raise ValueError("execution v1 requires equations for derivation checking")
         signature = self._signature()
         if signature != self._saved_signature:
             self.raw["revision"] += 1
-        self.validate()
+        self.validate(executable=executable, timeout=timeout)
         Model(self._document()).save(path)
         self._saved_signature = signature
 
-    def relower(self, *, replay=None):
+    def relower(self, *, replay=None, observe=None, executable=None, timeout=None):
         """Explicit recipe replay; a caller supplies compatible pass implementations.
 
         Callbacks run only while authoring, never in the saved runtime process.
@@ -101,10 +102,12 @@ class Program:
                 raise ValueError(f"unknown observation variable {observation['variable_id']}")
             if target["name"] != observation["name"]:
                 raise ValueError(f"replay target identity changed: {observation['name']}")
-        fresh = lower(self.model, observe=observed)
+        if observe is not None:
+            observed = list(dict.fromkeys([*observed, *observe]))
+        fresh = lower(self.model, observe=observed, executable=executable, timeout=timeout)
         for recipe in recipes:
             replay[recipe["name"]](fresh, self.model, **recipe["options"])
-        fresh.validate()
+        fresh.validate(executable=executable, timeout=timeout)
         return fresh
 
 

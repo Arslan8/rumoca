@@ -24,7 +24,7 @@ from typing import Any, Iterator
 from . import _cbor
 
 MAGIC = "RUMOCA-RBC"
-VERSION = 1
+VERSION = 2
 
 
 class BitcodeError(Exception):
@@ -450,8 +450,24 @@ class BuiltinCall(Expression):
         return f"{self.name}({', '.join(repr(a) for a in self.arguments)})"
 
 
+class StringConversion(Expression):
+    """Predefined scalar-to-String conversion with explicit format operands."""
+
+    __slots__ = ("value", "format_kind", "format_operands")
+
+    def __init__(self, id, provenance, value, format_kind, format_operands):
+        super().__init__(id, provenance)
+        self.value, self.format_kind, self.format_operands = value, format_kind, format_operands
+
+    def children(self):
+        return [self.value, *self.format_operands.values()]
+
+    def __repr__(self):
+        return f"String({self.value!r})"
+
+
 class Unsupported(Expression):
-    """A node bitcode v1 could not represent.
+    """A node bitcode v2 could not represent.
 
     Its presence means the artifact does not fully describe the model. A pass
     that cares about completeness should refuse rather than assume a value.
@@ -606,6 +622,7 @@ class ConnectionSet:
     id = property(lambda self: self._raw["id"])
     connectors = property(lambda self: tuple(self._raw.get("connectors", ())))
     unconnected = property(lambda self: bool(self._raw.get("unconnected", False)))
+    potential_equations = property(lambda self: tuple(self._raw.get("potential_equations", ())))
 
     @property
     def potentials(self) -> tuple["Variable", ...]:
@@ -826,7 +843,7 @@ class FunctionParameter:
 class Function:
     """A function declaration, without its body.
 
-    Bitcode v1 carries the *signature* — what a call site needs — and not the
+    Bitcode v2 carries the *signature* — what a call site needs — and not the
     body, which is a separate IR of SSA definitions, loop transitions and
     external interfaces. `has_body` says which, so an absent body is never
     mistaken for an empty one.

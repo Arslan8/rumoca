@@ -1080,6 +1080,7 @@ pub(crate) fn finalize_flat_model(
     // source signatures. Record-field bindings belong to the constructor and
     // must not be copied onto the scalar ABI parameters created below.
     functions::materialize_flat_function_call_args(flat)?;
+    functions::specialize_function_inputs(flat, tree)?;
     // Record parameter signatures and every call site must change together.
     // Run this only after the rewrite fixed point: earlier lowering allowed a
     // later rewrite to reintroduce source-shaped record arguments against an
@@ -1095,7 +1096,13 @@ pub(crate) fn finalize_flat_model(
     inject_referenced_qualified_class_constants(tree, class_index, model_name, flat, overlay, ctx)?;
     substitute_known_constants_in_flat(flat, ctx)?;
     resolve_nested_constructor_field_access_bindings(flat);
+    // Reachability is decided from the call graph as written, before any call
+    // is folded to its result. Folding first makes a pure call with settled
+    // arguments vanish, and the callee is then pruned as unreachable although
+    // the source calls it -- which emptied the collected table for every
+    // fixture whose calls take literal arguments.
     functions::prune_unreachable_functions(flat);
+    functions::fold_pure_constant_calls(flat)?;
     functions::validate_flat_function_bindings(flat)?;
     ctx.refresh_enum_parameter_lookup(flat);
     enum_literals::canonicalize_flat_enum_literals(flat, tree, &ctx.enum_parameter_values);

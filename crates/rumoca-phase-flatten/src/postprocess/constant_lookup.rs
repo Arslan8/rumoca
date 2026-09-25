@@ -285,7 +285,14 @@ pub(super) fn resolve_source_constant<'a>(
     name: &rumoca_core::Reference,
     ctx: &'a Context,
 ) -> Option<(SemanticConstantId, &'a rumoca_core::Expression)> {
-    let declaration = name.target_def_id()?;
+    resolve_source_constant_declaration(name, name.target_def_id()?, ctx)
+}
+
+pub(super) fn resolve_source_constant_declaration<'a>(
+    name: &rumoca_core::Reference,
+    declaration: rumoca_core::DefId,
+    ctx: &'a Context,
+) -> Option<(SemanticConstantId, &'a rumoca_core::Expression)> {
     let occurrence = name
         .instance_id()
         .and_then(|class_instance| ctx.constant_owner_for_class(class_instance))

@@ -59,6 +59,7 @@ from .model import (
     Literal,
     Provenance,
     Source,
+    StringConversion,
     Span,
     SymbolContract,
     TimeRef,
@@ -93,6 +94,7 @@ __all__ = [
     "UnaryOp",
     "BinaryOp",
     "BuiltinCall",
+    "StringConversion",
     "Conditional",
     "Domain",
     "DiscreteRealEquation",
@@ -254,7 +256,7 @@ class Model:
                 "sources": [{"id": 0, "name": f"<{producer}>"}],
                 "types": [], "variables": [],
                 "expressions": [], "equations": [], "initial_equations": [],
-                "relations": [], "conditions": [], "roots": [],
+                "relations": [], "conditions": [], "clocks": [], "clock_ownerships": [], "roots": [],
                 "events": [], "time_events": [], "connections": [],
                 "components": [], "trace_points": [],
                 "summary": {},
@@ -292,6 +294,11 @@ class Model:
     def connectors(self):
         from .connectors import Connector
         return [Connector(raw, self) for raw in self._raw.get("connectors", [])]
+
+    @property
+    def has_execution(self) -> bool:
+        """Whether the container carries a saved program (not a validity claim)."""
+        return self._document.get("execution") is not None
 
     def validate(self, strict: bool = True, *, connections: bool = False) -> None:
         from .compiler import check_model
@@ -436,6 +443,8 @@ class Model:
             "expressions": len(self.expressions),
             "relations": len(self._raw.get("relations", [])),
             "conditions": len(self._raw.get("conditions", [])),
+            "clocks": len(self._raw.get("clocks", [])),
+            "clock_ownerships": len(self._raw.get("clock_ownerships", [])),
             "roots": len(self._raw.get("roots", [])),
             "events": len(self.events),
             "time_events": len(self._raw.get("time_events", [])),
@@ -519,6 +528,11 @@ class Model:
                         built[node["rhs"]],
                     )
                 )
+            elif kind == "string_conversion":
+                format = node["format"]
+                built.append(StringConversion(identifier, provenance, built[node["value"]],
+                    format["kind"], {key: built[value] for key, value in format.items()
+                                     if key != "kind" and value is not None}))
             elif kind == "builtin":
                 built.append(
                     BuiltinCall(

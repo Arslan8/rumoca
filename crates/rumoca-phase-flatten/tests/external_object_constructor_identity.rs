@@ -37,7 +37,11 @@ end addPair;
 
 model UsesBoth
   parameter Handle handle = Handle(1.0);
-  parameter Real total = addPair(Pair(2.0, 3.0));
+  // One field is `time` so the call is not settled at translation and
+  // survives pure-constant folding; what is asserted is that the record
+  // construction is structural and arrives scalarized, not that it is
+  // unevaluable.
+  Real total = addPair(Pair(time, 3.0));
 end UsesBoth;
 "#;
 

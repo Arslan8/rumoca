@@ -158,7 +158,7 @@ class NetworkSan:
             if node.kind is not NodeKind.UNCONNECTED:
                 continue
             connector = node.connectors[0] if node.connectors else str(node)
-            owner = connector.rpartition(".")[0]
+            owner = next((p.component for p in network.ports if p.connector == connector), "")
             component = network.components.get(owner)
             anchors = [CanonicalAnchor(EntityKind.VARIABLE, flow.id, flow.name)
                        for flow, _ in node.flows]
@@ -218,7 +218,7 @@ class NetworkSan:
 
     # ── instrumentation ──────────────────────────────────────────────────────
 
-    def instrumentation(self, model, context: AnalysisContext
+    def requests(self, model, context: AnalysisContext
                         ) -> list[InstrumentationRequest]:
         """Both members of every port, tagged with the node they share."""
         network = build(model)
@@ -229,23 +229,35 @@ class NetworkSan:
     # ── runtime ──────────────────────────────────────────────────────────────
 
     def observe(self, stream: ObservationStream, model,
-                context: AnalysisContext) -> list[Finding]:
+                context: AnalysisContext, testcase) -> list[Finding]:
         """Check the two things a network asserts and a run can contradict."""
         network = build(model)
         if network.absent:
             return []
-        findings = self._conservation(stream, network)
-        findings += self._power(stream, network, context)
+        from ..network.observations import Samples
+        identifiers = {v.id for port in network.ports for v in port.potentials}
+        identifiers |= {v.id for port in network.ports for v, _ in port.flows}
+        samples = Samples(stream, identifiers)
+        if samples.reason:
+            return [Finding(sanitizer=self.name, kind="network-observation-incomplete",
+                            severity=Severity.INFO, test_case=testcase,
+                            evidence={"reason": samples.reason, "note": "coverage gap, not a model defect"})]
+        findings = self._conservation(samples, network)
+        findings += self._power(samples, network, context)
+        for finding in findings:
+            finding.test_case = testcase
         return findings
 
     def _conservation(self, stream, network) -> list[Finding]:
         """At every node, the signed flows sum to zero. At every step."""
         found = []
-        for node in network.nodes:
-            if node.kind is not NodeKind.ACAUSAL or len(node.flows) < 2:
+        # A multi-field connector owns separate conservation laws. Combining
+        # them can hide equal-and-opposite violations of different quantities.
+        for node, balance in ((node, balance) for node in network.nodes for balance in node.balances):
+            if not balance.terms:
                 continue
             series = [(flow, sign, _series(stream, flow))
-                      for flow, sign in node.flows]
+                      for flow, sign in balance.terms]
             if any(values is None for _, _, values in series):
                 continue
             length = min(len(values) for _, _, values in series)
@@ -266,7 +278,7 @@ class NetworkSan:
                 canonical_anchors=[
                     CanonicalAnchor(EntityKind.VARIABLE, flow.id, flow.name)
                     for flow, _, _ in series],
-                source_locations=locate(node.flows[0][0]),
+                source_locations=locate(balance.terms[0][0]),
                 evidence={
                     "node": str(node),
                     "required": " + ".join(

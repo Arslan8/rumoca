@@ -16,7 +16,7 @@ use super::constant_lookup::{
     named_constructor_arg, reference_key_has_array_shape, resolve_constant_field_access,
     resolve_constant_value_expr, resolve_constant_value_expr_for_ref,
     resolve_indexed_constant_field_access, resolve_inline_indexed_constant,
-    resolve_projected_constant_path, resolve_source_constant,
+    resolve_projected_constant_path, resolve_source_constant, resolve_source_constant_declaration,
     resolve_varref_through_constant_aliases, scalar_parameter_literal,
 };
 use super::*;
@@ -340,7 +340,7 @@ fn substitute_source_scalar_var_ref(
     env: ConstantSubstitutionEnv<'_>,
 ) -> Result<Option<rumoca_core::Expression>, FlattenError> {
     let Some((identity, value)) = resolve_source_constant(name, env.ctx) else {
-        return Ok(None);
+        return substitute_source_constant_projection(name, span, env);
     };
     Ok(Some(substitute_resolved_source_constant(
         name.as_str(),
@@ -349,6 +349,54 @@ fn substitute_source_scalar_var_ref(
         span,
         env,
     )?))
+}
+
+/// A joined record reference targets its field declaration, but its value is
+/// owned by the constant root. Preserve that exact root identity and project
+/// each resolved field after expanding the selected binding (MLS §5.3/§12.6).
+fn substitute_source_constant_projection(
+    name: &rumoca_core::Reference,
+    span: rumoca_core::Span,
+    env: ConstantSubstitutionEnv<'_>,
+) -> Result<Option<rumoca_core::Expression>, FlattenError> {
+    let Some(reference) = name.component_ref() else {
+        return Ok(None);
+    };
+    let parts = reference.parts();
+    for split in (1..parts.len()).rev() {
+        let root = &parts[split - 1];
+        let Some((identity, value)) =
+            resolve_source_constant_declaration(name, root.def_id, env.ctx)
+        else {
+            continue;
+        };
+        let mut projected =
+            substitute_resolved_source_constant(name.as_str(), identity, value, span, env)?;
+        if !root.subs.is_empty() {
+            projected = rumoca_core::Expression::Index {
+                base: Box::new(projected),
+                subscripts: root.subs.clone(),
+                span,
+            };
+        }
+        for field in &parts[split..] {
+            projected = rumoca_core::Expression::FieldAccess {
+                base: Box::new(projected),
+                field: field.ident.clone(),
+                field_def_id: field.def_id,
+                span,
+            };
+            if !field.subs.is_empty() {
+                projected = rumoca_core::Expression::Index {
+                    base: Box::new(projected),
+                    subscripts: field.subs.clone(),
+                    span,
+                };
+            }
+        }
+        return substitute_with_env(projected, env).map(Some);
+    }
+    Ok(None)
 }
 
 fn substitute_generated_scalar_var_ref(

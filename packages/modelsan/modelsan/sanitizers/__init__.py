@@ -1,6 +1,7 @@
 """Sanitizers. Each implements only the capabilities it needs."""
 
 from .assertion import AssertSan
+from .behavior import BehaviorSan
 from .base import (
     DifferentialOracle,
     FuzzHintProvider,
@@ -19,6 +20,7 @@ from .init_static import InitStaticSan
 from .initialization import InitSan
 from .numeric import NumericSan
 from .physical import PhysicalSan
+from .quantity import QuantitySan
 from .range import RangeSan
 from .registry import SanitizerRegistry
 from .singularity import SingularitySan
@@ -37,7 +39,7 @@ DEFAULT = (DomainSan, NumericSan, RangeSan, SolverSan, AssertSan,
 #: these, so they are opt-in rather than part of DEFAULT.
 COMPARATIVE = (DeterminismSan, DifferentialSan)
 
-__all__ = ["AssertSan", "COMPARATIVE", "DEFAULT", "DeterminismSan",
+__all__ = ["AssertSan", "BehaviorSan", "COMPARATIVE", "DEFAULT", "DeterminismSan",
            "DifferentialSan", "DifferentialOracle", "DiscontinuitySan",
            "DimensionSan",
     "InitStaticSan",
@@ -45,6 +47,6 @@ __all__ = ["AssertSan", "COMPARATIVE", "DEFAULT", "DeterminismSan",
     "StructureSan",
     "DivisorSan", "DomainSan", "EventSan", "FuzzHintProvider", "InitSan",
            "InstrumentationRequester",
-           "NumericSan", "PhysicalSan", "RangeSan", "RuntimeObserver",
+           "NumericSan", "PhysicalSan", "QuantitySan", "RangeSan", "RuntimeObserver",
            "SanitizerRegistry",
            "SingularitySan", "SolverSan", "StaticAnalyzer", "ZenoSan"]

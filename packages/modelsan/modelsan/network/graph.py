@@ -72,10 +72,12 @@ class Port:
     component: str
     """The instance that owns it, e.g. `L`. Empty at the top level."""
 
-    node: int
+    node: int | None
     potentials: tuple = ()
     flows: tuple = ()
     """`(variable, sign)` pairs, the sign as the conservation law gives it."""
+    connector_id: int | None = None
+    owner_id: int | None = None
 
     @property
     def name(self) -> str:
@@ -98,6 +100,7 @@ class Node:
     unconnected: bool = False
     potential_equations: tuple[int, ...] = ()
     source: object = None
+    owners: tuple[str, ...] | None = None
 
     @property
     def flows(self) -> tuple:
@@ -118,8 +121,8 @@ class Node:
     @property
     def components(self) -> tuple[str, ...]:
         seen: list[str] = []
-        for connector in self.connectors:
-            owner = _owner(connector)
+        owners = self.owners if self.owners is not None else tuple(map(_owner, self.connectors))
+        for owner in owners:
             if owner and owner not in seen:
                 seen.append(owner)
         return tuple(seen)
@@ -134,8 +137,8 @@ class Node:
         side and behaves as if it were short of an equation --- which is what
         a structural matching reports, without being able to say why.
         """
-        return tuple(connector for connector in self.connectors
-                     if not _owner(connector))
+        owners = self.owners if self.owners is not None else tuple(map(_owner, self.connectors))
+        return tuple(connector for connector, owner in zip(self.connectors, owners) if not owner)
 
     def __str__(self) -> str:
         return " -- ".join(self.connectors) or f"node {self.id}"
@@ -176,9 +179,10 @@ class Network:
     #: at". An artifact produced before the exporter emitted sets, or a model
     #: with no `connect` in it, both land here.
     absent: bool = True
+    identity_source: str = "legacy-paths"
 
-    def node(self, id: int) -> Node | None:
-        return self.nodes[id] if 0 <= id < len(self.nodes) else None
+    def node(self, id: int | None) -> Node | None:
+        return next((node for node in self.nodes if node.id == id), None)
 
     def ports_of(self, component: str) -> list[Port]:
         found = self.components.get(component)
@@ -215,6 +219,12 @@ def build(model) -> Network:
     equalities and flow sums. An artifact without them yields an empty network
     marked `absent`, never a network that merely looks unconnected.
     """
+    declarations = list(getattr(model, "connectors", ()) or ())
+    if declarations:
+        # SPEC_0007 identity discipline / MLS 9.2: explicit owners and member
+        # IDs are authoritative. Never fall back to path guessing on failure.
+        from .declared import build_declared
+        return build_declared(model, declarations)
     sets = list(getattr(model, "connection_sets", ()) or ())
     network = Network(absent=not sets)
 

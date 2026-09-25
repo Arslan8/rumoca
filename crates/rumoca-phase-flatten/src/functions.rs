@@ -21,6 +21,9 @@ mod function_metadata;
 mod function_output_validation;
 mod function_param_alias;
 mod function_requests;
+mod higher_order;
+mod pure_constants;
+mod package_constants;
 #[cfg(test)]
 mod tests;
 
@@ -52,6 +55,8 @@ use function_context::{
 };
 pub(crate) use function_metadata::FunctionTypeCatalog;
 pub(crate) use function_metadata::lower_record_function_params;
+pub(crate) use higher_order::specialize_function_inputs;
+pub(crate) use pure_constants::fold_pure_constant_calls;
 use function_metadata::*;
 use function_output_validation::validate_function_outputs_assigned;
 use function_param_alias::function_param_type_alias_dims;
@@ -489,6 +494,7 @@ fn lookup_function_request_with_scope<'tree>(
     if let Some((_, function)) = &mut resolved {
         function.transitively_non_replaceable =
             request_proves_transitive_non_replaceability(class_index, request);
+        package_constants::specialize_package_constants(tree, class_index, request, function)?;
     }
     Ok(resolved)
 }

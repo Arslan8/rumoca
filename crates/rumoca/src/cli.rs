@@ -15,7 +15,10 @@ mod cli_report_tests;
 #[cfg(test)]
 mod cli_tests;
 mod compile_selectors;
+mod diagnostics_json;
 mod model_resolution;
+#[cfg(test)]
+mod parameter_profile_tests;
 mod value;
 
 pub use compile_selectors::{CompilePhase, EmissionPolicyArg, InlinePolicyArg, ScalarizePolicyArg};
@@ -143,6 +146,11 @@ pub struct Cli {
     // (a low-importance global that shouldn't crowd the primary options).
     #[arg(long, global = true, value_name = "DIR")]
     pub cache_dir: Option<PathBuf>,
+
+    /// Write the command result and structured compiler diagnostics as JSON.
+    /// Replaces the file before command execution; terminal diagnostics remain enabled.
+    #[arg(long, global = true, value_name = "FILE")]
+    pub diagnostics_json: Option<PathBuf>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -296,6 +304,11 @@ pub struct ModelOptions {
     /// so the flattened model has the same shape either way.
     #[arg(long)]
     pub no_fold_parameter_bindings: bool,
+
+    /// Treat fixed parameters as non-tunable at their declared values.
+    /// Enables declared-value analyses; parameters with fixed=false remain tunable.
+    #[arg(long)]
+    pub freeze_parameters: bool,
 }
 
 /// `compile`/`check` model input: the required model-file positional plus the
@@ -722,10 +735,15 @@ pub fn parse_args(args: impl IntoIterator<Item = String>) -> std::result::Result
 /// ([`Cli::parse`] in `main`); on error `main` renders the result through the
 /// miette CLI hook.
 pub fn run(cli: Cli) -> Result<()> {
-    if let Some(dir) = cli.cache_dir {
+    let report_path = cli.diagnostics_json.as_deref();
+    diagnostics_json::run_with_report(report_path, || dispatch(cli.command, cli.cache_dir))
+}
+
+fn dispatch(command: Commands, cache_dir: Option<PathBuf>) -> Result<()> {
+    if let Some(dir) = cache_dir {
         rumoca_compile::source_roots::set_cache_root_override(dir);
     }
-    match cli.command {
+    match command {
         Commands::Compile(args) => run_compile(args),
         Commands::Sim(args) => run_sim(*args),
         Commands::Fmt(args) => fmt_cli::run_fmt(args),
@@ -968,6 +986,9 @@ fn resolve_scene_and_asset_dir(
 }
 
 fn run_configured_simulation(args: SimCommandArgs) -> Result<()> {
+    if args.model_options.freeze_parameters {
+        bail!("--freeze-parameters requires direct model-file input, without --config");
+    }
     let config_path = args.config.as_deref().ok_or_else(|| {
         anyhow::anyhow!("rumoca sim requires MODELICA_FILE or --config <rumoca-scenario.toml>")
     })?;
@@ -1013,6 +1034,7 @@ fn run_configured_simulation(args: SimCommandArgs) -> Result<()> {
                     .map(|path| path.to_string_lossy().to_string())
                     .collect(),
                 no_fold_parameter_bindings: false,
+                freeze_parameters: false,
             },
         };
         init_debug_tracing(&args.diagnostics)?;
@@ -1739,6 +1761,7 @@ fn compile_with_inferred_model(
         .model(&model)
         .verbose(verbose)
         .no_fold_parameter_bindings(args.options.no_fold_parameter_bindings)
+        .freeze_parameters(args.options.freeze_parameters)
         .source_roots(&source_roots);
     let result = compiler.compile_file(&args.model_file)?;
     Ok((result, model))
@@ -1761,6 +1784,7 @@ fn compile_early_ir_with_inferred_model(
         .model(&model)
         .verbose(verbose)
         .no_fold_parameter_bindings(args.options.no_fold_parameter_bindings)
+        .freeze_parameters(args.options.freeze_parameters)
         .source_roots(&source_roots);
     let artifact = match phase {
         CompilePhase::Ast => {
@@ -1792,6 +1816,7 @@ pub(crate) fn compile_dae_with_inferred_model(
         .model(&model)
         .verbose(verbose)
         .no_fold_parameter_bindings(args.options.no_fold_parameter_bindings)
+        .freeze_parameters(args.options.freeze_parameters)
         .source_roots(&source_roots);
     let result = compiler.compile_file_dae(&args.model_file)?;
     Ok((result, model))

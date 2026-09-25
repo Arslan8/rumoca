@@ -4500,6 +4500,7 @@ dependencies = [
  "rumoca-core",
  "rumoca-ir-solve",
  "serde_json",
+ "sha1",
  "tracing",
 ]
 

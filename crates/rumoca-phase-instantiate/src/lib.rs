@@ -221,6 +221,10 @@ pub struct InstantiateOptions {
     /// discrete-typed bindings, so the shape of the flattened model is
     /// unchanged either way.
     pub fold_parameter_declaration_bindings: bool,
+    /// Explicit frozen-parameter compilation profile. Fixed parameters become
+    /// translation-evaluated inputs and cannot be changed on the artifact.
+    /// Initialization-determined (`fixed=false`) parameters remain deferred.
+    pub freeze_parameters: bool,
 }
 
 impl Default for InstantiateOptions {
@@ -230,6 +234,7 @@ impl Default for InstantiateOptions {
             root_modifications: Vec::new(),
             compact_component_families: true,
             fold_parameter_declaration_bindings: true,
+            freeze_parameters: false,
         }
     }
 }
@@ -1247,7 +1252,10 @@ fn build_instance_data(
         is_primitive: args.is_primitive,
         is_discrete_type: args.is_discrete_type,
         from_expandable_connector: args.ctx.is_in_expandable_connector(),
-        evaluate: args.evaluate,
+        evaluate: args.evaluate
+            || (args.ctx.options.freeze_parameters
+                && matches!(args.effective_variability, rumoca_core::Variability::Parameter(_))
+                && args.attrs.fixed != Some(false)),
         is_final: args.comp.is_final,
         is_overconstrained: args.ctx.is_in_overconstrained(),
         is_protected: args.comp.is_protected || args.ctx.is_in_protected(),

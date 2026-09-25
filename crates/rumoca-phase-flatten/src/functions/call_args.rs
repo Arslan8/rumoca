@@ -401,7 +401,7 @@ fn has_named_argument_prefix(argument: &rumoca_core::Expression) -> bool {
     )
 }
 
-fn named_argument_value(
+pub(super) fn named_argument_value(
     argument: &rumoca_core::Expression,
 ) -> Option<(&str, &rumoca_core::Expression)> {
     let rumoca_core::Expression::FunctionCall {
@@ -532,9 +532,9 @@ impl ExpressionRewriter for DefaultInputSubstituter<'_> {
     }
 }
 
-fn rewrite_model_expressions(
+pub(super) fn rewrite_model_expressions(
     flat: &mut flat::Model,
-    rewriter: &mut CallArgumentMaterializer,
+    rewriter: &mut impl FallibleStatementRewriter<Error = FlattenError>,
 ) -> Result<(), FlattenError> {
     for variable in flat.variables.values_mut() {
         for expression in [
@@ -578,7 +578,7 @@ fn rewrite_model_expressions(
 
 fn rewrite_structured_templates(
     flat: &mut flat::Model,
-    rewriter: &mut CallArgumentMaterializer,
+    rewriter: &mut impl FallibleStatementRewriter<Error = FlattenError>,
 ) -> Result<(), FlattenError> {
     for family in flat
         .structured_equations
@@ -595,7 +595,7 @@ fn rewrite_structured_templates(
 
 fn rewrite_assertions(
     assertions: &mut [flat::AssertEquation],
-    rewriter: &mut CallArgumentMaterializer,
+    rewriter: &mut impl FallibleStatementRewriter<Error = FlattenError>,
 ) -> Result<(), FlattenError> {
     for assertion in assertions {
         assertion.condition = rewriter.rewrite_expression(&assertion.condition)?;
@@ -609,7 +609,7 @@ fn rewrite_assertions(
 
 fn rewrite_when_equations(
     equations: &mut [flat::WhenEquation],
-    rewriter: &mut CallArgumentMaterializer,
+    rewriter: &mut impl FallibleStatementRewriter<Error = FlattenError>,
 ) -> Result<(), FlattenError> {
     for equation in equations {
         match equation {
@@ -654,7 +654,7 @@ fn rewrite_when_equations(
 
 fn rewrite_function_expressions(
     flat: &mut flat::Model,
-    rewriter: &mut CallArgumentMaterializer,
+    rewriter: &mut impl FallibleStatementRewriter<Error = FlattenError>,
 ) -> Result<(), FlattenError> {
     for function in flat.functions.values_mut() {
         for parameter in function

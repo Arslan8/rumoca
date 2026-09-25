@@ -1,0 +1,714 @@
+{
+  "omc_version": "OpenModelica 1.27.1~2-g6db4671",
+  "source_sha256": "bed84288635118d82d866012fb611f041c0b8504a43a2e927c6cf5ccf58a1282",
+  "binary_sha256": "6d50c5ababb18c68b367a7b353599d7ce2b595c61f65187f98abfb38b625aa06",
+  "cases": [
+    {
+      "issue": 4749,
+      "model": "SemanticProbes.GasControl",
+      "kind": "issue-derived API probe",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+          "--model",
+          "SemanticProbes.GasControl",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/GasControl/model.rbc"
+        ],
+        "exit": 1,
+        "seconds": 8.983,
+        "stdout": "",
+        "stderr": "  \u001b[31m\u001b[0m \u001b[31m[ED008]\u001b[0m unresolved Flat reference\n  \u001b[31m\u2502\u001b[0m `Modelica.Media.Interfaces.PartialSimpleIdealGasMedium.cp_const`\n      \u256d\u2500[\u001b[36;1;4m/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/package.mo:6280:62\u001b[0m]\n \u001b[2m6279\u001b[0m \u2502     algorithm\n \u001b[2m6280\u001b[0m \u2502       state := ThermodynamicState(p=p, T=Modelica.Math.exp(s/cp_const +\n      \u00b7 \u001b[31;1m                                                             \u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u001b[0m\n      \u00b7                                                                  \u001b[31;1m\u2570\u2500\u2500 \u001b[31;1mundefined reference used here\u001b[0m\u001b[0m\n \u001b[2m6281\u001b[0m \u2502         Modelica.Math.log(reference_T) + R_gas*Modelica.Math.log(p/reference_p)));\n      \u2570\u2500\u2500\u2500\u2500\n\u001b[36m  help: \u001b[0mFlat IR must carry a declared, fully resolved coordinate identity\n\n"
+      },
+      "omc": {
+        "argv": [
+          "omc",
+          "--locale=C",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/GasControl/evaluate.mos"
+        ],
+        "exit": 0,
+        "seconds": 2.069,
+        "stdout": "true\ntrue\n\"/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/Air/SimpleAir.mo\"\nrecord Modelica.Media.Air.SimpleAir.ThermodynamicState\n    p = 101325.0,\n    T = 299.99999999999994\nend Modelica.Media.Air.SimpleAir.ThermodynamicState;\n\"\"\n",
+        "stderr": ""
+      },
+      "oracle_result": {
+        "oracle": "state_psX(p,entropy(state_pTX(p,300))).T == 300 K",
+        "method": "OMC scripting API evaluation; not a simulation trace",
+        "pressure_Pa": 101325,
+        "recoveredT": 299.99999999999994,
+        "error_K": -5.684341886080802e-14
+      }
+    },
+    {
+      "issue": 4749,
+      "model": "SemanticProbes.GasRoundTrip",
+      "kind": "issue-derived API probe",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+          "--model",
+          "SemanticProbes.GasRoundTrip",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/GasRoundTrip/model.rbc"
+        ],
+        "exit": 1,
+        "seconds": 3.172,
+        "stdout": "",
+        "stderr": "  \u001b[31m\u001b[0m \u001b[31m[ED008]\u001b[0m unresolved Flat reference\n  \u001b[31m\u2502\u001b[0m `Modelica.Media.Interfaces.PartialSimpleIdealGasMedium.cp_const`\n      \u256d\u2500[\u001b[36;1;4m/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/package.mo:6280:62\u001b[0m]\n \u001b[2m6279\u001b[0m \u2502     algorithm\n \u001b[2m6280\u001b[0m \u2502       state := ThermodynamicState(p=p, T=Modelica.Math.exp(s/cp_const +\n      \u00b7 \u001b[31;1m                                                             \u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u001b[0m\n      \u00b7                                                                  \u001b[31;1m\u2570\u2500\u2500 \u001b[31;1mundefined reference used here\u001b[0m\u001b[0m\n \u001b[2m6281\u001b[0m \u2502         Modelica.Math.log(reference_T) + R_gas*Modelica.Math.log(p/reference_p)));\n      \u2570\u2500\u2500\u2500\u2500\n\u001b[36m  help: \u001b[0mFlat IR must carry a declared, fully resolved coordinate identity\n\n"
+      },
+      "omc": {
+        "argv": [
+          "omc",
+          "--locale=C",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/GasRoundTrip/evaluate.mos"
+        ],
+        "exit": 0,
+        "seconds": 1.969,
+        "stdout": "true\ntrue\n\"/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/Air/SimpleAir.mo\"\nrecord Modelica.Media.Air.SimpleAir.ThermodynamicState\n    p = 102338.25,\n    T = 5204.053616778445\nend Modelica.Media.Air.SimpleAir.ThermodynamicState;\n\"\"\n",
+        "stderr": ""
+      },
+      "oracle_result": {
+        "oracle": "state_psX(p,entropy(state_pTX(p,300))).T == 300 K",
+        "method": "OMC scripting API evaluation; not a simulation trace",
+        "pressure_Pa": 102338.25,
+        "recoveredT": 5204.053616778445,
+        "error_K": 4904.053616778445
+      }
+    },
+    {
+      "issue": 4750,
+      "model": "SemanticProbes.WaterRoundTrip",
+      "kind": "issue-derived API probe",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+          "--model",
+          "SemanticProbes.WaterRoundTrip",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/WaterRoundTrip/model.rbc"
+        ],
+        "exit": 1,
+        "seconds": 2.469,
+        "stdout": "",
+        "stderr": "  \u001b[31m\u001b[0m \u001b[31m[ED008]\u001b[0m unresolved Flat reference\n  \u001b[31m\u2502\u001b[0m `Modelica.Media.Interfaces.PartialSimpleMedium.cp_const`\n      \u256d\u2500[\u001b[36;1;4m/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/package.mo:5984:62\u001b[0m]\n \u001b[2m5983\u001b[0m \u2502     algorithm\n \u001b[2m5984\u001b[0m \u2502       state := ThermodynamicState(p=p, T=Modelica.Math.exp(s/cp_const +\n      \u00b7 \u001b[31;1m                                                             \u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u001b[0m\n      \u00b7                                                                  \u001b[31;1m\u2570\u2500\u2500 \u001b[31;1mundefined reference used here\u001b[0m\u001b[0m\n \u001b[2m5985\u001b[0m \u2502         Modelica.Math.log(reference_T)))\n      \u2570\u2500\u2500\u2500\u2500\n\u001b[36m  help: \u001b[0mFlat IR must carry a declared, fully resolved coordinate identity\n\n"
+      },
+      "omc": {
+        "argv": [
+          "omc",
+          "--locale=C",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/WaterRoundTrip/evaluate.mos"
+        ],
+        "exit": 0,
+        "seconds": 0.516,
+        "stdout": "true\ntrue\n\"/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/Water/package.mo\"\nrecord Modelica.Media.Water.ConstantPropertyLiquidWater.ThermodynamicState\n    p = 1e5,\n    T = 327.4574409665021\nend Modelica.Media.Water.ConstantPropertyLiquidWater.ThermodynamicState;\n\"\"\n",
+        "stderr": ""
+      },
+      "oracle_result": {
+        "oracle": "state_psX(p,entropy(state_pTX(p,300))).T == 300 K",
+        "method": "OMC scripting API evaluation; not a simulation trace",
+        "pressure_Pa": 100000,
+        "recoveredT": 327.4574409665021,
+        "error_K": 27.457440966502077
+      }
+    },
+    {
+      "issue": 3624,
+      "model": "SemanticProbes.PulseControl",
+      "kind": "issue-derived API probe",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+          "--model",
+          "SemanticProbes.PulseControl",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulseControl/model.rbc"
+        ],
+        "exit": 0,
+        "seconds": 3.121,
+        "stdout": "",
+        "stderr": "[rumoca] warning[WR006]: annotation Evaluate has no effect on function local 'm': only components declared with the parameter prefix are evaluated (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/SpacePhasors/Functions/ToSpacePhasor.mo:10:54)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:105:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:138:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:151:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:178:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:191:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:215:14)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicExactClock.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'period' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicRealClock.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SubSample.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SuperSample.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/InductorDC.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/PartialAirGapDC.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ElectricalExcited.mo:54:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_PermanentMagnet.mo:56:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ReluctanceRotor.mo:48:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMEE.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMPM.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMR.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMEE.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMPM.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMR.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_n.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_p.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4469:28)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4684:29)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4892:30)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5082:65)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcarddiode' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5224:31)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:19:18)\n[rumoca] warning[WR005]: Evaluate=true on 'orientation' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:21:22)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/QuasiStatic/FundamentalWave/Components/QuasiStaticAnalogElectroMagneticConverter.mo:22:18)\n[rumoca] warning[WR005]: Evaluate=true on 'useFixedTemperature' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/HeatTransfer/Sensors/ConditionalFixedHeatFlowSensor.mo:5:21)\n[rumoca] warning[WR001]: external function 'readTimeTableData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:211:18)\n[rumoca] warning[WR001]: external function 'readTable1DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:225:18)\n[rumoca] warning[WR001]: external function 'readTable2DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:239:18)\n[rumoca] warning[WR001]: external function 'dgegv' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1724:18)\n[rumoca] warning[WR001]: external function 'dgelsx' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1970:18)\n[rumoca] warning[WR001]: external function 'dgelsx_vec' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2104:18)\n[rumoca] warning[WR001]: external function 'dgeqpf' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2238:18)\nwrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulseControl/model.rbc\n"
+      },
+      "modelsan": {
+        "static": [
+          {
+            "sanitizer": "init",
+            "kind": "start-violates-min",
+            "severity": "high",
+            "canonical_anchors": [
+              {
+                "kind": "variable",
+                "dae_id": 1,
+                "name": "dut.width"
+              }
+            ],
+            "backend_anchors": [],
+            "source_locations": [
+              {
+                "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Sources.mo",
+                "line": 2014,
+                "column": 0
+              }
+            ],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "variable": "dut.width",
+              "start": 0.0,
+              "bound": "min",
+              "limit": 2.2250738585072014e-308
+            },
+            "signature": "",
+            "sequence": 0
+          }
+        ],
+        "static_errors": [],
+        "note": "model does not run at its declared values: build-error during compilation: reading /tmp/tmpouvod22b/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+        "coverage": {
+          "domain.runtime": "observe_expression unavailable",
+          "network.static": "connection_graph unavailable",
+          "network.runtime": "observe_connector unavailable"
+        },
+        "findings": [
+          {
+            "sanitizer": "init",
+            "kind": "start-violates-min",
+            "severity": "high",
+            "canonical_anchors": [
+              {
+                "kind": "variable",
+                "dae_id": 1,
+                "name": "dut.width"
+              }
+            ],
+            "backend_anchors": [],
+            "source_locations": [
+              {
+                "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Sources.mo",
+                "line": 2014,
+                "column": 0
+              }
+            ],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "variable": "dut.width",
+              "start": 0.0,
+              "bound": "min",
+              "limit": 2.2250738585072014e-308
+            },
+            "signature": "init:start-violates-min:var:1:b1743b04",
+            "sequence": 0
+          }
+        ],
+        "results": [
+          {
+            "status": "backend-error",
+            "failure": {
+              "kind": "build-error",
+              "phase": "compilation",
+              "message": "reading /tmp/tmpouvod22b/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+              "raw": "reading /tmp/tmpouvod22b/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+              "time": null
+            },
+            "metadata": {},
+            "trace": null
+          }
+        ]
+      },
+      "omc": {
+        "argv": [
+          "omc",
+          "--locale=C",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulseControl/probe.mos"
+        ],
+        "exit": 0,
+        "seconds": 2.519,
+        "stdout": "true\ntrue\ntrue\ntrue\nMSL=4.1.0\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulseControl/probe_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 1.0, numberOfIntervals = 400, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'probe', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.0033696810000000002,\n    timeBackend = 0.00275886,\n    timeSimCode = 6.494560000000001e-4,\n    timeTemplates = 0.0022657140000000003,\n    timeCompile = 1.087251211,\n    timeSimulation = 0.014321375,\n    timeTotal = 1.110781521\nend SimulationResult;\n\n",
+        "stderr": ""
+      },
+      "oracle_result": {
+        "oracle": "periodic pulse active at t=0.1 for both phase-equivalent starts",
+        "time": 0.1,
+        "actual": 1.0,
+        "expected": 1
+      },
+      "trace_sha256": "62f69fcdf6010abe764140d191b1416d6e18e73e16986d67090358c545c4c0a5"
+    },
+    {
+      "issue": 3624,
+      "model": "SemanticProbes.PulsePast",
+      "kind": "issue-derived API probe",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+          "--model",
+          "SemanticProbes.PulsePast",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulsePast/model.rbc"
+        ],
+        "exit": 0,
+        "seconds": 3.222,
+        "stdout": "",
+        "stderr": "[rumoca] warning[WR006]: annotation Evaluate has no effect on function local 'm': only components declared with the parameter prefix are evaluated (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/SpacePhasors/Functions/ToSpacePhasor.mo:10:54)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:105:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:138:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:151:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:178:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:191:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:215:14)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicExactClock.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'period' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicRealClock.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SubSample.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SuperSample.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/InductorDC.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/PartialAirGapDC.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ElectricalExcited.mo:54:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_PermanentMagnet.mo:56:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ReluctanceRotor.mo:48:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMEE.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMPM.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMR.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMEE.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMPM.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMR.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_n.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_p.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4469:28)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4684:29)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4892:30)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5082:65)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcarddiode' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5224:31)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:19:18)\n[rumoca] warning[WR005]: Evaluate=true on 'orientation' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:21:22)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/QuasiStatic/FundamentalWave/Components/QuasiStaticAnalogElectroMagneticConverter.mo:22:18)\n[rumoca] warning[WR005]: Evaluate=true on 'useFixedTemperature' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/HeatTransfer/Sensors/ConditionalFixedHeatFlowSensor.mo:5:21)\n[rumoca] warning[WR001]: external function 'readTimeTableData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:211:18)\n[rumoca] warning[WR001]: external function 'readTable1DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:225:18)\n[rumoca] warning[WR001]: external function 'readTable2DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:239:18)\n[rumoca] warning[WR001]: external function 'dgegv' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1724:18)\n[rumoca] warning[WR001]: external function 'dgelsx' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1970:18)\n[rumoca] warning[WR001]: external function 'dgelsx_vec' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2104:18)\n[rumoca] warning[WR001]: external function 'dgeqpf' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2238:18)\nwrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulsePast/model.rbc\n"
+      },
+      "modelsan": {
+        "static": [
+          {
+            "sanitizer": "init",
+            "kind": "start-violates-min",
+            "severity": "high",
+            "canonical_anchors": [
+              {
+                "kind": "variable",
+                "dae_id": 1,
+                "name": "dut.width"
+              }
+            ],
+            "backend_anchors": [],
+            "source_locations": [
+              {
+                "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Sources.mo",
+                "line": 2014,
+                "column": 0
+              }
+            ],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "variable": "dut.width",
+              "start": 0.0,
+              "bound": "min",
+              "limit": 2.2250738585072014e-308
+            },
+            "signature": "",
+            "sequence": 0
+          }
+        ],
+        "static_errors": [],
+        "note": "model does not run at its declared values: build-error during compilation: reading /tmp/tmp73kc2ezm/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+        "coverage": {
+          "domain.runtime": "observe_expression unavailable",
+          "network.static": "connection_graph unavailable",
+          "network.runtime": "observe_connector unavailable"
+        },
+        "findings": [
+          {
+            "sanitizer": "init",
+            "kind": "start-violates-min",
+            "severity": "high",
+            "canonical_anchors": [
+              {
+                "kind": "variable",
+                "dae_id": 1,
+                "name": "dut.width"
+              }
+            ],
+            "backend_anchors": [],
+            "source_locations": [
+              {
+                "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Sources.mo",
+                "line": 2014,
+                "column": 0
+              }
+            ],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "variable": "dut.width",
+              "start": 0.0,
+              "bound": "min",
+              "limit": 2.2250738585072014e-308
+            },
+            "signature": "init:start-violates-min:var:1:b1743b04",
+            "sequence": 0
+          }
+        ],
+        "results": [
+          {
+            "status": "backend-error",
+            "failure": {
+              "kind": "build-error",
+              "phase": "compilation",
+              "message": "reading /tmp/tmp73kc2ezm/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+              "raw": "reading /tmp/tmp73kc2ezm/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+              "time": null
+            },
+            "metadata": {},
+            "trace": null
+          }
+        ]
+      },
+      "omc": {
+        "argv": [
+          "omc",
+          "--locale=C",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulsePast/probe.mos"
+        ],
+        "exit": 0,
+        "seconds": 2.569,
+        "stdout": "true\ntrue\ntrue\ntrue\nMSL=4.1.0\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/PulsePast/probe_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 1.0, numberOfIntervals = 400, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'probe', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.005377226000000001,\n    timeBackend = 0.0038900040000000003,\n    timeSimCode = 7.492810000000001e-4,\n    timeTemplates = 0.0024558780000000003,\n    timeCompile = 1.092330162,\n    timeSimulation = 0.015476499000000001,\n    timeTotal = 1.120488853\nend SimulationResult;\n\n",
+        "stderr": ""
+      },
+      "oracle_result": {
+        "oracle": "periodic pulse active at t=0.1 for both phase-equivalent starts",
+        "time": 0.1,
+        "actual": 0.0,
+        "expected": 1
+      },
+      "trace_sha256": "d42ea5f25e829bb414e44292715a4b8407610a6fdf4b3738376799912002bfb3"
+    },
+    {
+      "issue": 4451,
+      "model": "SemanticProbes.Delay",
+      "kind": "issue-derived API probe",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+          "--model",
+          "SemanticProbes.Delay",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Delay/model.rbc"
+        ],
+        "exit": 0,
+        "seconds": 3.321,
+        "stdout": "",
+        "stderr": "[rumoca] warning[WR006]: annotation Evaluate has no effect on function local 'm': only components declared with the parameter prefix are evaluated (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/SpacePhasors/Functions/ToSpacePhasor.mo:10:54)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:105:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:138:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:151:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:178:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:191:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:215:14)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicExactClock.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'period' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicRealClock.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SubSample.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SuperSample.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/InductorDC.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/PartialAirGapDC.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ElectricalExcited.mo:54:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_PermanentMagnet.mo:56:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ReluctanceRotor.mo:48:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMEE.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMPM.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMR.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMEE.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMPM.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMR.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_n.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_p.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4469:28)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4684:29)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4892:30)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5082:65)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcarddiode' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5224:31)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:19:18)\n[rumoca] warning[WR005]: Evaluate=true on 'orientation' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:21:22)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/QuasiStatic/FundamentalWave/Components/QuasiStaticAnalogElectroMagneticConverter.mo:22:18)\n[rumoca] warning[WR005]: Evaluate=true on 'useFixedTemperature' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/HeatTransfer/Sensors/ConditionalFixedHeatFlowSensor.mo:5:21)\n[rumoca] warning[WR001]: external function 'readTimeTableData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:211:18)\n[rumoca] warning[WR001]: external function 'readTable1DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:225:18)\n[rumoca] warning[WR001]: external function 'readTable2DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:239:18)\n[rumoca] warning[WR001]: external function 'dgegv' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1724:18)\n[rumoca] warning[WR001]: external function 'dgelsx' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1970:18)\n[rumoca] warning[WR001]: external function 'dgelsx_vec' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2104:18)\n[rumoca] warning[WR001]: external function 'dgeqpf' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2238:18)\nwrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Delay/model.rbc\n"
+      },
+      "modelsan": {
+        "static": [],
+        "static_errors": [],
+        "note": "model does not run at its declared values: build-error during compilation: reading /tmp/tmpi8b6s6y6/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+        "coverage": {
+          "domain.runtime": "observe_expression unavailable",
+          "network.static": "connection_graph unavailable",
+          "network.runtime": "observe_connector unavailable"
+        },
+        "findings": [],
+        "results": [
+          {
+            "status": "backend-error",
+            "failure": {
+              "kind": "build-error",
+              "phase": "compilation",
+              "message": "reading /tmp/tmpi8b6s6y6/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+              "raw": "reading /tmp/tmpi8b6s6y6/traced.rbc (bitcode v1, cbor) \u001b[31m\u001b[0m clocked conditions are not supported by bitcode v1",
+              "time": null
+            },
+            "metadata": {},
+            "trace": null
+          }
+        ]
+      },
+      "omc": {
+        "argv": [
+          "omc",
+          "--locale=C",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Delay/probe.mos"
+        ],
+        "exit": 0,
+        "seconds": 2.57,
+        "stdout": "true\ntrue\ntrue\ntrue\nMSL=4.1.0\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Delay/probe_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 1.0, numberOfIntervals = 400, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'probe', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.00357844,\n    timeBackend = 0.003398485,\n    timeSimCode = 7.82915e-4,\n    timeTemplates = 0.0024265380000000002,\n    timeCompile = 1.0846802969999998,\n    timeSimulation = 0.015198056000000001,\n    timeTotal = 1.11018667\nend SimulationResult;\n\n",
+        "stderr": ""
+      },
+      "oracle_result": {
+        "oracle": "previous sampled input; at t=.175 output should be sin(2*pi*.10)",
+        "time": 0.175,
+        "actual": 0.8090169943749475,
+        "expected": 0.5877852522924731,
+        "current_sample": 0.8090169943749475
+      },
+      "trace_sha256": "f28ecb6c0c58f8e6539734aed37ff6046042d30148faee8a6f97d9ba857ee6e5"
+    },
+    {
+      "issue": 4459,
+      "model": "SemanticProbes.Quantization",
+      "kind": "issue-derived API probe",
+      "compile": {
+        "argv": [
+          "/data/mrumoca/rumoca/target/debug/rumoca",
+          "compile",
+          "/data/mrumoca/rumoca/docs/evaluations/msl-upstream-open-issues-2026-09-24/SemanticProbes.mo",
+          "--model",
+          "SemanticProbes.Quantization",
+          "--no-fold-parameter-bindings",
+          "--source-root",
+          "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
+          "--cache-dir",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/cache",
+          "--emit-bitcode",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Quantization/model.rbc"
+        ],
+        "exit": 0,
+        "seconds": 3.173,
+        "stdout": "",
+        "stderr": "[rumoca] warning[WR006]: annotation Evaluate has no effect on function local 'm': only components declared with the parameter prefix are evaluated (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/SpacePhasors/Functions/ToSpacePhasor.mo:10:54)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:105:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:138:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:151:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:178:14)\n[rumoca] warning[WR001]: external function 'constructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:191:14)\n[rumoca] warning[WR001]: external function 'destructor' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Blocks/Types.mo:215:14)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicExactClock.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'period' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Clocks/PeriodicRealClock.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SubSample.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'factor' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/ClockSignals/Sampler/SuperSample.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/InductorDC.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'quasiStatic' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/Components/PartialAirGapDC.mo:3:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ElectricalExcited.mo:54:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_PermanentMagnet.mo:56:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/BasicMachines/SynchronousMachines/SM_ReluctanceRotor.mo:48:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMEE.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMPM.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Interfaces/InductionMachines/ThermalPortSMR.mo:6:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMEE.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMPM.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'useDamperCage' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Machines/Thermal/SynchronousMachines/ThermalAmbientSMR.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_n.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'k' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Polyphase/Basic/PlugToPin_p.mo:4:21)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4469:28)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4684:29)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:4892:30)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcard' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5082:65)\n[rumoca] warning[WR005]: Evaluate=true on 'modelcarddiode' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Electrical/Spice3.mo:5224:31)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:19:18)\n[rumoca] warning[WR005]: Evaluate=true on 'orientation' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/FundamentalWave/Components/SinglePhaseElectroMagneticConverter.mo:21:22)\n[rumoca] warning[WR005]: Evaluate=true on 'effectiveTurns' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Magnetic/QuasiStatic/FundamentalWave/Components/QuasiStaticAnalogElectroMagneticConverter.mo:22:18)\n[rumoca] warning[WR005]: Evaluate=true on 'useFixedTemperature' has no effect: the parameter has no evaluable binding (MLS \u00a718.6) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Thermal/HeatTransfer/Sensors/ConditionalFixedHeatFlowSensor.mo:5:21)\n[rumoca] warning[WR001]: external function 'readTimeTableData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:211:18)\n[rumoca] warning[WR001]: external function 'readTable1DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:225:18)\n[rumoca] warning[WR001]: external function 'readTable2DData' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:239:18)\n[rumoca] warning[WR001]: external function 'dgegv' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1724:18)\n[rumoca] warning[WR001]: external function 'dgelsx' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:1970:18)\n[rumoca] warning[WR001]: external function 'dgelsx_vec' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2104:18)\n[rumoca] warning[WR001]: external function 'dgeqpf' should declare `pure` or `impure` explicitly; the bare form is deprecated and is treated as impure (MLS 3.7 \u00a712.3) (/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/ObsoleteModelica4.mo:2238:18)\nwrote bitcode v1 (cbor) to /data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Quantization/model.rbc\n"
+      },
+      "modelsan": {
+        "static": [
+          {
+            "sanitizer": "init",
+            "kind": "start-violates-min",
+            "severity": "high",
+            "canonical_anchors": [
+              {
+                "kind": "variable",
+                "dae_id": 7,
+                "name": "dut.bits"
+              }
+            ],
+            "backend_anchors": [],
+            "source_locations": [
+              {
+                "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/RealSignals/Sampler/SampleWithADeffects.mo",
+                "line": 17,
+                "column": 0
+              }
+            ],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "variable": "dut.bits",
+              "start": 0,
+              "bound": "min",
+              "limit": 1
+            },
+            "signature": "",
+            "sequence": 0
+          },
+          {
+            "sanitizer": "init",
+            "kind": "start-violates-min",
+            "severity": "high",
+            "canonical_anchors": [
+              {
+                "kind": "variable",
+                "dae_id": 19,
+                "name": "dut.quantization.bits"
+              }
+            ],
+            "backend_anchors": [],
+            "source_locations": [
+              {
+                "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/RealSignals/Sampler/Utilities/Internal/Quantization.mo",
+                "line": 9,
+                "column": 0
+              }
+            ],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "variable": "dut.quantization.bits",
+              "start": 0,
+              "bound": "min",
+              "limit": 1
+            },
+            "signature": "",
+            "sequence": 0
+          },
+          {
+            "sanitizer": "divisor",
+            "kind": "divisor-reachable-zero",
+            "severity": "high",
+            "canonical_anchors": [
+              {
+                "kind": "expression",
+                "dae_id": 103,
+                "name": ""
+              },
+              {
+                "kind": "parameter",
+                "dae_id": 20,
+                "name": ""
+              }
+            ],
+            "backend_anchors": [],
+            "source_locations": [
+              {
+                "file": "target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Clocked/RealSignals/Sampler/Utilities/Internal/Quantization.mo",
+                "line": 16,
+                "column": 0
+              }
+            ],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "denominator": "dut.quantization.resolution",
+              "witness": "dut.quantization.resolution = 0",
+              "witness_rationale": "set to zero",
+              "denominator_at_witness": 0.0,
+              "denominator_at_declared_values": 0.5,
+              "denominator_range": "[-inf, inf]",
+              "path_condition": "always evaluated",
+              "verdict": "SAT",
+              "proof": "the division is not inside any branch",
+              "constraints": "dut.quantization.resolution: unbounded",
+              "note": "a permitted assignment drives the complete denominator to zero and the division is still evaluated there"
+            },
+            "signature": "",
+            "sequence": 0
+          },
+          {
+            "sanitizer": "network",
+            "kind": "network-boundary-port",
+            "severity": "low",
+            "canonical_anchors": [],
+            "backend_anchors": [],
+            "source_locations": [],
+            "phase": null,
+            "time": null,
+            "test_case": null,
+            "evidence": {
+              "node": "assignClock -- clock -- dut -- dut.limiter -- dut.quantization -- dut.sample1 -- sine",
+              "boundary_connectors": "assignClock, clock, dut, sine",
+              "wired_to": "dut.limiter, dut.quantization, dut.sample1",
+              "note": "this connector belongs to the model itself, not to a component inside it: the model is an interface compiled on its own, so the node is open on one side. Nothing forces its flow, which is why a structural matching reports an unmatched unknown here. Not a defect in the model"
+            },
+            "signature": "",
+            "sequence": 0
+          }
+        ],
+        "static_errors": [],
+        "note": "backend could not build the model",
+        "coverage": {
+          "domain.hints": "canonical_model unavailable",
+          "domain.runtime": "canonical_model, observe_expression unavailable",
+          "range.runtime": "canonical_model unavailable",
+          "range.hints": "canonical_model unavailable",
+          "assert.hints": "canonical_model unavailable",
+          "assert.static": "canonical_model unavailable",
+          "discontinuity.hints": "canonical_model unavailable",
+          "discontinuity.static": "canonical_model unavailable",
+          "singularity.static": "canonical_model unavailable",
+          "singularity.hints": "canonical_model unavailable",
+          "init.static": "canonical_model unavailable",
+          "init.hints": "canonical_model unavailable",
+          "physical.static": "canonical_model unavailable",
+          "physical.hints": "canonical_model unavailable",
+          "physical.runtime": "canonical_model unavailable",
+          "divisor.static": "canonical_model unavailable",
+          "divisor.hints": "canonical_model unavailable",
+          "dimension.static": "canonical_model unavailable",
+          "init-static.static": "canonical_model unavailable",
+          "network.static": "canonical_model, connection_graph unavailable",
+          "network.runtime": "observe_connector unavailable",
+          "structure.static": "canonical_model unavailable"
+        },
+        "findings": [
+          {
+            "sanitizer": "network",
+            "kind": "network-observation-incomplete",
+            "severity": "info",
+            "canonical_anchors": [],
+            "backend_anchors": [],
+            "source_locations": [],
+            "phase": null,
+            "time": null,
+            "test_case": {
+              "parameters": {},
+              "initial_values": {},
+              "input_trajectory": null,
+              "solver_options": {},
+              "origin": "declared"
+            },
+            "evidence": {
+              "reason": "missing or unsynchronized connector member observations",
+              "note": "coverage gap, not a model defect"
+            },
+            "signature": "network:network-observation-incomplete:exec:28637473",
+            "sequence": 0
+          }
+        ],
+        "results": [
+          {
+            "status": "backend-error",
+            "failure": {
+              "kind": "build-error",
+              "phase": "compilation",
+              "message": "cannot save: - expression 183 is an unsupported node: expression form string_conversion not in bitcode v1\n  - expression 188 is an unsupported node: expression form string_conversion not in bitcode v1",
+              "raw": "cannot save: - expression 183 is an unsupported node: expression form string_conversion not in bitcode v1\n  - expression 188 is an unsupported node: expression form string_conversion not in bitcode v1\n  \u001b[31m\u001b[0m /tmp/tmpliayn9rn/traced.rbc: 2 validation error(s)",
+              "time": null
+            },
+            "metadata": {},
+            "trace": null
+          }
+        ]
+      },
+      "omc": {
+        "argv": [
+          "omc",
+          "--locale=C",
+          "/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Quantization/probe.mos"
+        ],
+        "exit": 0,
+        "seconds": 2.52,
+        "stdout": "true\ntrue\ntrue\ntrue\nMSL=4.1.0\n\nrecord SimulationResult\n    resultFile = \"/data/mrumoca/rumoca/target/msl-upstream-open-issues-20260924/semantic-run-03/Quantization/probe_res.csv\",\n    simulationOptions = \"startTime = 0.0, stopTime = 1.0, numberOfIntervals = 400, tolerance = 1e-6, method = 'dassl', fileNamePrefix = 'probe', options = '', outputFormat = 'csv', variableFilter = '.*', cflags = '', simflags = ''\",\n    messages = \"LOG_SUCCESS       | info    | The initialization finished successfully without homotopy method.\nLOG_SUCCESS       | info    | The simulation finished successfully.\n\",\n    timeFrontend = 0.005368155,\n    timeBackend = 0.005239826,\n    timeSimCode = 0.001156853,\n    timeTemplates = 0.003354895,\n    timeCompile = 1.122742618,\n    timeSimulation = 0.015664972000000003,\n    timeTotal = 1.153760782\nend SimulationResult;\n\n",
+        "stderr": ""
+      },
+      "oracle_result": {
+        "oracle": "2-bit quantizer has at most four distinct levels",
+        "distinct_levels": [
+          -1.0,
+          -0.5,
+          0.0,
+          0.5,
+          1.0
+        ],
+        "count": 5,
+        "maximum_expected": 4
+      },
+      "trace_sha256": "9b1a20f715a8ab3e9ed76a0f034ddd72660584c3f7c863b633c6a4eece45f084"
+    }
+  ],
+  "recorded_at": "2026-09-24T14:20:31.489908+00:00",
+  "execution_note": "Issue-derived API probes. OMC expectations are external evaluation oracles, not ModelSan discoveries. The entropy cases use scripting evaluation of actual MSL functions; event/quantizer cases use simulation CSV traces.",
+  "evaluation_driver_sha256": "b303036401bc7671e6fc607217a3d6fe85c8be588ecbf913877c5fdb77d257df"
+}

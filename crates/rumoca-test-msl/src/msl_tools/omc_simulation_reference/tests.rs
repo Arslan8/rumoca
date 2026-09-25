@@ -155,6 +155,8 @@ fn select_models_preserves_generated_target_file_order() {
     .expect("write generated targets");
 
     let args = Args {
+        script_mode: false,
+        no_plots: false,
         dry_run: false,
         batch_size: 1,
         force: false,
@@ -834,6 +836,8 @@ fn load_trace_exclusions_reads_each_entrys_own_reason() {
     )
     .expect("write exclusions");
     let args = Args {
+        script_mode: false,
+        no_plots: false,
         dry_run: false,
         batch_size: 1,
         force: false,

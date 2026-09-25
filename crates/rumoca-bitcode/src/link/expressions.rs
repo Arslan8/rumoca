@@ -6,6 +6,21 @@ use crate::schema::*;
 impl Shift for RbcExprNode {
     fn shift(&mut self, m: &Map<'_>) -> Result<()> {
         match self {
+            Self::StringConversion { value, format } => {
+                value.shift(m)?;
+                match format {
+                    RbcStringConversionFormat::Options {
+                        minimum_length,
+                        left_justified,
+                        significant_digits,
+                    } => {
+                        minimum_length.shift(m)?;
+                        left_justified.shift(m)?;
+                        significant_digits.shift(m)?;
+                    }
+                    RbcStringConversionFormat::Format { value } => value.shift(m)?,
+                }
+            }
             Self::Literal { .. } => {}
             Self::Unsupported { detail } => {
                 return Err(super::LinkError(format!(
@@ -109,7 +124,8 @@ impl Shift for RbcCoordinate {
 impl Shift for RbcConditionNode {
     fn shift(&mut self, m: &Map<'_>) -> Result<()> {
         match self {
-            Self::Initial | Self::Always | Self::Clock => {}
+            Self::Initial | Self::Always => {}
+            Self::ClockActivation { clock } => clock.shift(m)?,
             Self::Unsupported { detail } => {
                 return Err(super::LinkError(format!("unsupported condition: {detail}")));
             }

@@ -63,6 +63,68 @@ pub fn run(
     Ok(session.finish())
 }
 
+/// Diagnostic mode executes the same edited instructions through the reference
+/// interpreter. Failure evidence is written even when no physical sample exists.
+#[cfg(feature = "solver-rk45")]
+pub fn run_with_domain_diagnostics(
+    artifact: &ir::ExecutionArtifact,
+    options: &crate::SimOptions,
+    root: &Path,
+) -> Result<crate::SimResult, String> {
+    if root.exists()
+        || artifact
+            .sinks
+            .iter()
+            .any(|sink| sink.filename == "domain-diagnostics.json")
+    {
+        return Err(
+            "domain diagnostics require a new directory and unreserved sink filename".into(),
+        );
+    }
+    let scope = rumoca_eval_solve::domain_diagnostics::Scope::start()?;
+    let solver_scope = rumoca_solver::diagnostics::Scope::start()?;
+    let mut options = options.clone();
+    options.execution_policy = rumoca_solver::SimExecutionPolicy::Interpreter;
+    let result = run(artifact, &options, root);
+    let mut evidence = scope.finish();
+    evidence["solver"] = solver_scope.finish();
+    // An invalid destination/program may fail before a trace directory exists.
+    // Do not create or reuse it behind the normal exclusive resource boundary.
+    if root.is_dir() {
+        let output = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(root.join("domain-diagnostics.json"))
+            .map_err(|e| e.to_string())?;
+        serde_json::to_writer_pretty(output, &evidence).map_err(|e| e.to_string())?;
+    }
+    result
+}
+
+/// Same domain-evidence boundary for ordinary equation simulations. Unsupported
+/// tensor/call/assignment-prefix evaluations remain counted as coverage gaps.
+#[cfg(feature = "solver-rk45")]
+pub fn simulate_equations_with_domain_diagnostics(
+    dae: &rumoca_ir_dae::Dae,
+    options: &crate::SimOptions,
+    destination: &Path,
+) -> Result<crate::SimResult, String> {
+    let output = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(destination)
+        .map_err(|e| e.to_string())?;
+    let scope = rumoca_eval_solve::domain_diagnostics::Scope::start()?;
+    let solver_scope = rumoca_solver::diagnostics::Scope::start()?;
+    let mut options = options.clone();
+    options.execution_policy = rumoca_solver::SimExecutionPolicy::Interpreter;
+    let result = crate::simulate_with_diagnostics(dae, &options).map_err(|e| e.to_string());
+    let mut evidence = scope.finish();
+    evidence["solver"] = solver_scope.finish();
+    serde_json::to_writer_pretty(output, &evidence).map_err(|e| e.to_string())?;
+    result
+}
+
 #[cfg(feature = "solver-rk45")]
 struct NativePublication(rumoca_eval_solve::execution::CsvExecution);
 #[cfg(feature = "solver-rk45")]

@@ -1,4 +1,4 @@
-//! Rumoca Bitcode v1 — the public wire schema.
+//! Rumoca Bitcode v2 — the public wire schema.
 //!
 //! This module is the contract external tools depend on. It is deliberately
 //! **not** a mirror of any internal Rumoca type: no field here is required to
@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 pub const RBC_MAGIC: &str = "RUMOCA-RBC";
 
 /// Public bitcode contract version. Independent of `DAE_SCHEMA_VERSION`.
-pub const RBC_VERSION: u32 = 1;
+pub const RBC_VERSION: u32 = 2;
 
 // ── Identities ───────────────────────────────────────────────────────────────
 //
@@ -62,6 +62,8 @@ rbc_id! {
     RelationId,
     /// Identifies a boolean condition within this artifact.
     ConditionId,
+    /// Identifies a scheduled or Boolean-triggered clock.
+    ClockId,
     /// Identifies a zero-crossing root within this artifact.
     RootId,
     /// Identifies an event action within this artifact.
@@ -140,6 +142,12 @@ pub struct RbcModel {
     pub relations: Vec<RbcRelation>,
     /// Boolean activation conditions over relations, clocks and discretes.
     pub conditions: Vec<RbcCondition>,
+    /// Exact schedules referenced by clock activations.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub clocks: Vec<RbcClock>,
+    /// Clock ownership of discrete variables, including sampled left-limit reads.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub clock_ownerships: Vec<RbcClockOwnership>,
     /// Zero-crossing surfaces the solver must monitor.
     pub roots: Vec<RbcRoot>,
     /// Actions performed when an event fires.
@@ -188,6 +196,10 @@ pub struct RbcSummary {
     pub expressions: u32,
     pub relations: u32,
     pub conditions: u32,
+    #[serde(default)]
+    pub clocks: u32,
+    #[serde(default)]
+    pub clock_ownerships: u32,
     pub roots: u32,
     pub events: u32,
     pub time_events: u32,
@@ -231,7 +243,6 @@ impl SourceId {
     /// `rumoca_core::SourceId` and names no file on its own.
     pub const PLACEHOLDER: SourceId = SourceId(0);
 }
-
 
 /// One source file.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -280,7 +291,7 @@ pub enum RbcOrigin {
 }
 
 /// Lowering kinds a consumer may care about. Mirrors the compiler's own
-/// classification; `Other` keeps a v1 reader working against a producer that
+/// classification; `Other` keeps a current reader working against a producer that
 /// learns a new kind.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -698,6 +709,12 @@ pub struct RbcExpr {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum RbcExprNode {
+    /// The predefined MLS scalar-to-String operation, never an arbitrary call
+    /// whose display name happens to be String.
+    StringConversion {
+        value: ExprId,
+        format: RbcStringConversionFormat,
+    },
     Literal {
         value: RbcLiteral,
     },
@@ -850,17 +867,27 @@ pub enum RbcDiscreteActivation {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum RbcLiteral {
-    Real { value: f64 },
-    Integer { value: i64 },
+    Real {
+        value: f64,
+    },
+    Integer {
+        value: i64,
+    },
     /// An enumeration value, carried as its 1-based ordinal (MLS §4.9.5).
     ///
     /// This is distinct from `Integer` even though both hold an integer: the
     /// DAE's type checker demands an `Enumeration` where the declaration says
     /// enumeration, and rebuilding one from an `Integer` literal is rejected
     /// with `expected Enumeration, found Integer`.
-    Enumeration { ordinal: i64 },
-    Boolean { value: bool },
-    String { value: String },
+    Enumeration {
+        ordinal: i64,
+    },
+    Boolean {
+        value: bool,
+    },
+    String {
+        value: String,
+    },
 }
 
 /// A leaf referencing a model quantity. This is how expressions name
@@ -908,11 +935,19 @@ pub enum RbcCoordinate {
     ///
     /// Without this a family body cannot be expressed, so exporting families
     /// without it produced artifacts that failed their own import.
-    Binder { domain: DomainId, ordinal: u32 },
+    Binder {
+        domain: DomainId,
+        ordinal: u32,
+    },
     /// A condition's value used inside an expression, such as `initial()`.
-    Condition { condition: ConditionId },
+    Condition {
+        condition: ConditionId,
+    },
     /// A function's formal parameter, read from inside that function's body.
-    FunctionParameter { function: FunctionId, ordinal: u32 },
+    FunctionParameter {
+        function: FunctionId,
+        ordinal: u32,
+    },
 }
 
 impl RbcCoordinate {
@@ -1014,7 +1049,7 @@ pub struct RbcDomain {
 ///
 /// The signature is what a *call site* needs: which function, how many
 /// arguments, what they mean. The body is a separate IR — SSA definitions,
-/// loop transitions, conditionals, external interfaces — and bitcode v1 does
+/// loop transitions, conditionals, external interfaces — and bitcode v2 does
 /// not carry it, which `body` records explicitly so an absent body is never
 /// mistaken for an empty one.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -1245,11 +1280,86 @@ pub enum RbcConditionNode {
         lhs: ConditionId,
         rhs: ConditionId,
     },
-    /// Clocked activation this schema version does not detail.
-    Clock,
+    /// Activation of one clock in the exact schedule table.
+    ClockActivation {
+        clock: ClockId,
+    },
     Unsupported {
         detail: String,
     },
+}
+
+/// Optional operands of the predefined String conversion (MLS §3.7.1).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum RbcStringConversionFormat {
+    Options {
+        minimum_length: Option<ExprId>,
+        left_justified: Option<ExprId>,
+        significant_digits: Option<ExprId>,
+    },
+    Format {
+        value: ExprId,
+    },
+}
+
+impl RbcStringConversionFormat {
+    pub fn operands(&self) -> Vec<ExprId> {
+        match self {
+            Self::Options {
+                minimum_length,
+                left_justified,
+                significant_digits,
+            } => [*minimum_length, *left_justified, *significant_digits]
+                .into_iter()
+                .flatten()
+                .collect(),
+            Self::Format { value } => vec![*value],
+        }
+    }
+}
+
+/// Exact clock rational. Decimal strings preserve 128-bit integers in both
+/// CBOR and JSON, including clients whose JSON numbers use floating point.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RbcClockRational {
+    pub numerator: String,
+    pub denominator: String,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RbcClockAnchor {
+    Absolute,
+    SimulationStart,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum RbcClockNode {
+    Periodic {
+        period: RbcClockRational,
+        phase: RbcClockRational,
+        anchor: RbcClockAnchor,
+    },
+    Triggered {
+        condition: ConditionId,
+    },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RbcClock {
+    pub id: ClockId,
+    pub node: RbcClockNode,
+    pub provenance: RbcProvenance,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RbcClockOwnership {
+    pub variable: VariableId,
+    pub clock: ClockId,
+    pub sampled: bool,
+    pub provenance: RbcProvenance,
 }
 
 /// A zero-crossing surface the solver monitors.

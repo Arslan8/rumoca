@@ -700,6 +700,14 @@ fn project_algebraic_block<M: ImplicitProjectionModel>(
     let structure = model.algebraic_projection_block_structure(block_index);
     let jacobian =
         algebraic_block_jacobian(model, y, p, t, &block.rows, &block.y_indices, structure)?;
+    crate::diagnostics::projection(
+        "projection",
+        t,
+        &block.rows,
+        &block.y_indices,
+        &residual,
+        &jacobian,
+    );
     let pattern = structure.map(solve::JacobianStructure::pattern);
     let (row_scales, variable_scales) = algebraic_block_scales(model, y, block, &jacobian, pattern);
     let residual_converged = scaled_residual_converged(&residual, &row_scales, tol);

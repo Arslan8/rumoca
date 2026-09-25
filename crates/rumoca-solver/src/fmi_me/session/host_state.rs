@@ -119,6 +119,7 @@ pub(super) fn update_discrete_states_to_completion(
     while discrete.terminate_simulation.is_none() && discrete.discrete_states_need_update {
         iterations = iterations.saturating_add(1);
         if iterations > EVENT_ITERATION_LIMIT {
+            crate::diagnostics::event_iterations(time, iterations, false);
             return Err(MeSessionError::EventIterationDiverged {
                 time,
                 limit: EVENT_ITERATION_LIMIT,
@@ -130,6 +131,7 @@ pub(super) fn update_discrete_states_to_completion(
     }
     discrete.values_of_continuous_states_changed = values_changed;
     discrete.nominals_of_continuous_states_changed = nominals_changed;
+    crate::diagnostics::event_iterations(time, iterations, !discrete.discrete_states_need_update);
     Ok(discrete)
 }
 

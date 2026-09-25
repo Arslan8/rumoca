@@ -37,6 +37,7 @@ class FailureKind(str, Enum):
     NONLINEAR_SOLVER_FAILURE = "nonlinear-solver-failure"
     DIVISION_BY_ZERO = "division-by-zero"
     NON_FINITE_VALUE = "non-finite-value"
+    ARRAY_BOUNDS = "array-index-out-of-bounds"
     STEP_SIZE_TOO_SMALL = "step-size-too-small"
     EVENT_ITERATION_FAILURE = "event-iteration-failure"
     ASSERTION_VIOLATED = "assertion-violated"

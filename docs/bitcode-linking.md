@@ -107,9 +107,10 @@ execution-pass metadata. Equation-level trace points remain. The result has no
 execution projection; lower it again and reapply instrumentation against the
 new variable IDs. Never reuse input solver/storage IDs or execution programs.
 
-The linker handles the known public RBC v1 equation schema, not internal DAE or
+The linker handles the known public RBC v2 equation schema, not internal DAE or
 Solve serialization. Opaque unsupported expressions/conditions are rejected.
-Preserving arrays, events or function signatures does not add support for them
+Clock schedules, activation references and sampled ownership are relocated
+with their typed IDs. Preserving arrays, events or function signatures does not add support for them
 to the bounded scalar-real, event-free RK45 execution adapter. Elided Modelica
 function bodies remain elided; this is not external-function symbol resolution.
 

@@ -1866,55 +1866,9 @@ fn apply_subscripts_flat(
     env: &FunctionEnv,
     eval: &EvalState<'_>,
 ) -> Result<Value, EvalError> {
-    let mut current = value;
-    for sub in subs {
-        current = apply_single_subscript(current, sub, env, eval)?;
-    }
-    Ok(current)
-}
-
-/// Apply a single subscript to a value.
-fn apply_single_subscript(
-    current: Value,
-    sub: &Subscript,
-    env: &FunctionEnv,
-    eval: &EvalState<'_>,
-) -> Result<Value, EvalError> {
-    match sub {
-        Subscript::Expr { expr, .. } => {
-            let idx_val = eval_expr_in_function(expr, env, eval)?;
-            let idx = idx_val.as_integer().ok_or_else(|| {
-                EvalError::type_mismatch("Integer", idx_val.type_name(), eval.span)
-            })? as usize;
-            let arr = current
-                .as_array()
-                .ok_or_else(|| EvalError::type_mismatch("Array", current.type_name(), eval.span))?;
-            if idx < 1 || idx > arr.len() {
-                return Err(EvalError::IndexOutOfBounds {
-                    index: idx as i64,
-                    size: arr.len(),
-                    span: eval.span,
-                });
-            }
-            Ok(arr[idx - 1].clone())
-        }
-        Subscript::Colon { .. } => Ok(current),
-        Subscript::Index { value: idx, .. } => {
-            let arr = current
-                .as_array()
-                .ok_or_else(|| EvalError::type_mismatch("Array", current.type_name(), eval.span))?;
-            let idx_i64 = *idx;
-            let idx_usize = idx_i64 as usize;
-            if idx_usize < 1 || idx_usize > arr.len() {
-                return Err(EvalError::IndexOutOfBounds {
-                    index: idx_i64,
-                    size: arr.len(),
-                    span: eval.span,
-                });
-            }
-            Ok(arr[idx_usize - 1].clone())
-        }
-    }
+    super::indexing::apply_subscripts(&value, subs, eval.span, &mut |expr| {
+        eval_expr_in_function(expr, env, eval)
+    })
 }
 
 #[cfg(test)]

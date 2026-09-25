@@ -513,10 +513,28 @@ pub(super) fn analyze(flat: &flat::Model) -> Result<Analysis, ToDaeError> {
     // dimensions can depend on the settled parameter values from MLS §4.5.
     let constants = constant_context(flat)?;
     let function_shapes = FunctionShapeAnalysis::analyze(flat, &constants)?;
-    let record_array_fields = Arc::clone(function_shapes.record_array_fields());
     let function_plans = validate_functions(flat, &function_shapes)?;
     let record_equations = analyze_record_equation_sets(flat)?;
     let expression_support = analyze_expression_support(flat, &constants)?;
+    analyze_model_owners(
+        flat,
+        constants,
+        function_shapes,
+        function_plans,
+        record_equations,
+        expression_support,
+    )
+}
+
+fn analyze_model_owners(
+    flat: &flat::Model,
+    constants: EvalContext,
+    function_shapes: FunctionShapeAnalysis,
+    function_plans: HashMap<FunctionSpecializationKey, FunctionPlan>,
+    record_equations: RecordEquationSets,
+    expression_support: ExpressionSupportPlans,
+) -> Result<Analysis, ToDaeError> {
+    let record_array_fields = Arc::clone(function_shapes.record_array_fields());
     let clocks = analyze_clocks(flat, &constants)?;
     let ModelRoles {
         states,
@@ -552,15 +570,14 @@ pub(super) fn analyze(flat: &flat::Model) -> Result<Analysis, ToDaeError> {
     )?;
     let (discrete_connection_ranks, aggregate_discrete_connections, discrete_value_topology) =
         analyze_discrete_connections(flat, &roles)?;
-    let (initial_algorithms, initial_discrete_equation_rows) =
-        analyze_initial_owners(
-            flat,
-            &roles,
-            &expression_roles,
-            &states,
-            &constants,
-            &mut sample_lattices,
-        )?;
+    let (initial_algorithms, initial_discrete_equation_rows) = analyze_initial_owners(
+        flat,
+        &roles,
+        &expression_roles,
+        &states,
+        &constants,
+        &mut sample_lattices,
+    )?;
     let balance = analyze_source_balance(SourceBalanceAnalysisInput {
         flat,
         roles: &roles,

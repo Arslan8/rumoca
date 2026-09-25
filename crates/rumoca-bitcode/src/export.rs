@@ -1,4 +1,4 @@
-//! DAE → Rumoca Bitcode v1.
+//! DAE → Rumoca Bitcode v2.
 //!
 //! The exporter reads the checked DAE through `Dae::inspect` and, optionally,
 //! the Flat model for connector provenance the DAE does not retain. It writes
@@ -8,6 +8,10 @@
 //! Dependency edges on each equation are computed here, using the compiler's
 //! own scalar coordinate projection, so a consumer never has to re-derive them
 //! by walking expressions.
+
+mod clocks;
+mod profile;
+mod strings;
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -19,6 +23,8 @@ use crate::schema::*;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ExportError {
+    #[error("bitcode v2 cannot represent semantic owner table `{0}`")]
+    UnsupportedOwner(&'static str),
     #[error("expression {0} references operand {1}, which is not yet defined")]
     ForwardOperand(u32, u32),
     #[error("dependency projection failed: {0}")]
@@ -164,6 +170,7 @@ fn build(
     model_name: &str,
     options: &ExportOptions,
 ) -> Result<RbcModel, ExportError> {
+    profile::check(view)?;
     let mut ctx = Ctx {
         sources: BTreeMap::new(),
         texts: Vec::new(),
@@ -184,6 +191,8 @@ fn build(
         export_equation_families(view, &mut ctx, EquationKind::Initial, options);
     let relations = export_relations(view, &mut ctx);
     let conditions = export_conditions(view, &mut ctx);
+    let clocks = clocks::export_clocks(view, &mut ctx);
+    let clock_ownerships = clocks::export_ownerships(view, &mut ctx);
     let roots = export_roots(view, &mut ctx);
     let events = export_events(view, &mut ctx);
     let discrete_definitions = export_discrete_definitions(view, &mut ctx);
@@ -208,7 +217,7 @@ fn build(
     let discrete_real_equations = export_discrete_real_equations(view, &mut ctx, options)?;
     let initial_discrete_values = export_initial_discrete_values(view, &mut ctx);
 
-    let summary = summarize(
+    let mut summary = summarize(
         &variables,
         &expressions,
         &equations,
@@ -227,6 +236,8 @@ fn build(
         &discrete_real_equations,
         &initial_discrete_values,
     );
+    summary.clocks = clocks.len() as u32;
+    summary.clock_ownerships = clock_ownerships.len() as u32;
 
     Ok(RbcModel {
         connector_types: Vec::new(),
@@ -246,6 +257,8 @@ fn build(
         initial_equation_families,
         relations,
         conditions,
+        clocks,
+        clock_ownerships,
         roots,
         events,
         time_events,
@@ -442,8 +455,10 @@ fn contract<'dae>(
         evaluate: declared.evaluate,
         // MLS §18.3: a structural parameter is one the translation depends on.
         structural: declared.evaluate
-            && matches!(variability,
-                        RbcVariability::Parameter | RbcVariability::Constant),
+            && matches!(
+                variability,
+                RbcVariability::Parameter | RbcVariability::Constant
+            ),
         effective_value,
         binding_depends_on: depends_on,
         binding_from_modification: declared.binding_from_modification,
@@ -456,16 +471,11 @@ fn contract<'dae>(
 /// Deliberately only the literal case. Anything else is what
 /// `binding_depends_on` is for: a consumer walks the chain rather than being
 /// handed a value the compiler guessed at.
-fn literal_value<'dae>(
-    view: dae::DaeView<'dae>,
-    expression: dae::ExprId<'dae>,
-) -> Option<f64> {
+fn literal_value<'dae>(view: dae::DaeView<'dae>, expression: dae::ExprId<'dae>) -> Option<f64> {
     let node = view.expression(expression)?;
     match node.operation() {
         dae::ExpressionOperation::Literal(dae::DaeLiteral::Real(value)) => Some(*value),
-        dae::ExpressionOperation::Literal(dae::DaeLiteral::Integer(value)) => {
-            Some(*value as f64)
-        }
+        dae::ExpressionOperation::Literal(dae::DaeLiteral::Integer(value)) => Some(*value as f64),
         _ => None,
     }
 }
@@ -559,6 +569,12 @@ fn expression_node(
         Ok(ExprId(operand.index()))
     };
     let node = match expression.operation() {
+        dae::ExpressionOperation::StringConversion { value, format, .. } => {
+            RbcExprNode::StringConversion {
+                value: check(value)?,
+                format: strings::format(format, check)?,
+            }
+        }
         dae::ExpressionOperation::Literal(literal) => RbcExprNode::Literal {
             value: literal_of(literal),
         },
@@ -567,8 +583,10 @@ fn expression_node(
             // Naming the kind is the difference between a report a maintainer
             // can act on and one that only says something is missing.
             None => unsupported(
-                &format!("coordinate kind {} not in bitcode v1",
-                         coordinate_kind_name(coordinate)),
+                &format!(
+                    "coordinate kind {} not in bitcode v2",
+                    coordinate_kind_name(coordinate)
+                ),
                 options,
             )?,
         },
@@ -577,10 +595,7 @@ fn expression_node(
                 op,
                 operand: check(operand)?,
             },
-            None => unsupported(
-                "unary operator has no bitcode v1 encoding",
-                options,
-            )?,
+            None => unsupported("unary operator has no bitcode v2 encoding", options)?,
         },
         dae::ExpressionOperation::Binary { operator, lhs, rhs } => match binary_of(operator) {
             Some(op) => RbcExprNode::Binary {
@@ -588,7 +603,7 @@ fn expression_node(
                 lhs: check(lhs)?,
                 rhs: check(rhs)?,
             },
-            None => unsupported("binary operator not in bitcode v1", options)?,
+            None => unsupported("binary operator not in bitcode v2", options)?,
         },
         dae::ExpressionOperation::Conditional(operands) => {
             // Packed as [cond, value, cond, value, ..., fallback]: an even
@@ -715,7 +730,10 @@ fn expression_node(
             subscripts: subscripts_of(subscripts, &check)?,
         },
         other => unsupported(
-            &format!("expression form {} not in bitcode v1", operation_name(&other)),
+            &format!(
+                "expression form {} not in bitcode v2",
+                operation_name(&other)
+            ),
             options,
         )?,
     };
@@ -1134,7 +1152,9 @@ fn export_domains(view: dae::DaeView<'_>, ctx: &mut Ctx<'_>) -> Vec<RbcDomain> {
     wanted.sort_by_key(|id| id.index());
     let mut out = Vec::with_capacity(wanted.len());
     for id in wanted {
-        let Some(domain) = view.domain(id) else { continue };
+        let Some(domain) = view.domain(id) else {
+            continue;
+        };
         out.push(RbcDomain {
             id: DomainId(id.index()),
             binders: domain
@@ -1206,13 +1226,15 @@ fn export_equation_families(
             scalar_rows: family.scalar_rows(),
             extents,
             scalar_view: match family.scalar_view() {
-                rumoca_core::ComprehensionScalarView::BinderSubstitution =>
-                    RbcScalarView::BinderSubstitution,
-                rumoca_core::ComprehensionScalarView::RowMajorProjection =>
-                    RbcScalarView::RowMajorProjection,
-                rumoca_core::ComprehensionScalarView::BinderPrefixProjection {
-                    binder_count,
-                } => RbcScalarView::BinderPrefixProjection { binder_count },
+                rumoca_core::ComprehensionScalarView::BinderSubstitution => {
+                    RbcScalarView::BinderSubstitution
+                }
+                rumoca_core::ComprehensionScalarView::RowMajorProjection => {
+                    RbcScalarView::RowMajorProjection
+                }
+                rumoca_core::ComprehensionScalarView::BinderPrefixProjection { binder_count } => {
+                    RbcScalarView::BinderPrefixProjection { binder_count }
+                }
             },
             provenance: ctx.provenance(family.provenance()),
         });
@@ -1242,9 +1264,7 @@ fn family_dependencies<'dae>(
     for point in 0..domain.scalar_count() as usize {
         let values = domain.structured().index_tuple_at(point).ok()??;
         for body in family.bodies().iter() {
-            let scalar = family
-                .scalar_view()
-                .body_scalar(point, domain.extents())?;
+            let scalar = family.scalar_view().body_scalar(point, domain.extents())?;
             rumoca_eval_dae::for_each_scalar_coordinate_cached(
                 view,
                 body,
@@ -1339,7 +1359,9 @@ fn export_conditions(view: dae::DaeView<'_>, ctx: &mut Ctx<'_>) -> Vec<RbcCondit
                 Op::Discrete(expression) => RbcConditionNode::Discrete {
                     expression: ExprId(expression.index()),
                 },
-                Op::Clock(_) => RbcConditionNode::Clock,
+                Op::Clock(clock) => RbcConditionNode::ClockActivation {
+                    clock: ClockId(clock.index()),
+                },
                 Op::Not(operand) => RbcConditionNode::Not {
                     operand: ConditionId(operand.index()),
                 },
@@ -1473,16 +1495,16 @@ fn export_time_events(
         };
         let schedule = match event.operation() {
             Op::Static(instant) => {
-                // The DAE carries an exact i128 rational. Bitcode v1 declares
+                // The DAE carries an exact i128 rational. Bitcode v2 declares
                 // i64; refuse rather than silently truncate an instant.
                 let numerator = i64::try_from(instant.numerator()).map_err(|_| {
                     ExportError::Projection(
-                        "time-event instant does not fit bitcode v1's i64 rational".into(),
+                        "time-event instant does not fit bitcode v2's i64 rational".into(),
                     )
                 })?;
                 let denominator = i64::try_from(instant.denominator()).map_err(|_| {
                     ExportError::Projection(
-                        "time-event instant does not fit bitcode v1's i64 rational".into(),
+                        "time-event instant does not fit bitcode v2's i64 rational".into(),
                     )
                 })?;
                 RbcSchedule::Static {
@@ -1668,8 +1690,12 @@ fn export_connection_sets(
         cursor
     }
     let join = |parent: &mut BTreeMap<String, String>, left: &str, right: &str| {
-        parent.entry(left.to_string()).or_insert_with(|| left.to_string());
-        parent.entry(right.to_string()).or_insert_with(|| right.to_string());
+        parent
+            .entry(left.to_string())
+            .or_insert_with(|| left.to_string());
+        parent
+            .entry(right.to_string())
+            .or_insert_with(|| right.to_string());
         let (a, b) = (root(parent, left), root(parent, right));
         if a != b {
             parent.insert(a, b);
@@ -1690,8 +1716,7 @@ fn export_connection_sets(
                 join(&mut parent, connector_path(lhs), connector_path(rhs));
                 index += 1;
             }
-            flat::EquationOrigin::FlowSum { .. }
-            | flat::EquationOrigin::UnconnectedFlow { .. } => {
+            flat::EquationOrigin::FlowSum { .. } | flat::EquationOrigin::UnconnectedFlow { .. } => {
                 index += 1;
             }
             _ => {}
@@ -1706,8 +1731,7 @@ fn export_connection_sets(
         let flat::EquationOrigin::Connection { lhs, rhs } = &equation.origin else {
             if matches!(
                 equation.origin,
-                flat::EquationOrigin::FlowSum { .. }
-                    | flat::EquationOrigin::UnconnectedFlow { .. }
+                flat::EquationOrigin::FlowSum { .. } | flat::EquationOrigin::UnconnectedFlow { .. }
             ) {
                 position += 1;
             }
@@ -1721,7 +1745,9 @@ fn export_connection_sets(
             span: equation.span,
         });
         for endpoint in [lhs.as_str(), rhs.as_str()] {
-            entry.connectors.insert(connector_path(endpoint).to_string());
+            entry
+                .connectors
+                .insert(connector_path(endpoint).to_string());
             if let Some(id) = by_name.get(endpoint) {
                 if !entry.potentials.contains(id) {
                     entry.potentials.push(*id);
@@ -1956,6 +1982,8 @@ fn summarize(
         expressions: expressions.len() as u32,
         relations: relations.len() as u32,
         conditions: conditions.len() as u32,
+        clocks: 0,
+        clock_ownerships: 0,
         roots: roots.len() as u32,
         events: events.len() as u32,
         time_events: time_events.len() as u32,

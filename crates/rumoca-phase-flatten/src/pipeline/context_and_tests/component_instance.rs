@@ -66,6 +66,34 @@ fn modifier_binding_scope(
         })
 }
 
+fn retain_record_instance(
+    request: ComponentInstanceProcess<'_, '_>,
+    var_name: VarName,
+) -> Result<(), FlattenError> {
+    if let Some(record) = variables::create_record_instance(
+        request.instance_data,
+        request.tree,
+        request.class_index,
+        request.effective_type_id,
+        request.canonical_type_id,
+    )? {
+        if !request.flat.record_types.contains_key(&record.type_def_id) {
+            let record_type = variables::create_record_type(
+                record.type_def_id,
+                request.tree,
+                request.class_index,
+                request.function_types,
+            )?;
+            request
+                .flat
+                .record_types
+                .insert(record.type_def_id, record_type);
+        }
+        request.flat.record_instances.insert(var_name, record);
+    }
+    Ok(())
+}
+
 pub(crate) fn process_component_instance(
     request: ComponentInstanceProcess<'_, '_>,
 ) -> Result<(), FlattenError> {
@@ -75,31 +103,9 @@ pub(crate) fn process_component_instance(
         return Ok(());
     }
 
-    // Record fields are Flat variables; retain only their container's resolved
-    // identity so downstream record equations can expand without name recovery.
+    // Record fields are Flat variables; retain their container identity.
     if !request.instance_data.is_primitive {
-        if let Some(record) = variables::create_record_instance(
-            request.instance_data,
-            request.tree,
-            request.class_index,
-            request.effective_type_id,
-            request.canonical_type_id,
-        )? {
-            if !request.flat.record_types.contains_key(&record.type_def_id) {
-                let record_type = variables::create_record_type(
-                    record.type_def_id,
-                    request.tree,
-                    request.class_index,
-                    request.function_types,
-                )?;
-                request
-                    .flat
-                    .record_types
-                    .insert(record.type_def_id, record_type);
-            }
-            request.flat.record_instances.insert(var_name, record);
-        }
-        return Ok(());
+        return retain_record_instance(request, var_name);
     }
 
     let import_context = variable_import_context_for_instance(

@@ -813,6 +813,7 @@ impl MeSimulationSession<'_, '_> {
         cursor: &mut MeOutputCursor,
     ) -> Result<(), MeSessionError> {
         let step = self.accept_proposal(proposal)?;
+        crate::diagnostics::accepted_proposal(step.previous().time(), step.accepted().time());
         crate::runtime::hotpath_stats::inc_solver_step();
         debug_assert!(
             step.order() > 0,
@@ -1089,6 +1090,7 @@ impl MeSimulationSession<'_, '_> {
         cause: MeEventCause,
         event_time: f64,
     ) -> Result<(), MeSessionError> {
+        crate::diagnostics::event(event_time);
         let settled = self.settle_event_mode(cause, event_time);
         self.host
             .guard_mutation(MeSessionLoss::EventRefresh, settled)

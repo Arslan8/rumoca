@@ -555,6 +555,8 @@ pub(super) fn build_sim_output_payload(
         "cache_key": context.cache_key,
         "target_selection": target_selection,
         "stop_time": args.stop_time,
+        "omc_transport": if args.script_mode { "script" } else { "zmq" },
+        "plots_requested": !args.no_plots,
         "use_experiment_stop_time": args.use_experiment_stop_time,
         "total_models": context.total,
         "processed": state.all_results.len(),

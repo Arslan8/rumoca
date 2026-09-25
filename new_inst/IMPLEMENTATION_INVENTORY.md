@@ -16,7 +16,7 @@ that the supplied connector-logging example runs.
 
 | Surface | Evidence in this fork | Implication |
 |---|---|---|
-| Public equation interchange | [RBC schema](../crates/rumoca-bitcode/src/schema.rs), `RBC_VERSION = 1`; Python `VERSION = 1` | Extend the public contract explicitly; do not replace it with private Rust serialization. |
+| Public equation interchange | [RBC schema](../crates/rumoca-bitcode/src/schema.rs), `RBC_VERSION = 2`; Python `VERSION = 2` | Extend the public contract explicitly; do not replace it with private Rust serialization. |
 | Empty-model construction | [Python Model](../packages/rumoca-bitcode/rumoca_bitcode/__init__.py), `Model.empty`, `builder`, `raw_model`, `refresh`, `save` | Reuse the existing model and document owner. Empty models already own a source-table entry for generated spans. |
 | Equation construction and rewriting | [Python Builder](../packages/rumoca-bitcode/rumoca_bitcode/builder.py), `add_variable`, `add_parameter`, `add_equation`, `add_derivative_equation`, `rewrite_equation`, `rewrite_operand` | Keep this as the equation-pass surface. Initial equations currently use `add_equation(..., initial=True)`. |
 | Rust equation builder | [build.rs](../crates/rumoca-bitcode/src/build.rs) | Extend existing builders rather than creating a sanitizer-specific authoring API. |

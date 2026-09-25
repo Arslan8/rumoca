@@ -1,7 +1,7 @@
 # Rumoca Bitcode: design and rationale
 
 **Audience:** Rumoca maintainers.
-**Status:** implemented; v1 in `crates/rumoca-bitcode`.
+**Status:** implemented; current v2 in `crates/rumoca-bitcode`.
 **Companions:** [`SPEC_RUMOCA_BITCODE.md`](SPEC_RUMOCA_BITCODE.md) (normative
 format), [`writing-a-bitcode-pass.md`](writing-a-bitcode-pass.md) (user guide),
 [`rumoca_bitcode_notes.md`](rumoca_bitcode_notes.md) (findings this design rests
@@ -114,7 +114,7 @@ than an interface definition.
 The parts of the plugin design that were actually good survived intact: opaque
 ids rather than pointers, a curated projection rather than internal types, and
 host-validated requests rather than direct mutation. Those are transport-
-independent, and they are all in v1.
+independent, and they are all in the current schema.
 
 ## 5. Design decisions
 
@@ -208,8 +208,10 @@ first byte, so a consumer is never told which it was handed.
 Protocol Buffers were evaluated first, as the brief asked. CBOR won on build
 friction: no `protoc`, no generated bindings, and a Python SDK with zero
 dependencies. The one property protobuf has that CBOR lacks — automatic
-unknown-field *preservation* on re-serialization — matters for a v1 pass
-round-tripping a v2 file, and is the reason to revisit this at v2.
+unknown-field *preservation* on re-serialization — matters for a pass preserving fields it does not edit. The Python SDK retains
+those raw fields within the supported version; semantic readers reject other
+version headers. See the current [contract](SPEC_RUMOCA_BITCODE.md) for the v2
+clock transport cutover.
 
 ### 5.7 Connector provenance is recovered at export, plus one compiler fix
 
@@ -271,7 +273,7 @@ right places.
 | Gap | Consequence | Cost |
 |---|---|---|
 | `--target` covers DAE targets only | `dae-modelica` and custom `ir = "dae"` targets render from bitcode. FMI packaging is one contained refactor away: `ManifestRenderer::Fmi` already ignores `CompilationResult` entirely, so the change is threading `Option<&CompilationResult>` through `render`, `write_manifest_files` and `compile_manifest_package`. Left undone deliberately — it touches the path all 17 built-in targets use. | small, but needs your review |
-| Functions, records, enumerations, clocks, general arrays | Export records them as `unsupported`; import refuses. Four test models round-trip; a model with functions does not. | schema + mapping work per feature |
+| Elided function bodies and unrepresented event owners | Calls refuse import; model-event transactions, structured roots, previous, terminal and delay owner tables refuse export. Arrays, records, enumerations, exact clocks and String conversion are represented. | schema and checked mapping work per remaining feature |
 | `connect(...)` statement spans | A connection reports the connector member's declaration, not `System.mo:31`. | retain a connection inventory on `flat::Model`; thread the span through `connections/equation_generation.rs` |
 | Type aliases | `Voltage` and `Current` collapse to `Real` on import. Structure is preserved; alias identity is not. | carry alias names in `RbcType` |
 

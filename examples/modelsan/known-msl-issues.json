@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "source": "KnownMSLIssues.mo",
+  "cases": [
+    {
+      "model": "KnownMSLIssues.GasControl",
+      "contracts": [
+        {
+          "kind": "equality",
+          "contract_id": "entropy-state-round-trip",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/4749; state_psX inverts specificEntropy at fixed pressure",
+          "actual": "actual",
+          "expected": "original"
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.GasRoundTrip",
+      "contracts": [
+        {
+          "kind": "equality",
+          "contract_id": "entropy-state-round-trip",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/4749; state_psX inverts specificEntropy at fixed pressure",
+          "actual": "actual",
+          "expected": "original"
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.WaterRoundTrip",
+      "contracts": [
+        {
+          "kind": "equality",
+          "contract_id": "entropy-state-round-trip",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/4750; state_psX inverts specificEntropy at fixed pressure",
+          "actual": "actual",
+          "expected": "original"
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.PulseControl",
+      "contracts": [
+        {
+          "kind": "periodic_pulse",
+          "contract_id": "periodic-pulse-phase",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/3624; BooleanPulse period/width/startTime contract",
+          "actual": "actual",
+          "period": 1,
+          "start": -0.25,
+          "duty": 0.5
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.PulsePast",
+      "contracts": [
+        {
+          "kind": "periodic_pulse",
+          "contract_id": "periodic-pulse-phase",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/3624; BooleanPulse period/width/startTime contract",
+          "actual": "actual",
+          "period": 1,
+          "start": -1.25,
+          "duty": 0.5
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.Delay",
+      "contracts": [
+        {
+          "kind": "sample_delay",
+          "contract_id": "one-sample-delay",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/4451; UnitDelay holds the previous sampled continuous input",
+          "actual": "actual",
+          "input": "u",
+          "period": 0.05
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.DelayControl",
+      "contracts": [
+        {
+          "kind": "sample_delay",
+          "contract_id": "one-sample-delay",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/4451; UnitDelay holds the previous sampled continuous input",
+          "actual": "actual",
+          "input": "u",
+          "period": 0.05
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.Quantization",
+      "contracts": [
+        {
+          "kind": "cardinality",
+          "contract_id": "two-bit-level-count",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/4459; two bits encode at most four distinct output levels",
+          "actual": "dut.y",
+          "maximum": 4
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.QuantizationControl",
+      "contracts": [
+        {
+          "kind": "cardinality",
+          "contract_id": "two-bit-level-count",
+          "origin": "https://github.com/modelica/ModelicaStandardLibrary/issues/4459; two bits encode at most four distinct output levels",
+          "actual": "dut.y",
+          "maximum": 4
+        }
+      ]
+    },
+    {
+      "model": "KnownMSLIssues.MoistAirFull",
+      "contracts": []
+    },
+    {
+      "model": "KnownMSLIssues.MoistAirReduced",
+      "contracts": []
+    }
+  ]
+}

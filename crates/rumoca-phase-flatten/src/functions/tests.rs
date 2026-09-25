@@ -1632,7 +1632,7 @@ fn test_convert_component_to_param_preserves_mixed_dynamic_rank() {
 }
 
 #[test]
-fn test_convert_component_to_param_resolves_constant_shape_expr() {
+fn test_convert_component_to_param_preserves_constant_shape_identity() {
     let package_def = rumoca_core::DefId::new(10);
     let n_state_def = rumoca_core::DefId::new(11);
     let mut package = class(
@@ -1690,11 +1690,16 @@ fn test_convert_component_to_param_resolves_constant_shape_expr() {
     )
     .unwrap();
 
-    assert_eq!(param.dimensions(), [2]);
-    assert!(matches!(
-        param.shape_expr.as_slice(),
-        [rumoca_core::Subscript::Index { value: 2, .. }]
-    ));
+    // The callable exposure can modify the package constant, so its declaration
+    // default is not authoritative until exposure specialization has run.
+    assert_eq!(param.dimensions(), [0]);
+    let [rumoca_core::Subscript::Expr { expr, .. }] = param.shape_expr.as_slice() else {
+        panic!("package shape constant must retain its resolved expression");
+    };
+    let rumoca_core::Expression::VarRef { name, .. } = expr.as_ref() else {
+        panic!("shape must retain its declaration reference");
+    };
+    assert_eq!(name.target_def_id(), Some(n_state_def));
 }
 
 #[test]

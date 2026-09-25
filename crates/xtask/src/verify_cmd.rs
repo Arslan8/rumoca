@@ -155,6 +155,12 @@ pub(crate) struct VerifyMslParityArgs {
     /// Explicit simulation-targets JSON file (absolute or workspace-relative)
     #[arg(long)]
     sim_targets_file: Option<PathBuf>,
+    /// Use socket-free OMC scripts for reference simulations.
+    #[arg(long)]
+    omc_script_mode: bool,
+    /// Produce comparison data without fetching/building browser plot assets.
+    #[arg(long)]
+    no_plots: bool,
     /// Include ModelicaTest sources in the discovered model set
     #[arg(long)]
     include_modelica_test: bool,
@@ -236,6 +242,12 @@ impl VerifyMslParityArgs {
     /// set fields are written; absent fields fall back to the harness defaults.
     fn to_parity_config_json(&self) -> serde_json::Value {
         let mut config = serde_json::Map::new();
+        if self.omc_script_mode {
+            config.insert("omc_script_mode".into(), true.into());
+        }
+        if self.no_plots {
+            config.insert("no_plots".into(), true.into());
+        }
         if let Some(value) = &self.results_dir {
             config.insert(
                 "results_dir".into(),

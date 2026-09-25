@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "date": "2026-09-24",
+  "git_head": "b38af3a38b0224bf22129cb1148ebf70e2492aa7",
+  "dirty_worktree": true,
+  "scope": "Configured known-issue fixtures; not all independent upstream entries, automatic semantic discovery, or compiler parity.",
+  "reports": {
+    "rumoca-source": {
+      "file": "detection-native.json",
+      "sha256": "bc5aca9315ce85530aa94c16108d48204d977b997a79a93a5a2ac2bb40ab220e",
+      "case_status_counts": {
+        "no-violation-observed": 4,
+        "violated": 5,
+        "blocked": 2
+      }
+    },
+    "openmodelica": {
+      "file": "detection-openmodelica.json",
+      "sha256": "82a5120d47ce80da31b32ada071d931333f7328bcaf31c46e394a942bed5c559",
+      "case_status_counts": {
+        "no-violation-observed": 4,
+        "violated": 4,
+        "blocked": 2,
+        "execution-failed": 1
+      }
+    }
+  },
+  "validation": [
+    {
+      "check": "Full ModelSan Python suite",
+      "command": "RUMOCA=/data/mrumoca/rumoca/target/debug/rumoca CARGO_BUILD_JOBS=4 RUST_TEST_THREADS=4 RAYON_NUM_THREADS=4 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=packages/rumoca-bitcode:packages/modelsan python3 -m pytest packages/modelsan/tests -q",
+      "exit_code": 0,
+      "passed": 284,
+      "skipped": 2,
+      "warnings": 2,
+      "elapsed_seconds": 417.42,
+      "note": "Two opt-in known-MSL integration tests skipped in this command; run separately below. Collection warnings concern imported dataclass TestCase."
+    },
+    {
+      "check": "Known-issue actual-library integration gate",
+      "command": "MODELSAN_MSL_TESTS=1 RUMOCA=/data/mrumoca/rumoca/target/debug/rumoca PYTHONPATH=packages/rumoca-bitcode:packages/modelsan python3 -m pytest packages/modelsan/tests/test_known_msl_issues.py -q",
+      "exit_code": 0,
+      "passed": 2,
+      "elapsed_seconds": 32.11,
+      "note": "Before extending the native test to include three newly unlocked entropy cases; OpenModelica test unchanged afterward."
+    },
+    {
+      "check": "Expanded nine-case native actual-library gate",
+      "command": "MODELSAN_MSL_TESTS=1 RUMOCA=/data/mrumoca/rumoca/target/debug/rumoca PYTHONPATH=packages/modelsan:packages/rumoca-bitcode python3 -m unittest discover -s packages/modelsan/tests -p test_known_msl_issues.py -k test_native_known_issue_detections_and_controls -v",
+      "exit_code": 0,
+      "passed": 1,
+      "elapsed_seconds": 33.049
+    },
+    {
+      "check": "Flatten tests and fixed 20-model before/after canary",
+      "evidence": "compiler-specialization-results.json",
+      "flatten_tests_passed": 682,
+      "canary_commands_exit_zero": true,
+      "canary_selected": 20,
+      "canary_status_changes": 0,
+      "native_completions": 8,
+      "retained_blockers": 12,
+      "full_566_model_parity_run": false
+    },
+    {
+      "check": "Clippy",
+      "status": "failed",
+      "reason": "Existing complexity errors in unchanged Flatten, DAE and Instantiate functions; compiler-specialization.md records details."
+    },
+    {
+      "check": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "check": "CLI help, new Python syntax, source/executable evidence hashes and new report links",
+      "status": "passed"
+    }
+  ],
+  "source_sha256": {
+    "packages/modelsan/modelsan/contracts/trace.py": "6faeacd12d57b3f973a194ef786e2185e0860c5717132a11c528c693f139a615",
+    "packages/modelsan/modelsan/sanitizers/behavior.py": "4e1f6c1f550ee83e143fdba9438dbe5abb3b3506bea4abd8eb094434030a973f",
+    "packages/modelsan/modelsan/findings/signature.py": "f196f645a9ed13232b1857d47b78043898a0b5dfde6bc4f28dbe25765dabc318",
+    "packages/modelsan/modelsan/sanitizers/solver.py": "a31b8cf8443480be6cb77bdf9eeac1cc21d8dd9b97334ef843f433eaacd49024",
+    "packages/modelsan/modelsan/pipeline.py": "63d620698c9a1b120ec85f5776a3c2b2c26a14a05de6f1262dfc25b04abd6b4e",
+    "packages/modelsan/modelsan/sanitizers/__init__.py": "22dfabc880ff1de699f7ea33ccd44cdaba7638108c1d8f4e95af7564152df153",
+    "packages/modelsan/modelsan/backends/rumoca_source.py": "52484423aec616ac7fac25332bf96464ca23a7b4de8ca92a5ee5a119d8c9942d",
+    "packages/modelsan/modelsan/backends/openmodelica.py": "87c0166811c8923e740c42f79b609f17a338bef88937a8ebfaa6ec9879634943",
+    "packages/modelsan/modelsan/backends/process.py": "8d89f1b081c6af103a4cae89dffce56f63395ef03d3706eae3f2d64f98e1a313",
+    "packages/modelsan/modelsan/backends/csv_trace.py": "24d98e0b382c998303046c3a8a55101b92af26dd58a374e55e5209084d2ce417",
+    "packages/modelsan/modelsan/campaign.py": "e14eaf132672373b7a0748d08c03bf7cd23e2eae87de5393024645e4b6bbb966",
+    "packages/modelsan/modelsan/campaign_provenance.py": "d4e4393298d9923adc42f0364ad1b1c9345b08bb6725082637d825b37f0805c6",
+    "packages/modelsan/modelsan/cli.py": "67ffcd0741f03ca6f12b1ffcf60be8b83f3c2d6c5962d27fa036fe7f2f932747",
+    "packages/modelsan/tests/test_behavior.py": "38dc8bf46f3a7c877545cef1af3e07d4384999d5fcb1e3b678eb45436dd3bfe6",
+    "packages/modelsan/tests/test_campaign.py": "d20740d2eb05354f73bf0416444c2ae3a64788941dcd62f7582794310a0ad44f",
+    "packages/modelsan/tests/test_known_msl_issues.py": "676d1a351ef4120aa4670701d28e5aa55f1e986fba878ce9a552bebddde451a7",
+    "packages/modelsan/tests/test_rumoca_source.py": "9485c573a5b43fdd504bcc1af222f8b109a41e1361f47751ac7ea7429f8b82cb",
+    "packages/modelsan/tests/test_openmodelica_backend.py": "fe8503627d8cdab6f42fb7f87b765ce161f2c3dc916073bef4b63266be9a5ee1",
+    "examples/modelsan/KnownMSLIssues.mo": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
+    "examples/modelsan/known-msl-issues.json": "4933d1d78c5c1ae53b7327d1d236d0a664ff653d4dba2ec5845f58534f36d179"
+  },
+  "provenance_note": "Campaign reports are exact archived copies; native executable path in the report is relative to this repository root. Current CLI normalizes future executable paths to absolute paths. Tree fingerprints cover Modelica sources only."
+}

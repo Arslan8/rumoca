@@ -14,8 +14,9 @@ def compiler():
     raise RuntimeError("rumoca executable not found; install it or set RUMOCA")
 
 
-def invoke(*args):
-    result = subprocess.run([compiler(), *map(str, args)], capture_output=True, text=True)
+def invoke(*args, executable=None, timeout=None):
+    result = subprocess.run([executable or compiler(), *map(str, args)],
+                            capture_output=True, text=True, timeout=timeout)
     if result.returncode:
         raise ValueError(result.stderr.strip() or result.stdout.strip())
     return result.stdout

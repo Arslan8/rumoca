@@ -97,6 +97,24 @@ fn full_suite_runs_msl_parity_before_lower_signal_heavy_gates() {
 }
 
 #[test]
+fn explicit_socket_free_reference_options_are_forwarded() {
+    let args = VerifyMslParityArgs {
+        omc_script_mode: true,
+        no_plots: true,
+        ..VerifyMslParityArgs::default()
+    };
+    let config = args.to_parity_config_json();
+    assert_eq!(config["omc_script_mode"], true);
+    assert_eq!(config["no_plots"], true);
+    assert!(
+        VerifyMslParityArgs::default()
+            .to_parity_config_json()
+            .get("omc_script_mode")
+            .is_none()
+    );
+}
+
+#[test]
 fn focused_msl_match_does_not_imply_selected_target_success_gate() {
     let args = VerifyMslParityArgs {
         sim_match: vec!["Modelica.Blocks.Examples.BooleanNetwork1".to_string()],

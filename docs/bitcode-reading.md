@@ -57,7 +57,7 @@ events (2)
 It is **not** Modelica and does not try to be. It is a listing of the canonical
 DAE: residual form (`0 = …`), coordinates spelled `der(x)` and `pre(x)`,
 everything parenthesised so no reader has to recall a precedence table, and an
-`<unsupported: …>` marker printed rather than elided wherever bitcode v1 could
+`<unsupported: …>` marker printed rather than elided wherever the current bitcode schema could
 not represent a node. A partial export should look partial.
 
 ## `bitcode emit-text` / `assemble` — the textual IR
@@ -72,7 +72,7 @@ rumoca bitcode assemble  model.rbctxt -o model.rbc
 
 ```text
 ; rumoca bitcode, textual form
-rbc 1
+rbc 2
 producer "rumoca 0.10.0"
 model "Modelica.Electrical.Analog.Examples.ChuaCircuit"
 

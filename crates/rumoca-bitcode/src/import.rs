@@ -1,4 +1,4 @@
-//! Rumoca Bitcode v1 → checked DAE.
+//! Rumoca Bitcode v2 → checked DAE.
 //!
 //! Import is deliberately *not* a deserializer that fills in structs. It runs
 //! [`crate::validate`] first, then rebuilds the model by issuing the DAE's own
@@ -18,6 +18,9 @@
 
 use rumoca_core::{SourceMap, Span};
 use rumoca_ir_dae as dae;
+
+mod clocks;
+mod strings;
 
 use crate::schema::*;
 use crate::validate::{ValidateOptions, ValidationError, validate};
@@ -95,6 +98,12 @@ fn rebuild_source_map(model: &RbcModel) -> (SourceMap, Vec<rumoca_core::SourceId
     }
     for condition in &model.conditions {
         note(condition.provenance.span);
+    }
+    for clock in &model.clocks {
+        note(clock.provenance.span);
+    }
+    for owner in &model.clock_ownerships {
+        note(owner.provenance.span);
     }
     for root in &model.roots {
         note(root.provenance.span);
@@ -257,6 +266,14 @@ fn rebuild(
     // reservation is what breaks the cycle, and it is the same order the
     // compiler's own lowering uses.
     let conditions = reserve_conditions(construction, &ctx)?;
+    let clocks = clocks::rebuild(construction, &ctx, &variables, &conditions)?;
+    if model
+        .expressions
+        .iter()
+        .any(|e| matches!(e.node, RbcExprNode::StringConversion { .. }))
+    {
+        construction.register_predefined_string(strings::DECLARATION)?;
+    }
     let tables = Tables {
         variables: &variables,
         domains: &domains,
@@ -266,7 +283,7 @@ fn rebuild(
     };
     let expressions = rebuild_expressions(construction, &ctx, &tables)?;
     define_variables(construction, &ctx, &expressions, reservations)?;
-    define_conditions(construction, &ctx, &expressions, &conditions)?;
+    define_conditions(construction, &ctx, &expressions, &conditions, &clocks)?;
     rebuild_equations(construction, &ctx, &expressions)?;
     rebuild_families(construction, &ctx, &expressions, &domains)?;
     rebuild_discrete_real(construction, &ctx, &expressions, &variables, &conditions)?;
@@ -369,12 +386,7 @@ fn rebuild_types<'dae>(
                     ));
                 }
                 let name = rumoca_core::VarName::intern(&record.name);
-                types.push(owner.record_array(
-                    name,
-                    fields,
-                    ty.dimensions.clone(),
-                    anchor,
-                )?);
+                types.push(owner.record_array(name, fields, ty.dimensions.clone(), anchor)?);
                 continue;
             }
             let scalar = scalar_of(ty.scalar);
@@ -488,6 +500,14 @@ fn build_expression<'dae>(
     at: dae::DaeProvenance,
 ) -> Result<dae::ExprId<'dae>, dae::DaeConstructionError> {
     Ok(match &expression.node {
+        RbcExprNode::StringConversion { value, format } => {
+            let value = resolve(built, value.0, "expression", ctx)?;
+            owner.at(at).string_conversion(
+                strings::DECLARATION,
+                value,
+                strings::format(format, built, ctx)?,
+            )?
+        }
         // An enumeration value has its own constructor: `literal` rejects
         // `DaeLiteral::Enumeration` outright, because the ordinal has to be
         // proved one-based (MLS §4.9.5) before the node is interned.
@@ -555,7 +575,9 @@ fn build_expression<'dae>(
             if let Some(ty) = empty_type {
                 // An empty literal carries no element from which to re-derive
                 // its type, so the constructor takes the type directly.
-                owner.at(at).empty_array(resolve(tables.types, ty.0, "type", ctx)?)?
+                owner
+                    .at(at)
+                    .empty_array(resolve(tables.types, ty.0, "type", ctx)?)?
             } else {
                 let mut operands = Vec::with_capacity(elements.len());
                 for element in elements {
@@ -607,7 +629,7 @@ fn build_expression<'dae>(
             let subscripts = subscripts_of(subscripts, built, ctx, at)?;
             owner.at(at).array_update(base, value, subscripts)?
         }
-        // A call needs the callee's *body* to rebuild, and bitcode v1 carries
+        // A call needs the callee's *body* to rebuild, and bitcode v2 carries
         // only the declaration. Refusing here is the same choice import makes
         // everywhere else: a DAE missing a function is not the model.
         RbcExprNode::Call { function, .. } => {
@@ -618,7 +640,7 @@ fn build_expression<'dae>(
                 .map(|f| f.name.as_str())
                 .unwrap_or("<unknown>");
             return Err(ctx.unsupported(format!(
-                "expression {} calls `{name}`, and bitcode v1 carries function \
+                "expression {} calls `{name}`, and bitcode v2 carries function \
                  declarations but not their bodies",
                 expression.id
             )));
@@ -693,6 +715,7 @@ fn define_conditions<'dae>(
     ctx: &Rebuild<'_>,
     expressions: &[dae::ExprId<'dae>],
     conditions: &[dae::ConditionId<'dae>],
+    clocks: &[dae::ClockId<'dae>],
 ) -> Result<(), dae::DaeConstructionError> {
     let mut relations = Vec::with_capacity(ctx.model.relations.len());
     construction.conditions(|owner| {
@@ -703,7 +726,8 @@ fn define_conditions<'dae>(
         }
         for (condition, id) in ctx.model.conditions.iter().zip(conditions) {
             let at = ctx.provenance(condition.provenance)?;
-            let input = condition_input(ctx, condition, &relations, conditions, expressions)?;
+            let input =
+                condition_input(ctx, condition, &relations, conditions, expressions, clocks)?;
             owner.define(*id, input, at)?;
         }
         for root in &ctx.model.roots {
@@ -723,6 +747,7 @@ fn condition_input<'dae>(
     relations: &[dae::RelationId<'dae>],
     conditions: &[dae::ConditionId<'dae>],
     expressions: &[dae::ExprId<'dae>],
+    clocks: &[dae::ClockId<'dae>],
 ) -> Result<dae::ConditionInput<'dae>, dae::DaeConstructionError> {
     let inner = |id: ConditionId| resolve(conditions, id.0, "condition", ctx);
     Ok(match &condition.node {
@@ -740,8 +765,8 @@ fn condition_input<'dae>(
         RbcConditionNode::AnyRise { lhs, rhs } => {
             dae::ConditionInput::AnyRise(inner(*lhs)?, inner(*rhs)?)
         }
-        RbcConditionNode::Clock => {
-            return Err(ctx.unsupported("clocked conditions are not supported by bitcode v1"));
+        RbcConditionNode::ClockActivation { clock } => {
+            dae::ConditionInput::Clock(resolve(clocks, clock.0, "clock", ctx)?)
         }
         RbcConditionNode::Unsupported { detail } => {
             return Err(ctx.unsupported(format!("unsupported condition: {detail}")));
@@ -754,8 +779,7 @@ fn condition_input<'dae>(
 /// Returned in artifact order so a family's `DomainId` indexes straight into
 /// the result. Parents are resolved first: the export writes domains sorted by
 /// index and a parent always precedes its child, so one pass suffices.
-type BinderTable<'dae> =
-    std::collections::HashMap<(DomainId, u32), dae::DomainBinderId<'dae>>;
+type BinderTable<'dae> = std::collections::HashMap<(DomainId, u32), dae::DomainBinderId<'dae>>;
 
 fn rebuild_domains<'dae>(
     construction: &mut dae::DaeConstruction<'dae>,
@@ -790,8 +814,7 @@ fn rebuild_domains<'dae>(
         // A binder identity is owner-local to its domain and has no public
         // raw constructor, so it is minted here while the domain is in hand.
         for ordinal in 0..domain.binders.len() {
-            let binder =
-                construction.domains(|domains| domains.binder(id, ordinal, at))?;
+            let binder = construction.domains(|domains| domains.binder(id, ordinal, at))?;
             built_binder(&mut binders, DomainId(built.len() as u32), ordinal, binder);
         }
         built.push(id);
@@ -826,9 +849,8 @@ fn rebuild_discrete_real<'dae>(
             for equation in &ctx.model.discrete_real_equations {
                 let at = ctx.provenance(equation.provenance)?;
                 let residual = resolve(expressions, equation.residual.0, "expression", ctx)?;
-                let build = |target: &mut dae::ResidualEquation<'_, 'dae>| {
-                    target.residual(residual)
-                };
+                let build =
+                    |target: &mut dae::ResidualEquation<'_, 'dae>| target.residual(residual);
                 match equation.activation {
                     RbcDiscreteRealActivation::Always => {
                         owner.real_equation(at, build)?;
@@ -899,14 +921,15 @@ fn rebuild_families<'dae>(
                 .map(|body| resolve(expressions, body.0, "expression", ctx))
                 .collect::<Result<_, _>>()?;
             let view = match family.scalar_view {
-                RbcScalarView::BinderSubstitution =>
-                    rumoca_core::ComprehensionScalarView::BinderSubstitution,
-                RbcScalarView::RowMajorProjection =>
-                    rumoca_core::ComprehensionScalarView::RowMajorProjection,
-                RbcScalarView::BinderPrefixProjection { binder_count } =>
-                    rumoca_core::ComprehensionScalarView::BinderPrefixProjection {
-                        binder_count,
-                    },
+                RbcScalarView::BinderSubstitution => {
+                    rumoca_core::ComprehensionScalarView::BinderSubstitution
+                }
+                RbcScalarView::RowMajorProjection => {
+                    rumoca_core::ComprehensionScalarView::RowMajorProjection
+                }
+                RbcScalarView::BinderPrefixProjection { binder_count } => {
+                    rumoca_core::ComprehensionScalarView::BinderPrefixProjection { binder_count }
+                }
             };
             // The two partitions are distinct owner types, so the call is
             // written twice rather than behind one closure.
@@ -968,6 +991,26 @@ fn rebuild_events<'dae>(
     conditions: &[dae::ConditionId<'dae>],
 ) -> Result<(), dae::DaeConstructionError> {
     construction.events(|owner| {
+        for event in &ctx.model.time_events {
+            let at = ctx.provenance(event.provenance)?;
+            match event.schedule {
+                RbcSchedule::Static {
+                    numerator,
+                    denominator,
+                } => {
+                    let instant = rumoca_core::ClockRational::new(numerator, denominator).map_err(
+                        |error| ctx.unsupported(format!("invalid time-event rational: {error}")),
+                    )?;
+                    owner.time_event(instant, at)?;
+                }
+                RbcSchedule::Dynamic { deadline } => {
+                    owner.dynamic_time_event(
+                        resolve(expressions, deadline.0, "expression", ctx)?,
+                        at,
+                    )?;
+                }
+            }
+        }
         for event in &ctx.model.events {
             let at = ctx.provenance(event.provenance)?;
             let trigger = resolve(conditions, event.trigger.0, "condition", ctx)?;
@@ -1123,7 +1166,7 @@ fn coordinate_of<'dae>(
         // Both are handled by `build_expression`, which holds the domain and
         // condition tables that `variables` alone cannot resolve.
         RbcCoordinate::Binder { .. } | RbcCoordinate::Condition { .. } => return None,
-        // Only meaningful inside a function body, which v1 does not carry.
+        // Only meaningful inside a function body, which v2 does not carry.
         RbcCoordinate::FunctionParameter { .. } => return None,
     })
 }

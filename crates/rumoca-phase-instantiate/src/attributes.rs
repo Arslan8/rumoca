@@ -175,8 +175,7 @@ fn extract_attr_expr_from_modification_expr(
 ) -> Option<ast::Expression> {
     match expr {
         ast::Expression::Modification { target, value, .. } => {
-            (target.parts.last()?.ident.text.as_ref() == attr_name)
-                .then(|| value.as_ref().clone())
+            (target.parts.last()?.ident.text.as_ref() == attr_name).then(|| value.as_ref().clone())
         }
         ast::Expression::NamedArgument { name, value, .. } => {
             (name.text.as_ref() == attr_name).then(|| value.as_ref().clone())
@@ -185,6 +184,21 @@ fn extract_attr_expr_from_modification_expr(
             .iter()
             .find_map(|m| extract_attr_expr_from_modification_expr(m, attr_name)),
         _ => None,
+    }
+}
+
+fn merge_missing_type_numeric_attrs_from_expr(
+    attrs: &mut ExtractedAttributes,
+    expr: &ast::Expression,
+) {
+    for (name, slot) in [
+        ("min", &mut attrs.min),
+        ("max", &mut attrs.max),
+        ("nominal", &mut attrs.nominal),
+    ] {
+        if slot.is_none() {
+            *slot = extract_attr_expr_from_modification_expr(expr, name);
+        }
     }
 }
 
@@ -212,7 +226,6 @@ pub(super) fn merge_type_hierarchy_numeric_attributes(
     class_def: Option<&ast::ClassDef>,
     attrs: &mut ExtractedAttributes,
 ) {
-    const NUMERIC: [&str; 3] = ["min", "max", "nominal"];
     if attrs.min.is_some() && attrs.max.is_some() && attrs.nominal.is_some() {
         return;
     }
@@ -229,17 +242,7 @@ pub(super) fn merge_type_hierarchy_numeric_attributes(
 
         for ext in &class.extends {
             for modification in &ext.modifications {
-                for name in NUMERIC {
-                    let slot = match name {
-                        "min" => &mut attrs.min,
-                        "max" => &mut attrs.max,
-                        _ => &mut attrs.nominal,
-                    };
-                    if slot.is_none() {
-                        *slot = extract_attr_expr_from_modification_expr(
-                            &modification.expr, name);
-                    }
-                }
+                merge_missing_type_numeric_attrs_from_expr(attrs, &modification.expr);
             }
         }
 
