@@ -93,8 +93,21 @@ end Coupled;
         self.assertTrue(list(result.observations.of(EquationResidual)))
         self.assertTrue(all(m.coordinates.startswith("internal-") for m in matrices))
 
-    def test_unsupported_clocked_import_is_not_a_model_bug(self):
-        from modelsan.backends.base import ExecutionStatus
+    def test_a_clocked_sample_model_runs_and_integrates_its_discrete_state(self):
+        """Clocked `sample`/`when`/`pre` executes, and executes correctly.
+
+        This asserted `BACKEND_ERROR` until the capability landed, and then
+        kept failing for being right about the past (TOOLBUG-027). What
+        replaces it is the behaviour, not the absence of it: a bare status
+        check would pass just as well on a backend that ran the model and got
+        the numbers wrong.
+
+        `d` steps once per sample instant and `x` integrates it, so over
+        [0, 0.55] with a 0.1 s period the closed form is exact:
+
+            d(t) = floor(t/0.1)                    -> 1, 2, 3, 4, 5
+            x(0.55) = 0.1*(1+2+3+4) + 0.05*5       -> 1.25
+        """
         path = self.root / "Clocked.mo"
         path.write_text('''model Clocked
   Real x(start=0, fixed=true);
@@ -106,6 +119,13 @@ equation
   end when;
 end Clocked;
 ''')
-        failure = self.backend.prepare(str(path), "Clocked")
-        result = failure if failure is not None else self.backend.run(NOMINAL)
-        self.assertEqual(result.status, ExecutionStatus.BACKEND_ERROR)
+        backend = RumocaBackend(RUMOCA, t_end=.55)
+        self.addCleanup(backend.close)
+        self.assertIsNone(backend.prepare(str(path), "Clocked"))
+        result = backend.run(NOMINAL)
+        self.assertTrue(result.ok, result.failure)
+
+        self.assertEqual(result.trace.final_state["d"], 5.0)
+        self.assertAlmostEqual(result.trace.final_state["x"], 1.25, places=9)
+        # One event per sample instant in (0, 0.55]: 0.1 .. 0.5.
+        self.assertEqual(len(list(result.observations.of(EventTriggered))), 5)

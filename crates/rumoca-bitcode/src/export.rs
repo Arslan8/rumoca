@@ -10,8 +10,11 @@
 //! by walking expressions.
 
 mod clocks;
+mod paths;
 mod profile;
 mod strings;
+
+use paths::{component_classes, connector_path};
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -346,7 +349,7 @@ fn export_components(
             continue;
         };
         let name = variable.name().to_string();
-        if let Some((component, _)) = name.split_once('.') {
+        if let Some((component, _)) = rumoca_core::split_first_top_level(&name) {
             let next = ComponentId(paths.len() as u32);
             paths.entry(component.to_string()).or_insert(next);
         }
@@ -378,8 +381,7 @@ fn export_variables(
             let variable = view.variable(id)?;
             let name = variable.name().to_string();
             let connector = flat.and_then(|flat| connector_member(flat, &name));
-            let component = name
-                .split_once('.')
+            let component = rumoca_core::split_first_top_level(&name)
                 .and_then(|(prefix, _)| component_of.get(prefix).copied());
             Some(RbcVariable {
                 id: VariableId(index as u32),
@@ -1886,55 +1888,9 @@ fn export_connection_sets(
     sets
 }
 
-/// The class each top-level instance is of, from Flat's declaring-class map.
-///
-/// Taken from a variable the instance declares *directly*: `L.L` is declared
-/// by `Analog.Basic.Inductor`, where `L.n.v` is declared by `NegativePin`. A
-/// connector's own class is recovered the same way one level down.
-fn component_classes(flat: Option<&flat::Model>) -> BTreeMap<String, String> {
-    let mut found: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
-    let Some(flat) = flat else {
-        return BTreeMap::new();
-    };
-    for (name, class) in flat.variable_declaring_classes.iter() {
-        let text = name.as_str();
-        let Some((owner, leaf)) = split_owner(text) else {
-            continue;
-        };
-        if leaf.is_empty() || owner.is_empty() {
-            continue;
-        }
-        *found
-            .entry(owner.to_string())
-            .or_default()
-            .entry(class.clone())
-            .or_default() += 1;
-    }
-    found
-        .into_iter()
-        .filter_map(|(owner, classes)| {
-            // An instance's variables agree on their declaring class except
-            // where one is inherited from a base; the commonest wins, and ties
-            // break on the name so the artifact stays deterministic.
-            let best = classes
-                .into_iter()
-                .max_by(|left, right| left.1.cmp(&right.1).then(right.0.cmp(&left.0)))?;
-            Some((owner, best.0))
-        })
-        .collect()
-}
-
-fn connector_path(member: &str) -> &str {
-    split_owner(member).map_or(member, |(path, _)| path)
-}
-
-/// `"battery.pin.v"` → `("battery.pin", "v")`. The one place this file takes a
-/// flattened path apart, so the boundary operation has a named owner rather
-/// than being open-coded wherever a prefix is wanted.
-fn split_owner(path: &str) -> Option<(&str, &str)> {
-    path.rsplit_once('.')
-}
-
+// Passing the assembled `RbcModel` instead would invert the order: the summary
+// is computed to put *into* that model.
+// SPEC_0021: Exception - the summary counts every table, so its arity is the schema's width.
 #[allow(clippy::too_many_arguments)]
 fn summarize(
     variables: &[RbcVariable],

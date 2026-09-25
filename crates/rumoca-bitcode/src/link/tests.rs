@@ -238,7 +238,9 @@ fn map_fixture() -> (RbcModel, RbcModel) {
 }
 
 #[test]
-// SPEC_0021: exhaustive expression-shape regression matrix.
+// Every node variant is relocated and checked in one body, so a variant added
+// to the schema and forgotten here is a visible gap rather than a silent one.
+// SPEC_0021: Exception - an exhaustive expression-shape regression matrix.
 #[allow(clippy::too_many_lines)]
 fn all_expression_shapes_relocate_only_typed_references() {
     let (out, input) = map_fixture();
@@ -385,7 +387,9 @@ fn event_condition_and_action_variants_relocate() {
 }
 
 #[test]
-// SPEC_0021: exhaustive cross-table schema fixture with explicit relocation checks.
+// The point is that every table's ids relocate together; splitting this would
+// let one table's check pass while another's regressed.
+// SPEC_0021: Exception - an exhaustive cross-table relocation fixture.
 #[allow(clippy::too_many_lines)]
 fn relocates_all_metadata_and_separate_equation_id_spaces() {
     let mut file = fixture();

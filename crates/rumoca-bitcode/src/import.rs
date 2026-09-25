@@ -1030,6 +1030,9 @@ fn rebuild_events<'dae>(
     })
 }
 
+// Bundling these into a context struct would hand this function the whole
+// model and hide which four tables it actually reads.
+// SPEC_0021: Exception - rebuilding one action needs every table it may reference at once.
 #[allow(clippy::too_many_arguments)]
 fn rebuild_action<'dae>(
     owner: &mut dae::Events<'_, 'dae>,

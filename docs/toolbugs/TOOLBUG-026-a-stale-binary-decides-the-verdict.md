@@ -1,6 +1,6 @@
 # TOOLBUG-026: a stale binary decides the verdict
 
-**Status:** open (three instances found the same day, none yet fixed)
+**Status:** fixed 2026-09-25
 **Found:** 2026-09-24, while re-verifying the MSL known-issues campaign.
 
 ## The defect
@@ -34,15 +34,27 @@ evaluation document. A future instance could as easily move the other way.
 
 ## Fix
 
-1. `compiler()` should prefer an in-tree `target/{debug,release}/rumoca` over
-   `PATH`, and `RUMOCA` over both. PATH last, not first.
-2. Assert a minimum version once at session start and fail with one clear
-   message, rather than producing N identical downstream failures.
-3. Every recorded campaign result already carries `executable_sha256`. Nothing
-   *checks* it. A re-run against a different hash should refuse to be compared
-   against the stored result without saying so.
+1. **Done.** `compiler()` now resolves `RUMOCA`, then the working copy's own
+   `target/{debug,release}/rumoca`, then `PATH`. An explicit choice beats a
+   discovered one, and the build whose source sits beside the package beats
+   whatever a shell happens to find.
+2. **Done.** `MINIMUM_VERSION` is checked once, and a compiler below it is
+   refused by name and version — "every rumoca found is older than 0.10.0:
+   /home/…/.cargo/bin/rumoca is 0.4.5" — instead of producing N downstream
+   failures that each blame something else. An executable that reports no
+   parseable version is accepted, because unknown is not the same as too old.
+3. **Not done.** Every recorded campaign result carries `executable_sha256` and
+   nothing checks it. A re-run against a different hash should refuse silent
+   comparison against the stored result. This remains open, and it is the
+   instance that bit hardest: the 6/6 detection claim retracted in
+   [TOOLBUG-027](TOOLBUG-027-tests-and-docs-assert-limitations-that-were-fixed.md)
+   came from one run against one build and was repeated in three documents
+   before anything re-ran it.
 
 ## Regression
 
-A test that runs the suite's `compiler()` with a doctored `PATH` containing an
-old binary and asserts it still selects the in-tree build.
+`packages/modelsan/tests/test_compiler_resolution.py`, five cases: a doctored
+`PATH` holding a 0.4.5 does not shadow the working copy; an explicit `RUMOCA`
+still wins; a too-old compiler is refused by name and version; an executable
+with no parseable version is not refused; and the probe reads the real
+compiler's version.

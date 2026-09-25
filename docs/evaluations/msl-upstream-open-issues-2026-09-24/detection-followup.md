@@ -79,9 +79,14 @@ Externally interrupted processes are inconclusive, not credited model defects.
 
 ## Remaining coverage gaps
 
-Native MoistAir still stops with EF015 because resolved class metadata for a
-`ThermodynamicState` record constructor is missing. Both triggering and control
-cases are blocked; no native detection is claimed.
+Native MoistAir still stops before execution; both triggering and control
+cases are blocked and no native detection is claimed. The blocker has moved as
+the frontend advanced: it was EF015, missing resolved class metadata for a
+`ThermodynamicState` record constructor, and is now ED019, an unsupported
+function shape proof -- `X`: axis 1 requires extent 2 where the call site
+proves 1, at `Modelica/Media/package.mo:5133`. The reduced-composition case is
+exactly the shape disagreement upstream #4771 reports, so the compiler is
+meeting the defect and declining to compile rather than reporting it.
 
 OpenModelica's quantizer CSV contains decreasing timestamps, including tiny
 floating-point reversals around clock/output events. The transport rejects it
@@ -96,7 +101,7 @@ additional contracts and executable fixtures for the wider issue inventory.
 
 ## Validation scope
 
-The full ModelSan Python suite passes **284 tests**, with the two opt-in
+The full ModelSan Python suite passes **326 of 327 tests**, with the two opt-in
 actual-library tests skipped in that command. Those tests pass separately with
 both backends, including a subsequent expanded nine-case native gate. The compiler
 repair passes 682 Flatten tests, including six new general regression cases.

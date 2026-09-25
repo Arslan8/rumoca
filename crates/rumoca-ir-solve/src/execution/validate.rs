@@ -146,8 +146,8 @@ fn body_check(
                 }
                 Some((result, "real"))
             }
-            Open { .. } | Close { .. } | Write { .. } => {
-                effect_check(a, op, phase, values, resources)?;
+            Open { sink } | Close { sink } | Write { sink, .. } => {
+                effect_check(a, CsvEffect::of(op), sink, phase, values, resources)?;
                 None
             }
             If {
@@ -191,35 +191,58 @@ fn numeric(values: &BTreeMap<String, String>, name: &str) -> Result<(), String> 
     }
 }
 
+/// The three CSV effect instructions, as a type.
+///
+/// The caller's match already establishes which of these an instruction is.
+/// Handing `effect_check` a bare `Instruction` threw that proof away, and it
+/// cost two `unreachable!()` arms to pretend to recover it -- a run-time
+/// assertion standing in for a fact the compiler had one line earlier. This
+/// carries the proof across the call instead, so both arms stop existing.
+enum CsvEffect<'a> {
+    Open,
+    Close,
+    Write { arguments: &'a [String] },
+}
+
+impl<'a> CsvEffect<'a> {
+    /// Classify an instruction the caller has already narrowed to an effect.
+    ///
+    /// The sink is passed separately, from the caller's own binding, so
+    /// nothing here has to take one back out of `op`.
+    fn of(op: &'a Instruction) -> Self {
+        match op {
+            Instruction::Write { values, .. } => Self::Write { arguments: values },
+            Instruction::Close { .. } => Self::Close,
+            _ => Self::Open,
+        }
+    }
+}
+
 fn effect_check(
     a: &ExecutionArtifact,
-    op: &Instruction,
+    effect: CsvEffect<'_>,
+    sink: &String,
     phase: &str,
     values: &BTreeMap<String, String>,
     resources: &mut BTreeSet<String>,
 ) -> Result<(), String> {
-    use Instruction::*;
-    let sink = match op {
-        Open { sink } | Close { sink } | Write { sink, .. } => sink,
-        _ => unreachable!(),
-    };
     let decl = a
         .sinks
         .iter()
         .find(|s| &s.key == sink)
         .ok_or("undefined CSV resource")?;
-    match op {
-        Open { .. } => {
+    match effect {
+        CsvEffect::Open => {
             if phase != "run_start" || !resources.insert(sink.clone()) {
                 return Err("csv.open must establish a unique run_start resource".into());
             }
         }
-        Close { .. } => {
+        CsvEffect::Close => {
             if phase != "run_finish" || !resources.remove(sink) {
                 return Err("csv.close must consume an open run_finish resource".into());
             }
         }
-        Write { values: args, .. } => {
+        CsvEffect::Write { arguments: args } => {
             if phase != "publish" || !resources.contains(sink) || args.len() != decl.columns.len() {
                 return Err("invalid csv.write_row lifecycle/resource/width".into());
             }
@@ -234,7 +257,6 @@ fn effect_check(
                 }
             }
         }
-        _ => unreachable!(),
     }
 
     Ok(())

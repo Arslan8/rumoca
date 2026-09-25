@@ -219,6 +219,23 @@ so span provenance remains traceable. Offenders: {offenders:#?}"
     );
 }
 
+/// Crates that declare their own `SourceId` and are not talking about
+/// `rumoca_core::SourceId` at all.
+///
+/// `rumoca-bitcode` defines `SourceId` as an index into `RbcModel::sources`,
+/// the artifact's own table. It names no file, it has no `from_source_name`,
+/// and `SourceId(0)` there is the first entry of that table rather than an
+/// unresolved source. The detector below matches the text `SourceId(0)`, so
+/// without this it reports a crate that cannot comply with the rule it is
+/// being held to.
+const FOREIGN_SOURCE_ID_CRATES: &[&str] = &["rumoca-bitcode"];
+
+fn declares_its_own_source_id(path: &Path) -> bool {
+    FOREIGN_SOURCE_ID_CRATES.iter().any(|crate_name| {
+        path.components().any(|component| component.as_os_str() == *crate_name)
+    })
+}
+
 #[test]
 fn test_repository_fixtures_use_source_named_spans() {
     let root = workspace_root().join("crates");
@@ -227,6 +244,7 @@ fn test_repository_fixtures_use_source_named_spans() {
 
     let offenders = rs_files
         .into_iter()
+        .filter(|path| !declares_its_own_source_id(path))
         .flat_map(|path| numeric_source_id_locations(&path))
         .collect::<Vec<_>>();
 

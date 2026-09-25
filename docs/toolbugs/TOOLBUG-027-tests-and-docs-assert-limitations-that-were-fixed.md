@@ -1,6 +1,6 @@
 # TOOLBUG-027: tests and docs assert limitations that were already fixed
 
-**Status:** open
+**Status:** fixed 2026-09-25
 **Found:** 2026-09-24, verifying the MSL known-issues campaign and test suite.
 
 ## The defect
@@ -24,18 +24,30 @@ x(0.55) = 1.2500000000000044     hand-computed 0.1*(1+2+3+4) + 0.05*5 = 1.25
 The test is the only thing still failing in the suite, and it fails by being
 right about 2026 and wrong about today.
 
-### 2. Native MoistAir is claimed blocked
+### 2. Native MoistAir is claimed blocked — RETRACTED
 
-`docs/evaluations/msl-upstream-open-issues-2026-09-24/detection-followup.md:82`
-states "Native MoistAir still stops with EF015 ... no native detection is
-claimed", and `detection-native.json` records both MoistAir cases as `blocked`.
-Re-running the campaign against the current binary gives
-`MoistAirReduced -> model-rejected` with the specific finding
-`solver / compile-time-array-bounds / high`, "index 2, size 1" at
-`MoistAir.mo:1273` — which is exactly upstream issue #4771 — and
-`MoistAirFull -> no-violation-observed`, a clean control.
+**This entry was wrong.** It read:
 
-Native detection is **6/6 with 5 clean controls**, not the documented 5/6.
+> `detection-followup.md:82` states "Native MoistAir still stops with EF015 ...
+> no native detection is claimed" ... Native detection is 6/6 with 5 clean
+> controls, not the documented 5/6.
+
+That was measured on 2026-09-24 and does not reproduce. Re-running the campaign
+on 2026-09-25 gives `MoistAirFull` and `MoistAirReduced` both `blocked`, so
+native detection is **5/6 with 4 clean controls** — exactly what the document
+claimed. Compiling the model directly reproduces it independently of any
+sanitizer, and it reproduces equally with the in-flight flatten work reverted
+to its authored state, so neither the pruning-order nor the folding-scope fix
+is responsible.
+
+What *is* stale is the blocker's identity: it was EF015, missing record
+metadata, and is now ED019, an unsupported function shape proof. The document
+now says so.
+
+The lesson is the one this file is about, turned around: a single measurement
+is not a fact. The 6/6 claim was taken from one campaign run and repeated in
+three places before anything re-ran it, which is exactly the failure mode
+[TOOLBUG-026](TOOLBUG-026-a-stale-binary-decides-the-verdict.md) describes.
 
 ### 3. The machine-readable census contradicts the prose
 
@@ -53,11 +65,15 @@ evaluation document we cannot cite.
 ## Fix
 
 - Replace the clocked test's limitation assertion with the behavioural one
-  above (step times, event count, and the closed-form integral).
+  above (step times, event count, and the closed-form integral). **Done** —
+  `test_a_clocked_sample_model_runs_and_integrates_its_discrete_state`.
 - Re-run the campaign and regenerate `detection-native.json`; correct the
-  "Remaining coverage gaps" paragraph.
-- Backfill `demonstrated_modelsan_detection` for the six, and have
-  `build_index.py` fail when the flag disagrees with `detection-*.json`.
+  "Remaining coverage gaps" paragraph. **Done** — the report is regenerated and
+  the paragraph names ED019.
+- Backfill `demonstrated_modelsan_detection`. **Done** — set for the five
+  issues the regenerated report shows as violated (#3624, #4451, #4459, #4749,
+  #4750), read from the report rather than listed by hand so the flag cannot
+  drift from the evidence.
 
 Related: [TOOLBUG-026](TOOLBUG-026-a-stale-binary-decides-the-verdict.md), which
 is why instance 2 was recorded wrong in the first place.

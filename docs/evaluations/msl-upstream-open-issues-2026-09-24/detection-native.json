@@ -6,13 +6,15 @@
   "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
   "provenance": {
     "backend": "rumoca-source",
-    "executable": "./target/debug/rumoca",
+    "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
     "version": "rumoca 0.10.0",
-    "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+    "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
     "stop_time": 1.0,
     "intervals": 400,
     "timeout_seconds": 90.0,
     "native_solver": "rk-like",
+    "execution_profile": "native-source",
+    "parameter_policy": "declared",
     "library_files": [],
     "source_trees": [
       {
@@ -54,7 +56,7 @@
             "model": "KnownMSLIssues.GasControl",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -65,6 +67,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -78,11 +81,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-77rhhden/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-5elvuz2d/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-5elvuz2d/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-5elvuz2d/cache"
             ],
             "returncode": 0
           },
@@ -1373,7 +1378,7 @@
             "model": "KnownMSLIssues.GasRoundTrip",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -1384,6 +1389,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -1397,11 +1403,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-stxh2lda/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-jxc91ekf/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-jxc91ekf/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-jxc91ekf/cache"
             ],
             "returncode": 0
           },
@@ -2692,7 +2700,7 @@
             "model": "KnownMSLIssues.WaterRoundTrip",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -2703,6 +2711,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -2716,11 +2725,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-mxmplz1j/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-uhcyjbh5/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-uhcyjbh5/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-uhcyjbh5/cache"
             ],
             "returncode": 0
           },
@@ -3972,7 +3983,7 @@
             "model": "KnownMSLIssues.PulseControl",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -3983,6 +3994,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -3996,11 +4008,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-phidhf2t/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-6snmyryf/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-6snmyryf/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-6snmyryf/cache"
             ],
             "returncode": 0
           },
@@ -5704,7 +5718,7 @@
             "model": "KnownMSLIssues.PulsePast",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -5715,6 +5729,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -5728,11 +5743,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-fmjpgx0a/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-s4sj9jzf/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-s4sj9jzf/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-s4sj9jzf/cache"
             ],
             "returncode": 0
           },
@@ -7434,7 +7451,7 @@
             "model": "KnownMSLIssues.Delay",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -7445,6 +7462,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -7458,11 +7476,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-jgn5qadr/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-4axv3_7t/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-4axv3_7t/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-4axv3_7t/cache"
             ],
             "returncode": 0
           },
@@ -10467,7 +10487,7 @@
             "model": "KnownMSLIssues.DelayControl",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -10478,6 +10498,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -10491,11 +10512,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-e749akw9/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-iv_khyab/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-iv_khyab/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-iv_khyab/cache"
             ],
             "returncode": 0
           },
@@ -12275,7 +12298,7 @@
             "model": "KnownMSLIssues.Quantization",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -12286,6 +12309,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -12299,11 +12323,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-zz07mjsw/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-oap627xi/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-oap627xi/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-oap627xi/cache"
             ],
             "returncode": 0
           },
@@ -20895,7 +20921,7 @@
             "model": "KnownMSLIssues.QuantizationControl",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -20906,6 +20932,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -20919,11 +20946,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-v_9c4n1u/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-dj7ezk6_/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-dj7ezk6_/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-dj7ezk6_/cache"
             ],
             "returncode": 0
           },
@@ -29494,7 +29523,7 @@
       "coverage": {
         "solver.collapse": "observe_solver_steps unavailable"
       },
-      "note": "model does not run at its declared values: build-error during compilation: [EF015] missing resolved class metadata for\n  \u2502 `Modelica.Media.Air.MoistAir.ThermodynamicState` (one exact record layout\n  \u2502 for the constructor declaration)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/Mo",
+      "note": "model does not run at its declared values: build-error during compilation: [ED019] unsupported Flat semantic owner `function shape proof`: `X`: axis 1\n  \u2502 requires extent 2 but the call site proves 3\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Mode",
       "executions": [
         {
           "status": "backend-error",
@@ -29502,8 +29531,8 @@
           "failure": {
             "kind": "build-error",
             "phase": "compilation",
-            "message": "[EF015] missing resolved class metadata for\n  \u2502 `Modelica.Media.Air.MoistAir.ThermodynamicState` (one exact record layout\n  \u2502 for the constructor declaration)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/Mo",
-            "raw": "[EF015] missing resolved class metadata for\n  \u2502 `Modelica.Media.Air.MoistAir.ThermodynamicState` (one exact record layout\n  \u2502 for the constructor declaration)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/Air/MoistAir.mo:32:28]\n 31 \u2502     \n 32 \u2502 \u256d\u2500\u25b6   redeclare record extends ThermodynamicState\n 33 \u2502 \u2502       \"ThermodynamicState record for moist air\"\n 34 \u2502 \u251c\u2500\u25b6   end ThermodynamicState;\n    \u00b7 \u2570\u2500\u2500\u2500\u2500 class used here\n 35 \u2502     \n    \u2570\u2500\u2500\u2500\u2500\n  help: name resolution must assign and preserve DefId metadata before\n        flattening",
+            "message": "[ED019] unsupported Flat semantic owner `function shape proof`: `X`: axis 1\n  \u2502 requires extent 2 but the call site proves 3\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Mode",
+            "raw": "[ED019] unsupported Flat semantic owner `function shape proof`: `X`: axis 1\n  \u2502 requires extent 2 but the call site proves 3\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/package.mo:5133:7]\n 5132 \u2502       Temperature T \"Temperature of medium\";\n 5133 \u2502       MassFraction[nX] X(start=reference_X)\n      \u00b7       \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n      \u00b7                \u2570\u2500\u2500 unsupported semantic owner\n 5134 \u2502         \"Mass fractions (= (component mass)/total mass  m_i/m)\";\n      \u2570\u2500\u2500\u2500\u2500\n  help: this construct is rejected before simulation until its checked DAE\n        representation is implemented",
             "time": null
           },
           "metadata": {
@@ -29512,7 +29541,7 @@
             "model": "KnownMSLIssues.MoistAirFull",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -29523,6 +29552,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -29536,11 +29566,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-v3hzd3tv/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-0v5k2bs4/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-0v5k2bs4/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-0v5k2bs4/cache"
             ],
             "returncode": 1
           },
@@ -29557,7 +29589,7 @@
       "coverage": {
         "solver.collapse": "observe_solver_steps unavailable"
       },
-      "note": "model does not run at its declared values: build-error during compilation: [EF015] missing resolved class metadata for\n  \u2502 `Modelica.Media.Air.MoistAir.ThermodynamicState` (one exact record layout\n  \u2502 for the constructor declaration)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/Mo",
+      "note": "model does not run at its declared values: build-error during compilation: [ED019] unsupported Flat semantic owner `function shape proof`: `X`: axis 1\n  \u2502 requires extent 2 but the call site proves 1\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Mode",
       "executions": [
         {
           "status": "backend-error",
@@ -29565,8 +29597,8 @@
           "failure": {
             "kind": "build-error",
             "phase": "compilation",
-            "message": "[EF015] missing resolved class metadata for\n  \u2502 `Modelica.Media.Air.MoistAir.ThermodynamicState` (one exact record layout\n  \u2502 for the constructor declaration)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/Mo",
-            "raw": "[EF015] missing resolved class metadata for\n  \u2502 `Modelica.Media.Air.MoistAir.ThermodynamicState` (one exact record layout\n  \u2502 for the constructor declaration)\n    \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/Air/MoistAir.mo:32:28]\n 31 \u2502     \n 32 \u2502 \u256d\u2500\u25b6   redeclare record extends ThermodynamicState\n 33 \u2502 \u2502       \"ThermodynamicState record for moist air\"\n 34 \u2502 \u251c\u2500\u25b6   end ThermodynamicState;\n    \u00b7 \u2570\u2500\u2500\u2500\u2500 class used here\n 35 \u2502     \n    \u2570\u2500\u2500\u2500\u2500\n  help: name resolution must assign and preserve DefId metadata before\n        flattening",
+            "message": "[ED019] unsupported Flat semantic owner `function shape proof`: `X`: axis 1\n  \u2502 requires extent 2 but the call site proves 1\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Mode",
+            "raw": "[ED019] unsupported Flat semantic owner `function shape proof`: `X`: axis 1\n  \u2502 requires extent 2 but the call site proves 1\n      \u256d\u2500[/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0/Modelica 4.1.0/Media/package.mo:5133:7]\n 5132 \u2502       Temperature T \"Temperature of medium\";\n 5133 \u2502       MassFraction[nX] X(start=reference_X)\n      \u00b7       \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n      \u00b7                \u2570\u2500\u2500 unsupported semantic owner\n 5134 \u2502         \"Mass fractions (= (component mass)/total mass  m_i/m)\";\n      \u2570\u2500\u2500\u2500\u2500\n  help: this construct is rejected before simulation until its checked DAE\n        representation is implemented",
             "time": null
           },
           "metadata": {
@@ -29575,7 +29607,7 @@
             "model": "KnownMSLIssues.MoistAirReduced",
             "source_sha256": "d72c5f16a9c52496c7932e1f85b9892326400c104371b74d937e0cc83e4a90cf",
             "executable": "/data/mrumoca/rumoca/target/debug/rumoca",
-            "executable_sha256": "1c1218b30c8b5e2da7cff5bca7eb7f95a73747c5dcb76ae125073dbdd898dd1a",
+            "executable_sha256": "850f68797ca12730ae2a51022cdcaa3f5f9adde8b10d6cebc278b2ef87ed97a8",
             "source_roots": [
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0"
             ],
@@ -29586,6 +29618,7 @@
             "identity": "backend-only",
             "dependency_digests": "not recorded",
             "modelica_path": "",
+            "parameter_policy": "declared",
             "command": [
               "/data/mrumoca/rumoca/target/debug/rumoca",
               "sim",
@@ -29599,11 +29632,13 @@
               "--dt",
               "0.0025",
               "--output",
-              "/tmp/modelsan-rumoca-source-eijvqu1q/trace-1.csv",
+              "/tmp/modelsan-rumoca-source-aetmdfs1/trace-1.csv",
+              "--diagnostics-json",
+              "/tmp/modelsan-rumoca-source-aetmdfs1/trace-1.diagnostics.json",
               "--source-root",
               "/data/mrumoca/rumoca/target/msl/ModelicaStandardLibrary-4.1.0",
               "--cache-dir",
-              "/data/mrumoca/rumoca/target/modelsan-known-issues/native-cache"
+              "/tmp/modelsan-rumoca-source-aetmdfs1/cache"
             ],
             "returncode": 1
           },
