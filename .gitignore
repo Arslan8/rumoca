@@ -88,3 +88,9 @@ crates/*/proptest-regressions/
 /*.rbc
 /*-sweep.json
 /*-census.json
+
+# Build artifact and run outputs, archived beside the checkout. docs.zip
+# exceeded GitHub's recommended file size on every push; the STATIC_*.jsonl
+# run data is the same class of generated bulk as the evaluation outputs.
+/docs.zip
+/docs/runs/data/
