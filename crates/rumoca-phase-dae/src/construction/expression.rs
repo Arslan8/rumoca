@@ -1243,14 +1243,19 @@ fn lower_builtin_call<'dae>(
     // Integer — the same one the shape proof already read through
     // `evaluate_shape_integer` — so folding it here is what keeps the two
     // agreeing instead of handing the constructor a coordinate it must refuse.
-    let extents_are_declared = matches!(
-        function,
-        BuiltinFunction::Zeros | BuiltinFunction::Ones | BuiltinFunction::Identity
-    );
+    // Only the extent operands are structural (MLS §10.3). A parameter's
+    // declaration binding must retain its dependencies for recalibration.
+    let first_extent = match function {
+        BuiltinFunction::Zeros | BuiltinFunction::Ones | BuiltinFunction::Identity => 0,
+        BuiltinFunction::Fill => 1,
+        BuiltinFunction::Linspace => 2,
+        _ => arguments.len(),
+    };
     let arguments = arguments
         .iter()
-        .map(|argument| {
-            if extents_are_declared
+        .enumerate()
+        .map(|(index, argument)| {
+            if index >= first_extent
                 && !matches!(argument, Expression::Literal { .. })
                 && let Some(extent) = symbols.shapes.proven_extent(argument)
             {

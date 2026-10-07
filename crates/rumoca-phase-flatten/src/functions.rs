@@ -63,6 +63,7 @@ use function_requests::{FunctionIdentitySet, same_function_request};
 pub(crate) use function_requests::{FunctionRequest, FunctionRequests};
 pub(crate) use higher_order::specialize_function_inputs;
 pub(crate) use pure_constants::check_settled_binding_bounds;
+pub(crate) use pure_constants::specialize_frozen_bindings;
 
 use crate::algorithms;
 use crate::ast_lower;

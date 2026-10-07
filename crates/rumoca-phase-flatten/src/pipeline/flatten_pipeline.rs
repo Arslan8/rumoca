@@ -1091,6 +1091,12 @@ pub(crate) fn finalize_flat_model(
     fold_time_invariant_derivatives(flat);
     crate::postprocess::rewrite_array_domain_comprehensions(flat)?;
     resolve_nested_constructor_field_access_bindings(flat);
+    // MLS §4.5 / §12.3: an explicitly frozen artifact may specialize pure
+    // bindings at their immutable inputs. This profile is not enabled by the
+    // default optimization pipeline or by literals at an ordinary call site.
+    if options.specialize_frozen_bindings {
+        functions::specialize_frozen_bindings(flat)?;
+    }
     // Reachability is decided from the call graph as written, before any call
     // is folded to its result. Folding first makes a pure call with settled
     // arguments vanish, and the callee is then pruned as unreachable although
